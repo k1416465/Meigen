@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}ホーム{% endblock %}
+{% block content %}
+<section class="hero-grid">
+  <article class="card clock-card">
+    <div class="card-heading"><img class="heading-icon-image custom-icon" src="{{ url_for('static', filename='icons/clock.png') }}" alt=""><span>現在時刻</span></div>
+    <div class="clock" id="clock">--:--:--</div>
+    <div class="clock-bottom"><span id="clockDate">{{ today }}（{{ weekday_short }}）</span></div>
+  </article>
+  <article class="card weather-card" id="weather">
+    <div class="card-heading"><img class="heading-icon-image custom-icon" src="{{ url_for('static', filename='icons/weather-heading.png') }}" alt=""><span>今日の天気</span><span class="weather-location" id="weatherLocation">{{ weather_label }}</span></div>
+    <div class="weather-main"><div class="weather-symbol" id="weatherSymbol">☀</div><div><div class="weather-temp" id="weatherTemp">--°</div><div class="weather-desc" id="weatherDesc">天気情報を取得しています</div></div></div>
+    <div class="weather-details"><div><span>最高気温</span><strong id="weatherMax">--°</strong></div><div><span>最低気温</span><strong id="weatherMin">--°</strong></div><div><span>降水確率</span><strong id="weatherRain">--%</strong></div></div>
+    
+  </article>
+</section>
+<div class="school-grid">
+  <section class="school-column" id="today-timetable">
+    <div class="section-heading"><div><h2>今日の時間割</h2>{% if class_name %}<p class="class-caption">表示中：{{ class_name }}</p>{% endif %}</div><a class="text-link" href="{{ url_for('timetable') }}">週間時間割 →</a></div>
+    <section class="card timetable-card">
+      <div class="table-top"><strong>{{ weekday }}</strong></div>
+      {% if not class_name %}<a class="class-not-selected" href="{{ url_for('settings') }}">設定から時間割のクラス選択ができます</a>
+      {% elif today_lessons %}<div class="lesson-list">{% for lesson in today_lessons %}<div class="lesson-row"><span class="lesson-number">{{ loop.index }}</span><span class="lesson-name">{{ lesson }}</span></div>{% endfor %}</div>
+      {% else %}<div class="empty-state"><strong>今日は授業がありません</strong></div>{% endif %}
+    </section>
+  </section>
+  <section class="school-column" id="events">
+    <div class="section-heading"><div><h2>今週の予定</h2></div></div>
+    <div class="event-list">
+      {% for event in events %}<article class="card event-card"><div class="event-date"><span class="event-month">{{ event.date[5:7] }}月</span><strong>{{ event.date[8:10] }}</strong></div><div class="event-copy"><strong>{{ event.title }}</strong></div></article>{% endfor %}
+    </div>
+  </section>
+</div>
+<script>
+(function () {
+  const timetableCard = document.querySelector('.timetable-card');
+  const eventList = document.querySelector('.event-list');
+  if (!timetableCard || !eventList) return;
+  function syncEventListHeight() {
+    const height = timetableCard.getBoundingClientRect().height;
+    eventList.style.maxHeight = height + 'px';
+    eventList.style.overflowY = eventList.scrollHeight > height ? 'auto' : 'visible';
+  }
+  window.addEventListener('load', syncEventListHeight);
+  window.addEventListener('resize', syncEventListHeight);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncEventListHeight);
+  syncEventListHeight();
+})();
+</script>
+{% endblock %}

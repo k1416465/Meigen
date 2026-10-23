@@ -1,0 +1,37 @@
+アイコン画像の入れ方
+
+通常のアイコンは、このフォルダー（static/icons）にPNG画像を入れます。
+
+home-top.png          上部のホーム
+home.png              下部メニューのホーム
+timetable.png         時間割
+events.png             今週の予定
+weather.png            下部メニューの天気
+weather-heading.png    「今日の天気」見出し横
+clock.png              「現在時刻」見出し横
+settings.png           設定
+operation.png          上部の運行情報
+appearance.png         外観ボタン
+
+【ライトモードとダークモードでアイコンの色を変える方法】
+
+static/icons の中に light と dark という2つのフォルダーを作ります。
+それぞれのフォルダーに、同じファイル名で色違いのPNG画像を入れてください。
+
+例：
+static/icons/light/home.png    ライトモード用のホームアイコン
+static/icons/dark/home.png     ダークモード用のホームアイコン
+static/icons/light/settings.png
+static/icons/dark/settings.png
+
+ライトモードでは light フォルダー、ダークモードでは dark フォルダーの画像が自動で使われます。
+アイコンごとに色を変えられます。全アイコンで色を変える必要はありません。
+まだテーマ別画像を用意していないアイコンは、static/icons 直下の通常画像が使われます。
+
+画像はPNG形式・正方形がおすすめです。ファイル名はライト用とダーク用で一致させてください。
+
+
+【テーマ切り替えボタンの画像】
+static/icons/theme-dark.png：ライトモード中に表示する画像（押すとダークモードへ）
+static/icons/theme-light.png：ダークモード中に表示する画像（押すとライトモードへ）
+この2つのPNG画像を自分で用意し、同じファイル名で置き換えてください。切り替えボタンの画像は static/icons/light/ と static/icons/dark/ には入れず、static/icons/ 直下に置きます。

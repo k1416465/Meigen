@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}設定{% endblock %}
+{% block content %}
+<section class="welcome-row"><div><h1>設定</h1></div><a class="back-link" href="{{ url_for('home') }}">ホームへ戻る</a></section>
+<form method="post" class="settings-form">
+  <details class="card settings-card setting-accordion">
+    <summary>クラスの選択</summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="クラスの選択">
+      <label class="choice-option"><input type="radio" name="class_name" value="" {% if not class_name %}checked{% endif %}><span>選択しない</span></label>
+      {% for name in class_names %}<label class="choice-option"><input type="radio" name="class_name" value="{{ name }}" {% if name == class_name %}checked{% endif %}><span>{{ name }}</span></label>{% endfor %}
+    </div>
+  </details>
+  <details class="card settings-card setting-accordion">
+    <summary>My路線</summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My路線">
+      {% for key, label in route_options.items() %}<label class="choice-option"><input type="radio" name="my_route" value="{{ key }}" {% if key == my_route %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
+    </div>
+  </details>
+  <details class="card settings-card setting-accordion">
+    <summary>天気</summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="天気">
+      {% for key, label in weather_options.items() %}<label class="choice-option"><input type="radio" name="weather_place" value="{{ key }}" {% if key == weather_place %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
+    </div>
+  </details>
+  <details class="card settings-card setting-accordion">
+    <summary>外観</summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="外観">
+      <label class="choice-option"><input type="radio" name="appearance" value="light" {% if appearance == 'light' %}checked{% endif %}><span>ライトモード</span></label>
+      <label class="choice-option"><input type="radio" name="appearance" value="dark" {% if appearance == 'dark' %}checked{% endif %}><span>ダークモード</span></label>
+      <label class="choice-option"><input type="radio" name="appearance" value="system" {% if appearance == 'system' %}checked{% endif %}><span>デバイスの設定に従う</span></label>
+    </div>
+  </details>
+  <button class="primary-button" type="submit">設定を保存</button>
+</form>
+{% endblock %}
