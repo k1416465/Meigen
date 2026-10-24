@@ -15,7 +15,7 @@ body.dark{--bg:#10121a;--surface:#191c27;--surface-2:#222635;--text:#f2f3f8;--mu
 .school-column .section-heading{margin:0 0 13px;min-height:53px}
 .school-column .section-heading h2{font-size:20px}
 .class-caption{font-size:11px;color:var(--muted);margin:5px 0 0}
-.school-column .timetable-card{height:calc(100% - 66px)}
+.school-column .schedule-card{height:calc(100% - 66px)}
 .school-column .lesson-list{padding:0 16px}
 .school-column .lesson-row{gap:10px;min-height:48px}
 .school-column .lesson-name{font-size:13px}
@@ -35,7 +35,7 @@ body.dark{--bg:#10121a;--surface:#191c27;--surface-2:#222635;--text:#f2f3f8;--mu
 .primary-button{justify-self:start;margin-top:5px;padding:12px 22px;border:0;border-radius:12px;background:var(--purple);color:white;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .primary-button:hover{filter:brightness(1.06)}
 @media(max-width:850px){.school-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}.school-column .section-heading{align-items:flex-start}.school-column .text-link{max-width:90px;line-height:1.5}.event-list .event-card{align-items:flex-start}.status-pill{display:none}}
-@media(max-width:620px){.top-actions{gap:6px}.operation-top-link{padding:0 8px;font-size:11px}.operation-top-icon{font-size:14px}.settings-top-link,.icon-button{width:35px;height:35px;border-radius:10px}.school-grid{grid-template-columns:1fr;gap:26px;margin-top:26px}.school-column .section-heading{margin-bottom:12px;min-height:0}.school-column .timetable-card{height:auto}.event-list{gap:9px}.event-list .event-card{align-items:center}.settings-card{padding:20px}.status-pill{display:none}}
+@media(max-width:620px){.top-actions{gap:6px}.operation-top-link{padding:0 8px;font-size:11px}.operation-top-icon{font-size:14px}.settings-top-link,.icon-button{width:35px;height:35px;border-radius:10px}.school-grid{grid-template-columns:1fr;gap:26px;margin-top:26px}.school-column .section-heading{margin-bottom:12px;min-height:0}.school-column .schedule-card{height:auto}.event-list{gap:9px}.event-list .event-card{align-items:center}.settings-card{padding:20px}.status-pill{display:none}}
 
 /* 画像アイコン差し替え用 */
 .custom-icon{object-fit:contain;display:block}.brand-mark.custom-icon{padding:5px;background:transparent;border-radius:0;width:34px;height:34px}.nav-icon.custom-icon{width:25px;height:25px}.operation-top-icon.custom-icon{width:22px;height:22px}.header-settings-icon{width:22px;height:22px}.settings-top-link{display:grid;place-items:center}

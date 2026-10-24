@@ -57,94 +57,105 @@ function getCurrentTheme() {
   return document.body.classList.contains("dark") ? "dark" : "light";
 }
 
-
 // ==================================================
-// 下部メニューの選択状態
+// 下部メニューの選択状態とアイコン画像
 // ==================================================
 
 function getActiveBottomNavKey() {
+  const path = window.location.pathname;
   const hash = window.location.hash;
 
-  if (hash === "#events") return "events";
-  if (hash === "#weather") return "weather";
-
-  const activeItem = document.querySelector(
-    ".bottom-nav .nav-item.active"
-  );
-
-  if (activeItem) {
-    return activeItem.dataset.navKey || null;
-  }
-
-  const path = window.location.pathname;
-
-  if (path === "/" || path.endsWith("/")) {
+  // ホーム
+  if (path === "/") {
     return "home";
   }
 
-  if (path.includes("timetable")) {
-    return "timetable";
+  // 運行情報・時刻表
+  if (
+    path === "/operation" ||
+    path.startsWith("/operation/")
+  ) {
+    return "operation";
   }
 
-  if (path.includes("settings")) {
-    return "settings";
+  // カレンダー
+  if (
+    path === "/calendar" ||
+    path.startsWith("/calendar/") ||
+    hash === "#events"
+  ) {
+    return "calendar";
+  }
+
+  // 時間割
+  if (
+    path === "/schedule" ||
+    path.startsWith("/schedule/")
+  ) {
+    return "schedule";
+  }
+
+  // その他
+  if (
+    path === "/more" ||
+    path.startsWith("/more/") ||
+    hash === "#weather"
+  ) {
+    return "more";
   }
 
   return null;
 }
 
 
-// ==================================================
-// 下部メニューのアイコン切り替え
-// ==================================================
-
 function updateBottomNavIcons(theme = getCurrentTheme()) {
   const activeKey = getActiveBottomNavKey();
 
+  const fileNames = {
+    home: "home.png",
+    operation: "operation.png",
+    calendar: "calendar.png",
+    schedule: "schedule.png",
+    more: "more.png"
+  };
+
   document.querySelectorAll(".bottom-nav .nav-item").forEach((item) => {
     const img = item.querySelector(".nav-icon");
-
     if (!img) return;
 
-    // HTMLに記載された通常画像のパスを保存
-    if (!img.dataset.originalSrc) {
-      img.dataset.originalSrc = img.getAttribute("src") || "";
-    }
-
-    const originalPath = img.dataset.originalSrc;
-    const fileName = originalPath.split("/").pop();
+    const key = item.dataset.navKey;
+    const fileName = fileNames[key];
 
     if (!fileName) return;
 
-    const isActive = item.dataset.navKey === activeKey;
+    const isActive = key === activeKey;
 
-    // home.png → home-blue.png
-    const blueFileName = fileName.replace(
-      /\.png$/i,
-      "-blue.png"
-    );
-
-    // 選択中：テーマ共通の青い画像
-    // 通常時：テーマ別フォルダの画像
-    const targetPath = isActive
-      ? `/static/icons/${blueFileName}`
+    // 選択中は active、それ以外はライト・ダーク別の画像
+    const imagePath = isActive
+      ? `/static/icons/active/${fileName}`
       : `/static/icons/${theme}/${fileName}`;
 
-    img.onerror = function () {
-      img.onerror = null;
+    // 同じ画像への再設定を避ける
+    if (img.dataset.currentIconPath !== imagePath) {
+      img.dataset.currentIconPath = imagePath;
 
-      if (isActive) {
-        // 青い画像が見つからない場合は通常画像に戻す
-        img.src = `/static/icons/${theme}/${fileName}`;
-      } else {
-        // テーマ別画像がない場合は共通画像を使う
-        img.src = originalPath;
-      }
-    };
+      img.onerror = function () {
+        console.error("下部メニューのアイコンを読み込めません:", imagePath);
+        img.onerror = null;
 
-    img.src = targetPath;
+        // 選択中の画像がない場合は、現在のテーマ用画像を試す
+        if (isActive) {
+          const fallbackPath = `/static/icons/${theme}/${fileName}`;
+          img.dataset.currentIconPath = fallbackPath;
+          img.src = fallbackPath;
+        }
+      };
 
-    // 選択状態をアクセシビリティ属性にも反映
+      img.src = imagePath;
+    }
+
+    item.classList.toggle("active", isActive);
+
     if (isActive) {
       item.setAttribute("aria-current", "page");
     } else {
@@ -152,7 +163,6 @@ function updateBottomNavIcons(theme = getCurrentTheme()) {
     }
   });
 }
-
 
 // ==================================================
 // 通常アイコンをライト・ダーク別の画像に切り替える

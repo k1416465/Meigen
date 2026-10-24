@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% block title %}ホーム{% endblock %}
 {% block content %}
@@ -65,18 +64,17 @@
 </section>
 
 <div class="school-grid">
-  <section class="school-column" id="today-timetable">
+  <section class="school-column" id="today-schedule">
     <div class="section-heading">
       <div>
-        <h2>今日の時間割</h2>
+        <h2><a href="{{ url_for('schedule') }}" style="color: inherit; text-decoration: none;">今日の時間割</a></h2>
         {% if class_name %}
           <p class="class-caption">表示中：{{ class_name }}</p>
         {% endif %}
       </div>
-      <a class="text-link" href="{{ url_for('timetable') }}">週間時間割 →</a>
     </div>
 
-    <section class="card timetable-card">
+    <section class="card schedule-card">
       <div class="table-top">
         <strong>{{ weekday }}</strong>
       </div>
@@ -108,14 +106,17 @@
   <section class="school-column" id="events">
     <div class="section-heading">
       <div>
-        <h2>今週の予定</h2>
+        <h2><a href="{{ url_for('calendar_page') }}" style="color: inherit; text-decoration: none;">今週の予定</a></h2>
       </div>
     </div>
 
-    <div class="event-list">
+    <div class="event-list" style="display: flex; flex-direction: column; min-height: 0; box-sizing: border-box; overscroll-behavior: contain;">
       {% for event in events %}
-        <article class="card event-card">
-          <div class="event-date">
+        <article class="card event-card event-card-{{ event.kind|default('school') }}" style="flex: 0 0 auto;">
+          <div
+            class="event-date"
+            style="background-color: {% if event.kind|default('school') == 'holiday' %}#FDECEC{% elif event.kind|default('school') == 'personal' %}{{ {'blue': '#E8F2FC', 'red': '#FDECEC', 'orange': '#FFF0E2', 'yellow': '#FFF8D6', 'green': '#E8F5EA', 'purple': '#F2E8FA', 'pink': '#FCE8F1'}.get(event.color|default('blue'), '#E8F2FC') }}{% else %}#E8F2FC{% endif %}; color: {{ event.text_color|default('#0563B5') }};"
+          >
             <span class="event-month">{{ event.date[5:7] }}月</span>
             <strong>{{ event.date[8:10] }}</strong>
           </div>
@@ -124,26 +125,45 @@
           </div>
         </article>
       {% endfor %}
+
+      {% if not events %}
+        <div class="card empty-state">
+          <strong>今週の予定はありません</strong>
+        </div>
+      {% endif %}
     </div>
   </section>
 </div>
 
 <script>
 (function () {
-  const timetableCard = document.querySelector('.timetable-card');
+  const scheduleCard = document.querySelector('.schedule-card');
   const eventList = document.querySelector('.event-list');
 
-  if (!timetableCard || !eventList) return;
+  if (!scheduleCard || !eventList) return;
 
   function syncEventListHeight() {
-    const height = timetableCard.getBoundingClientRect().height;
+    // 今週の予定欄だけを、時間割カードと同じ高さに制限する。
+    // 予定が収まらない場合は、この一覧の中だけでスクロールさせる。
+    const height = Math.round(scheduleCard.getBoundingClientRect().height);
+    if (!height) return;
+
     eventList.style.maxHeight = height + 'px';
+    eventList.style.minHeight = '0';
+    eventList.style.boxSizing = 'border-box';
+    eventList.style.overscrollBehavior = 'contain';
     eventList.style.overflowY =
       eventList.scrollHeight > height ? 'auto' : 'visible';
   }
 
   window.addEventListener('load', syncEventListHeight);
   window.addEventListener('resize', syncEventListHeight);
+
+  // 時間割カードの高さが変わった場合（画面幅・文字サイズ変更など）も追従する。
+  if ('ResizeObserver' in window) {
+    const observer = new ResizeObserver(syncEventListHeight);
+    observer.observe(scheduleCard);
+  }
 
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(syncEventListHeight);

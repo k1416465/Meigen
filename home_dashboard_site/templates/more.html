@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}その他{% endblock %}
+
+{% block content %}
+<section class="welcome-row">
+  <div>
+    <h1>その他</h1>
+  </div>
+</section>
+
+
+<!-- ==================================
+     5つのツール
+================================== -->
+
+<section class="more-tools-section">
+
+  <div class="more-tools-grid">
+
+    <!-- 名簿 -->
+    <a
+      class="card more-tool-card"
+      href="{{ url_for('roster_page') }}"
+    >
+      <img
+        class="more-tool-icon custom-icon"
+        src="{{ url_for('static', filename='icons/dark/roster.png') }}"
+        alt=""
+      >
+      <strong>名簿</strong>
+      <span class="more-tool-description">
+        2学年の名簿
+      </span>
+    </a>
+
+
+    <!-- 録音 -->
+    <a
+      class="card more-tool-card"
+      href="{{ url_for('recording_page') }}"
+    >
+      <img
+        class="more-tool-icon custom-icon"
+        src="{{ url_for('static', filename='icons/dark/recording.png') }}"
+        alt=""
+      >
+      <strong>録音</strong>
+      <span class="more-tool-description">
+        迷言の録音
+      </span>
+    </a>
+
+
+    <!-- スタンプ -->
+    <a
+      class="card more-tool-card"
+      href="{{ url_for('stamp_page') }}"
+    >
+      <img
+        class="more-tool-icon custom-icon"
+        src="{{ url_for('static', filename='icons/dark/stamp.png') }}"
+        alt=""
+      >
+      <strong>スタンプ</strong>
+      <span class="more-tool-description">
+        迷言集スタンプ
+      </span>
+    </a>
+
+
+    <!-- 動画 -->
+    <a
+      class="card more-tool-card"
+      href="{{ url_for('video_page') }}"
+    >
+      <img
+        class="more-tool-icon custom-icon"
+        src="{{ url_for('static', filename='icons/dark/video.png') }}"
+        alt=""
+      >
+      <strong>動画</strong>
+      <span class="more-tool-description">
+        迷言公式YouTube
+      </span>
+    </a>
+
+
+    <!-- 電卓 -->
+    <a
+      class="card more-tool-card"
+      href="{{ url_for('calculator_page') }}"
+    >
+      <img
+        class="more-tool-icon custom-icon"
+        src="{{ url_for('static', filename='icons/dark/calculator.png') }}"
+        alt=""
+      >
+      <strong>電卓</strong>
+      <span class="more-tool-description">
+        電卓・単位変換
+      </span>
+    </a>
+
+  </div>
+</section>
+
+{% endblock %}

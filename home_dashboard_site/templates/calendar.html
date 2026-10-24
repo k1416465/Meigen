@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+{% block title %}カレンダー{% endblock %}
+
+{% block content %}
+<section class="welcome-row calendar-heading">
+  <div>
+    <h1>カレンダー</h1>
+  </div>
+  <button type="button" class="calendar-add-toggle" id="calendarAddToggle" aria-expanded="false" aria-controls="calendarAddForm">＋ 予定を追加</button>
+</section>
+
+<style>
+  .calendar-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .calendar-add-card:has(.calendar-add-form[hidden]) { display:none; }
+  .calendar-add-toggle, .calendar-primary-button {
+    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+    border:0; border-radius:10px; padding:10px 16px; background:#077AE3;
+    color:#fff; font:inherit; cursor:pointer;
+  }
+  .calendar-add-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:16px; }
+  .calendar-add-form[hidden] { display:none; }
+  .calendar-add-form label, .calendar-edit-form label { display:flex; flex-direction:column; gap:6px; font-size:.9rem; }
+  .calendar-add-form input[type="date"], .calendar-add-form input[type="text"],
+  .calendar-add-form textarea, .calendar-edit-form input[type="date"],
+  .calendar-edit-form input[type="text"], .calendar-edit-form textarea {
+    width:100%; min-width:0; padding:10px 12px; border:1px solid var(--border-color,#d7dce2);
+    border-radius:8px; background:var(--card-bg,transparent); color:inherit; font:inherit;
+  }
+  .calendar-add-form .wide, .calendar-edit-form .wide { grid-column:1 / -1; }
+  .calendar-add-form button[type="submit"], .calendar-edit-form button[type="submit"] {
+    justify-self:start; border:0; border-radius:9px; padding:10px 14px; background:#077AE3; color:white; cursor:pointer; font:inherit;
+  }
+  .calendar-color-options { display:flex; flex-wrap:wrap; gap:9px; margin-top:4px; }
+  .calendar-color-option { position:relative; display:inline-flex !important; flex-direction:row !important; align-items:center; gap:6px !important; cursor:pointer; }
+  .calendar-color-option input { position:absolute; opacity:0; width:1px; height:1px; }
+  .calendar-color-swatch { width:23px; height:23px; border-radius:50%; background:var(--swatch); border:2px solid transparent; box-shadow:0 0 0 1px #999; display:inline-block; }
+  .calendar-color-option input:checked + .calendar-color-swatch { outline:3px solid var(--swatch); outline-offset:3px; }
+  .calendar-color-option input:focus-visible + .calendar-color-swatch { outline:3px solid currentColor; outline-offset:4px; }
+  .calendar-day-number.holiday-date { color:#d73545 !important; }
+  .calendar-day-number { border:0; background:transparent; color:inherit; font:inherit; font-weight:700; cursor:pointer; padding:2px 5px; border-radius:5px; }
+  .calendar-day-number:hover, .calendar-day-number:focus-visible { background:rgba(7,122,227,.12); outline:2px solid #077AE3; }
+  .calendar-event { display:block; padding:3px 5px; margin-top:3px; border-radius:4px; font-size:.82em; font-weight:600; overflow-wrap:anywhere; }
+  .calendar-event.school { background:rgba(7,122,227,.13); color:#077AE3; }
+  .calendar-event.holiday { background:rgba(220,53,69,.12); color:#d73545; }
+  .calendar-event.personal {
+    border-left:3px solid var(--personal-event-color,#077AE3);
+    background:color-mix(in srgb,var(--personal-event-color,#077AE3) 15%,transparent);
+    color:var(--personal-event-text-color,#0563B5);
+    cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:pan-y;
+  }
+  .calendar-event-title { font-weight:700; color:inherit; }
+  .calendar-event-detail { display:none; margin-top:2px; font-size:.8em; white-space:pre-wrap; font-weight:400; color:inherit; }
+  /* カレンダー上では各日の予定を2件まで表示し、残りは日付モーダルに表示 */
+  .calendar-day > .calendar-event:nth-of-type(n+3) { display:none; }
+  .calendar-more-events { margin-top:3px; font-size:.75em; opacity:.8; text-align:center; }
+  .calendar-event-delete-form { display:none; }
+  .calendar-event.personal:focus-visible { outline:2px solid #077AE3; outline-offset:2px; }
+  .calendar-modal-backdrop { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.48); }
+  .calendar-modal-backdrop[hidden] { display:none; }
+  .calendar-modal { width:min(520px,100%); max-height:min(85vh,760px); overflow:auto; padding:20px; border-radius:14px; background:var(--card-bg,#fff); color:var(--text-color,inherit); box-shadow:0 12px 40px rgba(0,0,0,.25); }
+  .calendar-modal h2 { margin:0 36px 14px 0; font-size:1.2rem; }
+  .calendar-modal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .calendar-modal-close { border:0; border-radius:8px; padding:5px 10px; font:inherit; cursor:pointer; background:rgba(127,127,127,.15); color:inherit; }
+  .calendar-modal-event { padding:10px 11px; margin-top:9px; border-radius:8px; background:rgba(127,127,127,.08); overflow-wrap:anywhere; }
+  .calendar-modal-event.school { border-left:4px solid #077AE3; }
+  .calendar-modal-event.holiday { border-left:4px solid #d73545; }
+  .calendar-modal-event.personal { border-left:4px solid var(--personal-event-color,#077AE3); }
+  .calendar-modal-event-title { font-weight:700; }
+  .calendar-modal-event-detail { white-space:pre-wrap; margin-top:4px; font-size:.9em; }
+  .calendar-modal-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; }
+  .calendar-secondary-button, .calendar-danger-button { border:0; border-radius:9px; padding:9px 13px; font:inherit; cursor:pointer; }
+  .calendar-secondary-button { background:rgba(127,127,127,.16); color:inherit; }
+  .calendar-danger-button { background:#c62828; color:#fff; }
+  .calendar-edit-form { display:grid; grid-template-columns:1fr; gap:12px; }
+  .calendar-edit-form[hidden] { display:none; }
+  .calendar-modal-help { font-size:.88rem; opacity:.8; margin:0 0 12px; }
+  @media (max-width:600px) {
+    .calendar-heading { align-items:flex-start; }
+    .calendar-add-toggle { padding:9px 11px; font-size:.9rem; }
+    .calendar-add-form { grid-template-columns:1fr; }
+    .calendar-add-form .wide { grid-column:auto; }
+    .calendar-modal { padding:16px; }
+  }
+</style>
+
+<section class="card calendar-card calendar-add-card">
+  <form class="calendar-add-form" id="calendarAddForm" method="post" action="{{ url_for('calendar_page') }}" hidden>
+    <input type="hidden" name="action" value="add">
+    <label>日付
+      <input type="date" name="event_date" value="{{ today.isoformat() }}" required>
+    </label>
+    <label>予定名
+      <input type="text" name="title" maxlength="80" placeholder="例：友達と出かける" required>
+    </label>
+    <div class="wide">
+      <div style="font-size:.9rem; margin-bottom:6px;">予定の色</div>
+      <div class="calendar-color-options">
+        {% for color_name, color_value in personal_event_colors.items() %}
+          <label class="calendar-color-option" title="{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}">
+            <input type="radio" name="color" value="{{ color_name }}"{% if color_name == 'blue' %} checked{% endif %} aria-label="{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}">
+            <span class="calendar-color-swatch" style="--swatch:{{ color_value }};"></span>
+            <span>{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+    <label class="wide">詳細（任意）
+      <textarea name="detail" rows="2" maxlength="300" placeholder="時間や場所など"></textarea>
+    </label>
+    <input type="hidden" name="return_date" value="{{ year }}-{{ '%02d'|format(month) }}-01">
+    <button type="submit">予定を保存</button>
+  </form>
+</section>
+
+<section class="card calendar-card">
+  <div class="calendar-navigation">
+    <a href="{{ url_for('calendar_page', year=previous_year, month=previous_month) }}">‹ 前月</a>
+    <h2>{{ year }}年{{ month }}月</h2>
+    <a href="{{ url_for('calendar_page', year=next_year, month=next_month) }}">翌月 ›</a>
+  </div>
+
+  <div class="calendar-grid">
+    {% for weekday in ["日", "月", "火", "水", "木", "金", "土"] %}
+      <div class="calendar-weekday">{{ weekday }}</div>
+    {% endfor %}
+    {% for week in weeks %}
+      {% for day in week %}
+        <div class="calendar-day{% if not day.in_month %} outside-month{% endif %}{% if day.date == today %} today{% endif %}">
+          <button type="button" class="calendar-day-number{% if day.is_holiday %} holiday-date{% endif %}"
+            data-open-day="{{ day.date.isoformat() }}" aria-label="{{ day.date.year }}年{{ day.date.month }}月{{ day.date.day }}日の予定を表示">
+            {{ day.date.day }}
+          </button>
+          {% for event in day.events %}
+            {% set event_color = personal_event_colors.get(event.color, '#077AE3') if event.kind == 'personal' else '#077AE3' %}
+            {% set event_text_color = personal_event_text_colors.get(event.color, '#0563B5') if event.kind == 'personal' else '' %}
+            <div class="calendar-event {{ event.kind }}"
+              {% if event.kind == 'personal' %}
+                style="--personal-event-color:{{ event_color }};--personal-event-text-color:{{ event_text_color }};"
+                role="button" tabindex="0" data-personal-event
+                data-event-id="{{ event.id }}" data-event-date="{{ event.date }}"
+                data-event-title="{{ event.title }}" data-event-detail="{{ event.detail }}"
+                data-event-color="{{ event.color }}"
+                aria-label="{{ event.title }}。タップまたは長押しで編集・削除"
+                title="タップまたは長押しで編集・削除"
+              {% endif %}>
+              <div class="calendar-event-title">{{ event.title }}</div>
+              {% if event.detail %}<div class="calendar-event-detail">{{ event.detail }}</div>{% endif %}
+            </div>
+          {% endfor %}
+          {% if day.events|length > 2 %}
+            <div class="calendar-more-events">ほか {{ day.events|length - 2 }} 件</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+  <p class="calendar-modal-help">日付を押すと、その日の予定をすべて表示します。自分の予定はタップまたは長押しで編集・削除できます。</p>
+</section>
+
+<div class="calendar-modal-backdrop" id="calendarDayBackdrop" hidden>
+  <section class="calendar-modal" role="dialog" aria-modal="true" aria-labelledby="calendarDayTitle">
+    <div class="calendar-modal-header">
+      <h2 id="calendarDayTitle">この日の予定</h2>
+      <button type="button" class="calendar-modal-close" data-close-modal>閉じる</button>
+    </div>
+    <div id="calendarDayEvents"></div>
+    <div class="calendar-modal-actions">
+      <button type="button" class="calendar-primary-button" id="addEventForDay">＋ この日に予定を追加</button>
+    </div>
+  </section>
+</div>
+
+<div class="calendar-modal-backdrop" id="calendarActionBackdrop" hidden>
+  <section class="calendar-modal" role="dialog" aria-modal="true" aria-labelledby="calendarActionTitle">
+    <div class="calendar-modal-header">
+      <h2 id="calendarActionTitle">予定の操作</h2>
+      <button type="button" class="calendar-modal-close" data-close-modal>閉じる</button>
+    </div>
+    <p id="calendarActionSummary"></p>
+    <div class="calendar-modal-actions">
+      <button type="button" class="calendar-primary-button" id="editEventButton">編集</button>
+      <button type="button" class="calendar-danger-button" id="deleteEventButton">削除</button>
+      <button type="button" class="calendar-secondary-button" data-close-modal>キャンセル</button>
+    </div>
+  </section>
+</div>
+
+<div class="calendar-modal-backdrop" id="calendarEditBackdrop" hidden>
+  <section class="calendar-modal" role="dialog" aria-modal="true" aria-labelledby="calendarEditTitle">
+    <div class="calendar-modal-header">
+      <h2 id="calendarEditTitle">予定を編集</h2>
+      <button type="button" class="calendar-modal-close" data-close-modal>閉じる</button>
+    </div>
+    <form class="calendar-edit-form" id="calendarEditForm" method="post" action="{{ url_for('calendar_page', year=year, month=month) }}">
+      <input type="hidden" name="action" value="edit">
+      <input type="hidden" name="event_id" id="editEventId">
+      <label>日付
+        <input type="date" name="event_date" id="editEventDate" required>
+      </label>
+      <label>予定名
+        <input type="text" name="title" id="editEventTitle" maxlength="80" required>
+      </label>
+      <div>
+        <div style="font-size:.9rem; margin-bottom:6px;">予定の色</div>
+        <div class="calendar-color-options">
+          {% for color_name, color_value in personal_event_colors.items() %}
+            <label class="calendar-color-option" title="{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}">
+              <input type="radio" name="color" value="{{ color_name }}"{% if color_name == 'blue' %} checked{% endif %} required aria-label="{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}">
+              <span class="calendar-color-swatch" style="--swatch:{{ color_value }};"></span>
+              <span>{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+      <label>詳細（任意）
+        <textarea name="detail" id="editEventDetail" rows="3" maxlength="300"></textarea>
+      </label>
+      <input type="hidden" name="return_date" id="editReturnDate" value="{{ year }}-{{ '%02d'|format(month) }}-01">
+      <button type="submit">変更を保存</button>
+    </form>
+  </section>
+</div>
+
+<form id="calendarDeleteForm" method="post" action="{{ url_for('calendar_page', year=year, month=month) }}" hidden>
+  <input type="hidden" name="action" value="delete">
+  <input type="hidden" name="event_id" id="deleteEventId">
+  <input type="hidden" name="return_date" id="deleteReturnDate" value="{{ year }}-{{ '%02d'|format(month) }}-01">
+</form>
+
+<script>
+(() => {
+  const addToggle = document.getElementById('calendarAddToggle');
+  const addForm = document.getElementById('calendarAddForm');
+  const dayBackdrop = document.getElementById('calendarDayBackdrop');
+  const actionBackdrop = document.getElementById('calendarActionBackdrop');
+  const editBackdrop = document.getElementById('calendarEditBackdrop');
+  const dayEvents = document.getElementById('calendarDayEvents');
+  let selectedDay = '{{ today.isoformat() }}';
+  let selectedEvent = null;
+  let pressTimer = null;
+  let longPressHandled = false;
+
+  if (addToggle && addForm) {
+    addToggle.addEventListener('click', () => {
+      const willOpen = addForm.hidden;
+      addForm.hidden = !willOpen;
+      addToggle.setAttribute('aria-expanded', String(willOpen));
+      addToggle.textContent = willOpen ? '－ 入力を閉じる' : '＋ 予定を追加';
+      if (willOpen) addForm.querySelector('input[name="title"]')?.focus();
+    });
+  }
+
+  const closeModals = () => {
+    [dayBackdrop, actionBackdrop, editBackdrop].forEach(el => { el.hidden = true; });
+  };
+  document.querySelectorAll('[data-close-modal]').forEach(button => {
+    button.addEventListener('click', closeModals);
+  });
+  [dayBackdrop, actionBackdrop, editBackdrop].forEach(backdrop => {
+    backdrop.addEventListener('click', event => {
+      if (event.target === backdrop) closeModals();
+    });
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeModals();
+  });
+
+  const safeText = value => String(value ?? '');
+  function openDay(date) {
+    selectedDay = date;
+    const dayButton = document.querySelector(`[data-open-day="${date}"]`);
+    const dayCell = dayButton?.closest('.calendar-day');
+    document.getElementById('calendarDayTitle').textContent = `${date.replaceAll('-', '/')} の予定`;
+    dayEvents.replaceChildren();
+    const events = dayCell ? Array.from(dayCell.querySelectorAll('.calendar-event')) : [];
+    if (!events.length) {
+      const empty = document.createElement('p');
+      empty.textContent = 'この日の予定はありません。';
+      dayEvents.appendChild(empty);
+    }
+    events.forEach(eventEl => {
+      const item = document.createElement('div');
+      item.className = `calendar-modal-event ${eventEl.classList.contains('personal') ? 'personal' : eventEl.classList.contains('holiday') ? 'holiday' : 'school'}`;
+      if (eventEl.classList.contains('personal')) {
+        item.style.setProperty('--personal-event-color', eventEl.style.getPropertyValue('--personal-event-color'));
+      }
+      const title = document.createElement('div');
+      title.className = 'calendar-modal-event-title';
+      title.textContent = eventEl.querySelector('.calendar-event-title')?.textContent || '';
+      item.appendChild(title);
+      const detailText = eventEl.querySelector('.calendar-event-detail')?.textContent || '';
+      if (detailText) {
+        const detail = document.createElement('div');
+        detail.className = 'calendar-modal-event-detail';
+        detail.textContent = detailText;
+        item.appendChild(detail);
+      }
+      if (eventEl.hasAttribute('data-personal-event')) {
+        const actions = document.createElement('div');
+        actions.className = 'calendar-modal-actions';
+        const manage = document.createElement('button');
+        manage.type = 'button';
+        manage.className = 'calendar-secondary-button';
+        manage.textContent = '編集・削除';
+        manage.addEventListener('click', () => {
+          selectedEvent = eventEl;
+          openActions();
+        });
+        actions.appendChild(manage);
+        item.appendChild(actions);
+      }
+      dayEvents.appendChild(item);
+    });
+    dayBackdrop.hidden = false;
+  }
+
+  document.querySelectorAll('[data-open-day]').forEach(button => {
+    button.addEventListener('click', () => openDay(button.dataset.openDay));
+  });
+
+  document.getElementById('addEventForDay').addEventListener('click', () => {
+    closeModals();
+    addForm.querySelector('input[name="event_date"]').value = selectedDay;
+    if (addForm.hidden) {
+      addForm.hidden = false;
+      addToggle.setAttribute('aria-expanded', 'true');
+      addToggle.textContent = '－ 入力を閉じる';
+    }
+    addForm.querySelector('input[name="title"]')?.focus();
+  });
+
+  function openActions() {
+    if (!selectedEvent) return;
+    document.getElementById('calendarActionSummary').textContent =
+      `${selectedEvent.dataset.eventDate}：${selectedEvent.dataset.eventTitle}`;
+    dayBackdrop.hidden = true;
+    actionBackdrop.hidden = false;
+  }
+
+  function openEdit() {
+    if (!selectedEvent) return;
+    document.getElementById('editEventId').value = selectedEvent.dataset.eventId;
+    document.getElementById('editEventDate').value = selectedEvent.dataset.eventDate;
+    document.getElementById('editEventTitle').value = selectedEvent.dataset.eventTitle || '';
+    document.getElementById('editEventDetail').value = selectedEvent.dataset.eventDetail || '';
+    document.getElementById('editReturnDate').value = selectedEvent.dataset.eventDate;
+    const color = selectedEvent.dataset.eventColor || 'blue';
+    const radio = document.querySelector(`#calendarEditForm input[name="color"][value="${color}"]`);
+    if (radio) radio.checked = true;
+    actionBackdrop.hidden = true;
+    editBackdrop.hidden = false;
+    document.getElementById('editEventTitle').focus();
+  }
+
+  document.getElementById('editEventButton').addEventListener('click', openEdit);
+  document.getElementById('deleteEventButton').addEventListener('click', () => {
+    if (!selectedEvent) return;
+    if (window.confirm(`「${selectedEvent.dataset.eventTitle}」を削除しますか？`)) {
+      document.getElementById('deleteEventId').value = selectedEvent.dataset.eventId;
+      document.getElementById('deleteReturnDate').value = selectedEvent.dataset.eventDate;
+      document.getElementById('calendarDeleteForm').submit();
+    }
+  });
+
+  document.querySelectorAll('[data-personal-event]').forEach(eventEl => {
+    const beginPress = () => {
+      longPressHandled = false;
+      clearTimeout(pressTimer);
+      pressTimer = setTimeout(() => {
+        longPressHandled = true;
+        selectedEvent = eventEl;
+        openActions();
+      }, 650);
+    };
+    const cancelPress = () => {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    };
+    eventEl.addEventListener('pointerdown', beginPress);
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(name => eventEl.addEventListener(name, cancelPress));
+    eventEl.addEventListener('click', event => {
+      if (longPressHandled) {
+        longPressHandled = false;
+        event.preventDefault();
+        return;
+      }
+      selectedEvent = eventEl;
+      openActions();
+    });
+    eventEl.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        selectedEvent = eventEl;
+        openActions();
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

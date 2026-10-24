@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f7fb">
-  <title>{% block title %}ホーム{% endblock %}</title>
+  <title>{% block title %}迷言{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -12,7 +12,6 @@
   data-weather-place="{{ weather_place|default('sano') }}"
   data-appearance="{{ appearance|default('system') }}"
 >
-  <!-- 上部メニュー -->
   <header class="topbar">
     <a class="brand" href="{{ url_for('home') }}">
       <img
@@ -20,18 +19,15 @@
         src="{{ url_for('static', filename='icons/home-top.png') }}"
         alt=""
       >
-      <span>ホーム</span>
+      <span>迷言</span>
     </a>
 
     <div class="top-actions">
-      <!-- 運行情報 -->
       <a
         class="operation-top-link"
         id="operationTopLink"
-        href="https://transit.yahoo.co.jp/diainfo/area/4"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="運行情報（Yahoo!路線情報）"
+        href="{{ url_for('operation_page') }}"
+        aria-label="運行情報"
       >
         <img
           class="operation-top-icon custom-icon"
@@ -46,7 +42,6 @@
         </span>
       </a>
 
-      <!-- 設定 -->
       <a
         class="settings-top-link"
         href="{{ url_for('settings') }}"
@@ -60,7 +55,6 @@
         >
       </a>
 
-      <!-- ライト・ダーク切り替え -->
       <button
         class="icon-button"
         id="themeToggle"
@@ -77,87 +71,57 @@
     </div>
   </header>
 
-  <!-- ページ本文 -->
   <main class="page">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- 下部メニュー -->
   <nav class="bottom-nav" aria-label="メインメニュー">
-
-    <!-- ホーム -->
     <a
-      class="nav-item {% if request.endpoint == 'home' %}active{% endif %}"
+      class="nav-item"
       data-nav-key="home"
       href="{{ url_for('home') }}"
     >
-      <img
-        class="nav-icon custom-icon"
-        src="{{ url_for('static', filename='icons/home.png') }}"
-        alt=""
-      >
+      <img class="nav-icon custom-icon" src="" alt="">
       <span>ホーム</span>
     </a>
 
-    <!-- 時間割 -->
     <a
-      class="nav-item {% if request.endpoint == 'timetable' %}active{% endif %}"
-      data-nav-key="timetable"
-      href="{{ url_for('timetable') }}"
+      class="nav-item"
+      data-nav-key="operation"
+      href="{{ url_for('operation_page') }}"
     >
-      <img
-        class="nav-icon custom-icon"
-        src="{{ url_for('static', filename='icons/timetable.png') }}"
-        alt=""
-      >
+      <img class="nav-icon custom-icon" src="" alt="">
+      <span>時刻表</span>
+    </a>
+
+    <a
+      class="nav-item"
+      data-nav-key="calendar"
+      href="{{ url_for('calendar_page') }}"
+    >
+      <img class="nav-icon custom-icon" src="" alt="">
+      <span>カレンダー</span>
+    </a>
+
+    <a
+      class="nav-item"
+      data-nav-key="schedule"
+      href="{{ url_for('schedule') }}"
+    >
+      <img class="nav-icon custom-icon" src="" alt="">
       <span>時間割</span>
     </a>
 
-    <!-- 行事 -->
     <a
       class="nav-item"
-      data-nav-key="events"
-      href="{{ url_for('home') }}#events"
+      data-nav-key="more"
+      href="{{ url_for('more_page') }}"
     >
-      <img
-        class="nav-icon custom-icon"
-        src="{{ url_for('static', filename='icons/events.png') }}"
-        alt=""
-      >
-      <span>行事</span>
+      <img class="nav-icon custom-icon" src="" alt="">
+      <span>その他</span>
     </a>
-
-    <!-- 天気 -->
-    <a
-      class="nav-item"
-      data-nav-key="weather"
-      href="{{ url_for('home') }}#weather"
-    >
-      <img
-        class="nav-icon custom-icon"
-        src="{{ url_for('static', filename='icons/weather.png') }}"
-        alt=""
-      >
-      <span>天気</span>
-    </a>
-
-    <!-- 設定 -->
-    <a
-      class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}"
-      data-nav-key="settings"
-      href="{{ url_for('settings') }}"
-    >
-      <img
-        class="nav-icon custom-icon"
-        src="{{ url_for('static', filename='icons/settings.png') }}"
-        alt=""
-      >
-      <span>設定</span>
-    </a>
-
   </nav>
 
-  <!-- JavaScript -->
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tool_name }}{% endblock %}
+
+{% block content %}
+<section class="welcome-row">
+  <div>
+    <h1>{{ tool_name }}</h1>
+    <p>{{ description }}</p>
+  </div>
+</section>
+
+<div class="card tool-placeholder">
+  <p>このページは準備中です。</p>
+  <p>今後、このページに専用の機能を追加します。</p>
+
+  <a class="tool-back-link" href="{{ url_for('more_page') }}">
+    ← その他に戻る
+  </a>
+</div>
+{% endblock %}

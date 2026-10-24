@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container operation-page">
+
+    <header class="page-header">
+        <h1>時刻表</h1>
+    </header>
+
+    <!-- 駅選択 -->
+    <section class="station-selector">
+        <div class="station-grid station-grid-large">
+            <a class="station-button station-tochigi" href="/station/oyama">
+                <span class="station-name">小山駅</span>
+                <span class="station-name-en">Oyama</span>
+            </a>
+            <a class="station-button station-tochigi" href="/station/tochigi">
+                <span class="station-name">栃木駅</span>
+                <span class="station-name-en">Tochigi</span>
+            </a>
+            <a class="station-button station-sano" href="/station/sano">
+                <span class="station-name">佐野駅</span>
+                <span class="station-name-en">Sano</span>
+            </a>
+            <a class="station-button station-ashikaga" href="/station/ashikaga">
+                <span class="station-name">足利駅</span>
+                <span class="station-name-en">Ashikaga</span>
+            </a>
+        </div>
+
+        <div class="station-grid station-grid-small">
+            <a class="station-button" href="/station/omoigawa">思川駅</a>
+            <a class="station-button" href="/station/ohirashita">大平下駅</a>
+            <a class="station-button" href="/station/iwafune">岩舟駅</a>
+            <a class="station-button" href="/station/tomita">富田駅</a>
+            <a class="station-button" href="/station/ashikaga_flower_park">あしかがフラワーパーク駅</a>
+            <a class="station-button" href="/station/yamamae">山前駅</a>
+            <a class="station-button" href="/station/omata">小俣駅</a>
+        </div>
+    </section>
+
+    <!-- 運行情報 -->
+    <section class="operation-alert-section">
+        <div class="operation-section-heading">
+            <div>
+                <h2>運行情報</h2>
+            </div>
+        </div>
+
+        {% if operation_alerts %}
+        <div class="operation-alert-list">
+            {% for alert in operation_alerts %}
+            <article class="card operation-alert-card">
+                <div class="operation-alert-icon">
+                    <img
+                        src="{{ url_for('static', filename='icons/operation/' ~ alert.icon) }}"
+                        alt="{{ alert.status }}"
+                        loading="lazy"
+                    >
+                </div>
+
+                <div class="operation-alert-content">
+                <div class="operation-alert-heading">
+                    <h3 class="operation-alert-route">{{ alert.route }}</h3>
+                    <p class="operation-alert-status">{{ alert.status }}</p>
+
+                    {% if alert.updated_at %}
+                    <p class="operation-alert-updated">
+                         更新時刻：{{ alert.updated_at }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                    {% if alert.detail %}
+                    <p class="operation-alert-detail">{{ alert.detail }}</p>
+                    {% endif %}
+
+                </div>
+
+                
+                {% if alert.source_url %}
+                <a
+                    class="route-settings-button operation-alert-source"
+                    href="{{ alert.source_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="{{ alert.route }}の詳細情報を開く"
+                    title="詳細情報を開く"
+                >
+                    詳細
+                    <span aria-hidden="true">›</span>
+                </a>
+                {% endif %}
+
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <section class="card operation-no-alert">
+            <p>概ね平常通りです</p>
+        </section>
+        {% endif %}
+
+    </section>
+
+    <!-- 路線の設定 -->
+    <section class="card route-settings-card">
+        <div class="route-settings-content">
+            <div>
+                <h2>路線の設定</h2>
+                <p>設定した路線を変更できます。</p>
+            </div>
+            <a class="route-settings-button" href="{{ url_for('settings') }}">
+                路線を変更
+                <span aria-hidden="true">›</span>
+            </a>
+        </div>
+    </section>
+</div>
+
+<!-- 現在地から最寄り駅を探すボタン -->
+<button
+    type="button"
+    class="nearest-station-button"
+    id="nearestStationButton"
+    aria-label="現在地から最寄り駅を探す"
+    title="現在地から最寄り駅を探す"
+>
+    <img
+        id="nearest-station-icon"
+        src="{{ url_for('static', filename='icons/light/arrow.png') }}"
+        alt=""
+    >
+</button>
+
+<p
+    id="nearestStationMessage"
+    class="nearest-station-message"
+    aria-live="polite"
+></p>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("nearestStationButton");
+    const message = document.getElementById("nearestStationMessage");
+    const icon = document.getElementById("nearest-station-icon");
+
+    if (!button || !message) return;
+
+    function updateArrowIcon() {
+        if (!icon) return;
+
+        const isDark = document.body.classList.contains("dark");
+        icon.src = isDark
+            ? "{{ url_for('static', filename='icons/dark/arrow.png') }}"
+            : "{{ url_for('static', filename='icons/light/arrow.png') }}";
+    }
+
+    updateArrowIcon();
+
+    const observer = new MutationObserver(updateArrowIcon);
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["class"]
+    });
+
+    const stations = [
+        {id: "oyama", name: "小山駅", lat: 36.3147, lon: 139.8002},
+        {id: "omoigawa", name: "思川駅", lat: 36.3294, lon: 139.7698},
+        {id: "tochigi", name: "栃木駅", lat: 36.3735, lon: 139.7305},
+        {id: "ohirashita", name: "大平下駅", lat: 36.3494, lon: 139.7046},
+        {id: "iwafune", name: "岩舟駅", lat: 36.3227, lon: 139.6538},
+        {id: "sano", name: "佐野駅", lat: 36.3167, lon: 139.5786},
+        {id: "tomita", name: "富田駅", lat: 36.3067, lon: 139.5489},
+        {id: "ashikaga_flower_park", name: "あしかがフラワーパーク駅", lat: 36.3135, lon: 139.5314},
+        {id: "ashikaga", name: "足利駅", lat: 36.3318, lon: 139.4568},
+        {id: "yamamae", name: "山前駅", lat: 36.3495, lon: 139.4147},
+        {id: "omata", name: "小俣駅", lat: 36.3623, lon: 139.3757}
+    ];
+
+    function distanceInKm(lat1, lon1, lat2, lon2) {
+        const earthRadius = 6371;
+        const toRadians = degrees => degrees * Math.PI / 180;
+        const dLat = toRadians(lat2 - lat1);
+        const dLon = toRadians(lon2 - lon1);
+
+        const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRadians(lat1)) *
+            Math.cos(toRadians(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+
+        return earthRadius * 2 * Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        );
+    }
+
+    button.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+            message.textContent = "このブラウザでは位置情報を利用できません。";
+            return;
+        }
+
+        button.disabled = true;
+        message.textContent = "現在地を確認しています…";
+
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+
+                let nearest = null;
+                let nearestDistance = Infinity;
+
+                for (const station of stations) {
+                    const distance = distanceInKm(
+                        userLat, userLon, station.lat, station.lon
+                    );
+
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearest = station;
+                    }
+                }
+
+                if (!nearest) {
+                    message.textContent = "最寄り駅を特定できませんでした。";
+                    button.disabled = false;
+                    return;
+                }
+
+                message.textContent = `${nearest.name}を表示します。`;
+                window.location.href = `/station/${nearest.id}`;
+            },
+            error => {
+                const messages = {
+                    1: "位置情報の利用が許可されていません。",
+                    2: "現在地を取得できませんでした。",
+                    3: "位置情報の取得がタイムアウトしました。"
+                };
+
+                message.textContent =
+                    messages[error.code] ||
+                    "位置情報を取得できませんでした。";
+
+                button.disabled = false;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
+            }
+        );
+    });
+});
+</script>
+
+<!-- 運行情報の詳細を左揃え・全文表示 -->
+<style>
+.operation-alert-card {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) auto !important;
+    align-items: start !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.operation-alert-content {
+    min-width: 0 !important;
+    width: 100% !important;
+    justify-self: stretch !important;
+    text-align: left !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.operation-alert-route,
+.operation-alert-status,
+.operation-alert-detail,
+.operation-alert-updated {
+    text-align: left !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.operation-alert-detail {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: initial !important;
+    line-height: 1.7 !important;
+    padding: 0 !important;
+}
+
+/* 路線名・運行状況・更新時刻を同じ行に表示 */
+.operation-alert-heading {
+    display: flex !important;
+    align-items: baseline !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+}
+
+.operation-alert-heading .operation-alert-route,
+.operation-alert-heading .operation-alert-status {
+    display: inline !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.5 !important;
+}
+
+.operation-alert-heading .operation-alert-updated {
+    display: inline !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    color: #888888 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.5 !important;
+}
+
+@media (max-width: 480px) {
+    .operation-alert-card {
+        grid-template-columns: 36px minmax(0, 1fr) auto !important;
+        gap: 9px !important;
+    }
+
+    .operation-alert-detail {
+        font-size: 12px !important;
+    }
+}
+
+/* 運行情報の「詳細」ボタン */
+.operation-alert-source {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    gap: 7px !important;
+
+    min-width: 100px !important;
+    min-height: 42px !important;
+    padding: 10px 18px !important;
+
+    border: 1px solid #077AE3 !important;
+    border-radius: 8px !important;
+
+    background: transparent !important;
+    color: #077AE3 !important;
+
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+
+    cursor: pointer !important;
+    align-self: center !important;
+
+    transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+/* マウスを乗せたとき */
+.operation-alert-source:hover {
+    background: #077AE3 !important;
+    border-color: #077AE3 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* 右向き記号 */
+.operation-alert-source span {
+    font-size: 20px !important;
+    line-height: 1 !important;
+    color: inherit !important;
+}
+
+/* ダークモード */
+[data-theme="dark"] .operation-alert-source {
+    border-color: #58aaff !important;
+    color: #58aaff !important;
+}
+
+[data-theme="dark"] .operation-alert-source:hover {
+    background: #58aaff !important;
+    border-color: #58aaff !important;
+    color: #ffffff !important;
+}
+
+</style>
+
+{% endblock %}
