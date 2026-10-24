@@ -7,25 +7,157 @@
   <title>{% block title %}ホーム{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body data-weather-place="{{ weather_place|default('sano') }}" data-appearance="{{ appearance|default('system') }}">
+
+<body
+  data-weather-place="{{ weather_place|default('sano') }}"
+  data-appearance="{{ appearance|default('system') }}"
+>
+  <!-- 上部メニュー -->
   <header class="topbar">
-    <a class="brand" href="{{ url_for('home') }}"><img class="brand-mark custom-icon" src="{{ url_for('static', filename='icons/home-top.png') }}" alt=""><span>ホーム</span></a>
+    <a class="brand" href="{{ url_for('home') }}">
+      <img
+        class="brand-mark custom-icon"
+        src="{{ url_for('static', filename='icons/home-top.png') }}"
+        alt=""
+      >
+      <span>ホーム</span>
+    </a>
+
     <div class="top-actions">
-      <a class="operation-top-link" id="operationTopLink" href="https://transit.yahoo.co.jp/diainfo/area/4" target="_blank" rel="noopener noreferrer" aria-label="運行情報（Yahoo!路線情報）"><img class="operation-top-icon custom-icon" src="{{ url_for('static', filename='icons/operation.png') }}" alt=""><span class="operation-top-label">{{ railway_label|default('運行情報') }}</span><span id="operationStatusText" class="operation-status-text">取得中…</span></a>
-      <a class="settings-top-link" href="{{ url_for('settings') }}" aria-label="設定" title="設定"><img class="custom-icon header-settings-icon" src="{{ url_for('static', filename='icons/settings.png') }}" alt=""></a>
-      <button class="icon-button" id="themeToggle" aria-label="テーマ切り替え" title="ライト・ダーク切り替え"><img id="themeIcon" class="theme-icon" src="{{ url_for('static', filename='icons/theme-dark.png') }}" alt=""></button>
+      <!-- 運行情報 -->
+      <a
+        class="operation-top-link"
+        id="operationTopLink"
+        href="https://transit.yahoo.co.jp/diainfo/area/4"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="運行情報（Yahoo!路線情報）"
+      >
+        <img
+          class="operation-top-icon custom-icon"
+          src="{{ url_for('static', filename='icons/operation.png') }}"
+          alt=""
+        >
+        <span class="operation-top-label">
+          {{ railway_label|default('運行情報') }}
+        </span>
+        <span id="operationStatusText" class="operation-status-text">
+          取得中…
+        </span>
+      </a>
+
+      <!-- 設定 -->
+      <a
+        class="settings-top-link"
+        href="{{ url_for('settings') }}"
+        aria-label="設定"
+        title="設定"
+      >
+        <img
+          class="custom-icon header-settings-icon"
+          src="{{ url_for('static', filename='icons/settings.png') }}"
+          alt=""
+        >
+      </a>
+
+      <!-- ライト・ダーク切り替え -->
+      <button
+        class="icon-button"
+        id="themeToggle"
+        aria-label="テーマ切り替え"
+        title="ライト・ダーク切り替え"
+      >
+        <img
+          id="themeIcon"
+          class="theme-icon"
+          src="{{ url_for('static', filename='icons/theme-dark.png') }}"
+          alt=""
+        >
+      </button>
     </div>
   </header>
+
+  <!-- ページ本文 -->
   <main class="page">
     {% block content %}{% endblock %}
   </main>
+
+  <!-- 下部メニュー -->
   <nav class="bottom-nav" aria-label="メインメニュー">
-    <a class="nav-item {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}"><img class="nav-icon custom-icon" src="{{ url_for('static', filename='icons/home.png') }}" alt=""><span>ホーム</span></a>
-    <a class="nav-item {% if request.endpoint == 'timetable' %}active{% endif %}" href="{{ url_for('timetable') }}"><img class="nav-icon custom-icon" src="{{ url_for('static', filename='icons/timetable.png') }}" alt=""><span>時間割</span></a>
-    <a class="nav-item" href="{{ url_for('home') }}#events"><img class="nav-icon custom-icon" src="{{ url_for('static', filename='icons/events.png') }}" alt=""><span>行事</span></a>
-    <a class="nav-item" href="{{ url_for('home') }}#weather"><img class="nav-icon custom-icon" src="{{ url_for('static', filename='icons/weather.png') }}" alt=""><span>天気</span></a>
-    <a class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}"><img class="nav-icon custom-icon" src="{{ url_for('static', filename='icons/settings.png') }}" alt=""><span>設定</span></a>
+
+    <!-- ホーム -->
+    <a
+      class="nav-item {% if request.endpoint == 'home' %}active{% endif %}"
+      data-nav-key="home"
+      href="{{ url_for('home') }}"
+    >
+      <img
+        class="nav-icon custom-icon"
+        src="{{ url_for('static', filename='icons/home.png') }}"
+        alt=""
+      >
+      <span>ホーム</span>
+    </a>
+
+    <!-- 時間割 -->
+    <a
+      class="nav-item {% if request.endpoint == 'timetable' %}active{% endif %}"
+      data-nav-key="timetable"
+      href="{{ url_for('timetable') }}"
+    >
+      <img
+        class="nav-icon custom-icon"
+        src="{{ url_for('static', filename='icons/timetable.png') }}"
+        alt=""
+      >
+      <span>時間割</span>
+    </a>
+
+    <!-- 行事 -->
+    <a
+      class="nav-item"
+      data-nav-key="events"
+      href="{{ url_for('home') }}#events"
+    >
+      <img
+        class="nav-icon custom-icon"
+        src="{{ url_for('static', filename='icons/events.png') }}"
+        alt=""
+      >
+      <span>行事</span>
+    </a>
+
+    <!-- 天気 -->
+    <a
+      class="nav-item"
+      data-nav-key="weather"
+      href="{{ url_for('home') }}#weather"
+    >
+      <img
+        class="nav-icon custom-icon"
+        src="{{ url_for('static', filename='icons/weather.png') }}"
+        alt=""
+      >
+      <span>天気</span>
+    </a>
+
+    <!-- 設定 -->
+    <a
+      class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}"
+      data-nav-key="settings"
+      href="{{ url_for('settings') }}"
+    >
+      <img
+        class="nav-icon custom-icon"
+        src="{{ url_for('static', filename='icons/settings.png') }}"
+        alt=""
+      >
+      <span>設定</span>
+    </a>
+
   </nav>
+
+  <!-- JavaScript -->
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

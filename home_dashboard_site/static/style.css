@@ -104,3 +104,134 @@ body.dark{--bg:#10121a;--surface:#191c27;--surface-2:#222635;--text:#f2f3f8;--mu
 body.dark .operation-status-text[data-state="normal"]{background:#173b2a;color:#78d8a0}
 body.dark .operation-status-text[data-state="alert"]{background:#482c1c;color:#ffb47c}
 @media(max-width:620px){.operation-top-link{max-width:48vw;gap:5px;padding:0 6px}.operation-top-label{max-width:74px}.operation-status-text{max-width:78px;padding:4px 5px;font-size:9px}.operation-top-icon.custom-icon{width:18px;height:18px}}
+
+
+/* =========================================
+   今回の修正：設定画面をコンパクトにする
+========================================= */
+
+.setting-accordion summary {
+    padding: 14px 20px;
+    min-height: 48px;
+}
+
+.setting-options {
+    padding: 0 20px 16px;
+}
+
+.setting-choice-list {
+    gap: 7px;
+}
+
+.choice-option {
+    min-height: 36px;
+    padding: 7px 10px;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.settings-form {
+    gap: 10px;
+}
+
+
+/* =========================================
+   今回の修正：天気アイコン画像
+========================================= */
+
+.weather-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    font-size: 49px;
+    line-height: 1;
+}
+
+.weather-condition-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* 週間時間割：設定リンクの下線をなくす */
+.timetable-empty .class-not-selected,
+.timetable-empty .class-not-selected:hover,
+.timetable-empty .class-not-selected:focus,
+.timetable-empty .class-not-selected:active {
+    text-decoration: none;
+}
+
+/* =========================================
+   下部メニュー：画面幅を基準に固定
+========================================= */
+
+html {
+    width: 100%;
+    min-width: 0;
+}
+
+body {
+    width: 100%;
+    min-width: 0;
+}
+
+.bottom-nav {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+
+    justify-content: initial !important;
+    align-items: center !important;
+    gap: 0 !important;
+
+    padding: 10px 4px calc(10px + env(safe-area-inset-bottom)) !important;
+    box-sizing: border-box !important;
+
+    transform: none !important;
+}
+
+.bottom-nav > .nav-item {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 4px 2px !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+}
+
+.bottom-nav > .nav-item > img.nav-icon {
+    display: block !important;
+    width: 25px !important;
+    height: 25px !important;
+    min-width: 25px !important;
+    flex: 0 0 25px !important;
+    object-fit: contain !important;
+    margin: 0 !important;
+}
+
+.bottom-nav > .nav-item > span {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}

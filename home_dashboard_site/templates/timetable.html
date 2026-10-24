@@ -1,13 +1,49 @@
+
 {% extends "base.html" %}
 {% block title %}週間時間割{% endblock %}
 {% block content %}
-<section class="welcome-row timetable-welcome"><div><h1>週間時間割</h1></div><a class="back-link" href="{{ url_for('home') }}">← ホームへ戻る</a></section>
+
+<section class="welcome-row timetable-welcome">
+  <div>
+    <h1>週間時間割</h1>
+  </div>
+  <a class="back-link" href="{{ url_for('home') }}">ホームへ戻る</a>
+</section>
+
 <nav class="timetable-class-switch" aria-label="クラスを切り替え">
   {% for name in class_names %}
-    <a class="timetable-class-button{% if name == class_name %} active{% endif %}" href="{{ url_for('timetable', class_name=name) }}"{% if name == class_name %} aria-current="page"{% endif %}>{{ name }}</a>
+    <a
+      class="timetable-class-button{% if name == class_name %} active{% endif %}"
+      href="{{ url_for('timetable', class_name=name) }}"
+      {% if name == class_name %}aria-current="page"{% endif %}
+    >{{ name }}</a>
   {% endfor %}
 </nav>
+
 {% if class_name %}
-<div class="week-grid">{% for day in weekdays %}<section class="card week-day"><div class="week-day-heading"><span>{{ day }}</span></div>{% for lesson in timetable.get(day, []) %}<div class="week-lesson"><span class="week-lesson-number">{{ loop.index }}</span><strong>{{ lesson }}</strong></div>{% endfor %}</section>{% endfor %}</div>
-{% else %}<section class="card empty-state timetable-empty"><strong>設定でクラスを選択してください</strong><p><a class="text-link" href="{{ url_for('settings') }}">設定画面を開く →</a></p></section>{% endif %}
+  <div class="week-grid">
+    {% for day in weekdays %}
+      <section class="card week-day">
+        <div class="week-day-heading">
+          <span>{{ day }}</span>
+        </div>
+
+        {% for lesson in timetable.get(day, []) %}
+          <div class="week-lesson">
+            <span class="week-lesson-number">{{ loop.index }}</span>
+            <strong>{{ lesson }}</strong>
+          </div>
+        {% endfor %}
+      </section>
+    {% endfor %}
+  </div>
+{% else %}
+  <section class="card empty-state timetable-empty">
+    <a
+      class="class-not-selected"
+      href="{{ url_for('settings') }}"
+    >設定から時間割のクラス選択ができます</a>
+  </section>
+{% endif %}
+
 {% endblock %}
