@@ -482,6 +482,9 @@ def home():
         class_name=class_name,
         class_names=CLASS_NAMES,
         weekday_short="月火水木金土日"[selected_day.weekday()],
+        # index.html の時計・時間割の日付ラベルに渡す
+        clock_date_label=f"{now.year}年{now.month}月{now.day}日（{'月火水木金土日'[now.weekday()]}）",
+        schedule_date_label=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日（{'月火水木金土日'[selected_day.weekday()]}）",
         weather_place=weather_place,
         weather_label=WEATHER_OPTIONS[weather_place],
         railway_label=ROUTE_OPTIONS[selected_route()],
