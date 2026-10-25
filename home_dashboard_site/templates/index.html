@@ -228,7 +228,7 @@
 
       <div>
         <div class="weather-temp" id="weatherTemp">--°</div>
-        <div class="weather-desc" id="weatherDesc">天気情報を取得中</div>
+        <div class="weather-desc" id="weatherDesc">天気を取得中</div>
       </div>
     </div>
 
@@ -306,8 +306,12 @@
     <div class="event-list" style="display: flex; flex-direction: column; min-height: 0; box-sizing: border-box; overscroll-behavior: contain;">
       {% for event in events %}
         {% if event.kind|default('school') == 'personal' %}
-          <details class="card event-card event-card-personal" style="flex: 0 0 auto;">
-            <summary style="display:flex; align-items:center; gap:8px; cursor:pointer; list-style:none;">
+          <article class="card event-card event-card-personal home-personal-event" role="button" tabindex="0"
+            data-event-id="{{ event.id }}" data-event-date="{{ event.date }}"
+            data-event-title="{{ event.title }}" data-event-detail="{{ event.detail|default('') }}"
+            data-event-color="{{ event.color|default('blue') }}"
+            aria-label="予定 {{ event.title }}。押すと編集・削除できます" style="flex: 0 0 auto; cursor:pointer;">
+            <div style="display:flex; align-items:center; gap:8px;">
               <div class="event-date" style="background-color: {{ {'blue': '#E8F2FC', 'red': '#FDECEC', 'orange': '#FFF0E2', 'yellow': '#FFF8D6', 'green': '#E8F5EA', 'purple': '#F2E8FA', 'pink': '#FCE8F1'}.get(event.color|default('blue'), '#E8F2FC') }}; color: {{ event.text_color|default('#0563B5') }};">
                 <span class="event-month">{{ event.date[5:7] }}月</span>
                 <strong>{{ event.date[8:10] }}</strong>
@@ -316,34 +320,8 @@
                 <strong>{{ event.title }}</strong>
                 {% if event.detail|default('') %}<div style="font-size:.8rem; margin-top:3px;">{{ event.detail }}</div>{% endif %}
               </div>
-            </summary>
-            <div style="padding-top:8px;" onclick="event.stopPropagation();">
-              <form method="post" action="{{ url_for('calendar_page') }}" style="display:grid; gap:7px; margin-top:4px;">
-                <input type="hidden" name="action" value="edit">
-                <input type="hidden" name="event_id" value="{{ event.id }}">
-                <input type="hidden" name="return_to" value="home">
-                <input type="hidden" name="return_date" value="{{ event.date }}">
-                <label style="font-size:.8rem;">日付 <input type="date" name="event_date" value="{{ event.date }}" required style="max-width:100%;"></label>
-                <label style="font-size:.8rem;">予定名 <input type="text" name="title" value="{{ event.title }}" maxlength="80" required style="width:100%; box-sizing:border-box;"></label>
-                <label style="font-size:.8rem;">詳細 <textarea name="detail" rows="2" maxlength="300" style="width:100%; box-sizing:border-box;">{{ event.detail|default('') }}</textarea></label>
-                <label style="font-size:.8rem;">色
-                  <select name="color" style="max-width:100%;">
-                    {% for color_key, color_label in [('blue','青'),('red','赤'),('orange','橙'),('yellow','黄'),('green','緑'),('purple','紫'),('pink','桃')] %}
-                      <option value="{{ color_key }}" {% if event.color|default('blue') == color_key %}selected{% endif %}>{{ color_label }}</option>
-                    {% endfor %}
-                  </select>
-                </label>
-                <button type="submit" style="padding:6px 10px;">変更を保存</button>
-              </form>
-              <form method="post" action="{{ url_for('calendar_page') }}" onsubmit="return confirm('「{{ event.title|e }}」を削除しますか？');" style="margin-top:6px;">
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="event_id" value="{{ event.id }}">
-                <input type="hidden" name="return_to" value="home">
-                <input type="hidden" name="return_date" value="{{ event.date }}">
-                <button type="submit" style="padding:6px 10px;">この予定を削除</button>
-              </form>
             </div>
-          </details>
+          </article>
         {% else %}
           <article class="card event-card event-card-{{ event.kind|default('school') }}" style="flex: 0 0 auto;">
             <div class="event-date" style="background-color: {% if event.kind|default('school') == 'holiday' %}#FDECEC{% else %}#E8F2FC{% endif %}; color: {{ event.text_color|default('#0563B5') }};">
@@ -366,7 +344,93 @@
   </section>
 </div>
 
+<div id="homeEventModalBackdrop" class="home-event-modal-backdrop" hidden>
+  <section class="home-event-modal" role="dialog" aria-modal="true" aria-labelledby="homeEventModalTitle">
+    <div class="home-event-modal-header">
+      <h2 id="homeEventModalTitle">予定を編集</h2>
+      <button type="button" id="homeEventModalClose" class="home-event-modal-close">閉じる</button>
+    </div>
+    <form method="post" action="{{ url_for('calendar_page') }}" class="home-event-edit-form">
+      <input type="hidden" name="action" value="edit">
+      <input type="hidden" name="event_id" id="homeEditEventId">
+      <input type="hidden" name="return_to" value="home">
+      <input type="hidden" name="return_date" id="homeEditReturnDate">
+      <label>日付 <input type="date" name="event_date" id="homeEditEventDate" required></label>
+      <label>予定名 <input type="text" name="title" id="homeEditEventTitle" maxlength="80" required></label>
+      <label>詳細 <textarea name="detail" id="homeEditEventDetail" rows="3" maxlength="300"></textarea></label>
+      <label>色 <select name="color" id="homeEditEventColor">
+        <option value="blue">青</option><option value="red">赤</option><option value="orange">橙</option>
+        <option value="yellow">黄</option><option value="green">緑</option><option value="purple">紫</option><option value="pink">桃</option>
+      </select></label>
+      <button type="submit">変更を保存</button>
+    </form>
+    <form method="post" action="{{ url_for('calendar_page') }}" id="homeEventDeleteForm" class="home-event-delete-form">
+      <input type="hidden" name="action" value="delete">
+      <input type="hidden" name="event_id" id="homeDeleteEventId">
+      <input type="hidden" name="return_to" value="home">
+      <input type="hidden" name="return_date" id="homeDeleteReturnDate">
+      <button type="submit">この予定を削除</button>
+    </form>
+  </section>
+</div>
+<style>
+  .home-event-modal-backdrop { position:fixed; inset:0; z-index:2000; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.48); }
+  .home-event-modal-backdrop[hidden] { display:none; }
+  .home-event-modal { width:min(520px,100%); max-height:85vh; overflow:auto; padding:20px; border-radius:14px; background:var(--surface,#fff); color:var(--text,inherit); box-shadow:0 12px 40px rgba(0,0,0,.25); }
+  .home-event-modal-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .home-event-modal-header h2 { margin:0; font-size:1.2rem; }
+  .home-event-modal-close { border:0; border-radius:8px; padding:6px 10px; font:inherit; cursor:pointer; }
+  .home-event-edit-form { display:grid; gap:10px; }
+  .home-event-edit-form label { display:grid; gap:4px; font-size:.9rem; }
+  .home-event-edit-form input, .home-event-edit-form textarea, .home-event-edit-form select { width:100%; box-sizing:border-box; font:inherit; padding:8px; }
+  .home-event-edit-form button, .home-event-delete-form button { padding:8px 12px; font:inherit; cursor:pointer; }
+  .home-event-delete-form { margin-top:10px; }
+  @media(max-width:600px) { .home-event-modal { padding:16px; } }
+</style>
 <script>
+// 前回見ていた日付をブラウザーの再読み込み・履歴復元で引き継がず、ホームを開き直したら当日に戻す。
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const navigation = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+  if (params.has('day_offset') && navigation && (navigation.type === 'reload' || navigation.type === 'back_forward')) {
+    window.location.replace('/');
+  }
+})();
+
+(function () {
+  const backdrop = document.getElementById('homeEventModalBackdrop');
+  if (!backdrop) return;
+  const closeButton = document.getElementById('homeEventModalClose');
+  const deleteForm = document.getElementById('homeEventDeleteForm');
+  function closeModal() { backdrop.hidden = true; }
+  function openFor(card) {
+    const d = card.dataset;
+    document.getElementById('homeEditEventId').value = d.eventId || '';
+    document.getElementById('homeEditEventDate').value = d.eventDate || '';
+    document.getElementById('homeEditReturnDate').value = d.eventDate || '';
+    document.getElementById('homeEditEventTitle').value = d.eventTitle || '';
+    document.getElementById('homeEditEventDetail').value = d.eventDetail || '';
+    document.getElementById('homeEditEventColor').value = d.eventColor || 'blue';
+    document.getElementById('homeDeleteEventId').value = d.eventId || '';
+    document.getElementById('homeDeleteReturnDate').value = d.eventDate || '';
+    deleteForm.dataset.title = d.eventTitle || 'この予定';
+    backdrop.hidden = false;
+    document.getElementById('homeEditEventTitle').focus();
+  }
+  document.querySelectorAll('.home-personal-event').forEach(card => {
+    card.addEventListener('click', () => openFor(card));
+    card.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openFor(card); }
+    });
+  });
+  closeButton.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', event => { if (event.target === backdrop) closeModal(); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && !backdrop.hidden) closeModal(); });
+  deleteForm.addEventListener('submit', event => {
+    if (!confirm('「' + (deleteForm.dataset.title || 'この予定') + '」を削除しますか？')) event.preventDefault();
+  });
+})();
+
 (function () {
   const scheduleCard = document.querySelector('.schedule-card');
   const eventList = document.querySelector('.event-list');

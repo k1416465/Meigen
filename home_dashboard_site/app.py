@@ -344,7 +344,7 @@ def home():
         schedule_date_label=schedule_date_label,
         today_lessons=today_lessons,
         events=filtered_events(now),
-        today=f"{displayed_day.year}/{displayed_day.month:02d}/{displayed_day.day:02d}",
+        today=f"{now.year}/{now.month:02d}/{now.day:02d}",
         day_offset=day_offset,
         displayed_date=displayed_day.isoformat(),
         class_name=class_name,
