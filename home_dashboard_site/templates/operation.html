@@ -11,47 +11,47 @@
     <!-- 駅選択：PC・スマホ共通の順番とボタンサイズ -->
     <section class="station-selector">
         <div class="station-grid station-grid-large">
-            <a class="station-button" href="/station/oyama">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/oyama/timetable">
                 <span class="station-name">小山</span>
                 <span class="station-name-en">Oyama</span>
             </a>
-            <a class="station-button" href="/station/omoigawa">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/omoigawa/timetable">
                 <span class="station-name">思川</span>
                 <span class="station-name-en">Omoigawa</span>
             </a>
-            <a class="station-button" href="/station/tochigi">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/tochigi/timetable">
                 <span class="station-name">栃木</span>
                 <span class="station-name-en">Tochigi</span>
             </a>
-            <a class="station-button" href="/station/ohirashita">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/ohirashita/timetable">
                 <span class="station-name">大平下</span>
                 <span class="station-name-en">Ohirashita</span>
             </a>
-            <a class="station-button" href="/station/iwafune">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/iwafune/timetable">
                 <span class="station-name">岩舟</span>
                 <span class="station-name-en">Iwafune</span>
             </a>
-            <a class="station-button" href="/station/sano">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/sano/timetable">
                 <span class="station-name">佐野</span>
                 <span class="station-name-en">Sano</span>
             </a>
-            <a class="station-button" href="/station/tomita">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/tomita/timetable">
                 <span class="station-name">富田</span>
                 <span class="station-name-en">Tomita</span>
             </a>
-            <a class="station-button" href="/station/ashikaga_flower_park">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable">
                 <span class="station-name">あしかがフラワーパーク</span>
                 <span class="station-name-en">Ashikaga Flower Park</span>
             </a>
-            <a class="station-button" href="/station/ashikaga">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/ashikaga/timetable">
                 <span class="station-name">足利</span>
                 <span class="station-name-en">Ashikaga</span>
             </a>
-            <a class="station-button" href="/station/yamamae">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/yamamae/timetable">
                 <span class="station-name">山前</span>
                 <span class="station-name-en">Yamamae</span>
             </a>
-            <a class="station-button" href="/station/omata">
+            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/omata/timetable">
                 <span class="station-name">小俣</span>
                 <span class="station-name-en">Omata</span>
             </a>
@@ -139,6 +139,21 @@
     </section>
 </div>
 
+<!-- My駅ボタン（My駅設定機能は後日追加予定） -->
+<button
+    type="button"
+    class="my-station-button"
+    id="myStationButton"
+    aria-label="My駅を開く"
+    title="My駅を開く"
+>
+    <img
+        id="my-station-icon"
+        src="{{ url_for('static', filename='icons/light/heart.png') }}"
+        alt=""
+    >
+</button>
+
 <!-- 現在地から最寄り駅を探すボタン -->
 <button
     type="button"
@@ -165,25 +180,48 @@ document.addEventListener("DOMContentLoaded", () => {
     const button = document.getElementById("nearestStationButton");
     const message = document.getElementById("nearestStationMessage");
     const icon = document.getElementById("nearest-station-icon");
+    const myStationButton = document.getElementById("myStationButton");
+    const myStationIcon = document.getElementById("my-station-icon");
 
     if (!button || !message) return;
 
-    function updateArrowIcon() {
-        if (!icon) return;
-
+    function updateThemeIcons() {
         const isDark = document.body.classList.contains("dark");
-        icon.src = isDark
-            ? "{{ url_for('static', filename='icons/dark/arrow.png') }}"
-            : "{{ url_for('static', filename='icons/light/arrow.png') }}";
+        if (icon) {
+            icon.src = isDark
+                ? "{{ url_for('static', filename='icons/dark/arrow.png') }}"
+                : "{{ url_for('static', filename='icons/light/arrow.png') }}";
+        }
+        if (myStationIcon) {
+            myStationIcon.src = isDark
+                ? "{{ url_for('static', filename='icons/dark/heart.png') }}"
+                : "{{ url_for('static', filename='icons/light/heart.png') }}";
+        }
     }
 
-    updateArrowIcon();
+    updateThemeIcons();
 
-    const observer = new MutationObserver(updateArrowIcon);
+    const observer = new MutationObserver(updateThemeIcons);
     observer.observe(document.body, {
         attributes: true,
         attributeFilter: ["class"]
     });
+
+    // My駅設定が実装されたら localStorage の myStationId に駅IDを保存する想定
+    if (myStationButton) {
+        myStationButton.addEventListener("click", () => {
+            const myStationId = localStorage.getItem("myStationId");
+            if (!myStationId) {
+                message.textContent = "My駅の設定機能は今後追加予定です。";
+                return;
+            }
+            if (!/^[a-z0-9_]+$/i.test(myStationId)) {
+                message.textContent = "My駅の設定を確認してください。";
+                return;
+            }
+            window.location.href = `https://ryomo-line-timetable.onrender.com/station/${myStationId}/timetable`;
+        });
+    }
 
     const stations = [
         {id: "oyama", name: "小山駅", lat: 36.3147, lon: 139.8002},
@@ -252,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 message.textContent = "";
-                window.location.href = `/station/${nearest.id}`;
+                window.location.href = `https://ryomo-line-timetable.onrender.com/station/${nearest.id}/timetable`;
             },
             error => {
                 const messages = {
