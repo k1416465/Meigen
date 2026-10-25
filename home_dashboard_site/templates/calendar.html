@@ -414,6 +414,17 @@
       }
     });
   });
+
+  // ホームの予定カードから遷移してきた場合は、該当予定の編集・削除画面を開く。
+  const requestedEventId = new URLSearchParams(window.location.search).get('open_event');
+  if (requestedEventId) {
+    const requestedEvent = Array.from(document.querySelectorAll('[data-personal-event]'))
+      .find(el => el.dataset.eventId === requestedEventId);
+    if (requestedEvent) {
+      selectedEvent = requestedEvent;
+      openActions();
+    }
+  }
 })();
 </script>
 {% endblock %}
