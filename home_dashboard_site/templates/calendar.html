@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block title %}カレンダー
+{% block title %}迷言｜カレンダー{% endblock %}
+{% block content %}
+
 <script>
 (() => {
   const KEY = 'meigen.devicePersonalEvents.v1';
@@ -65,7 +67,6 @@
 <section class="welcome-row calendar-heading">
   <div>
     <h1>カレンダー</h1>
-    <p>学校行事・祝日・自分の予定</p>
   </div>
   <button type="button" class="calendar-add-toggle" id="calendarAddToggle" aria-expanded="false" aria-controls="calendarAddForm">＋ 予定を追加</button>
 </section>
@@ -229,7 +230,7 @@
     {% endfor %}
   </div>
   </div>
-  <p class="calendar-modal-help">日付を押すと、その日の予定をすべて表示します。自分の予定はタップまたは長押しで編集・削除できます。</p>
+  <p class="calendar-modal-help">日付を押すと、その日の予定をすべて表示します。自分の予定はタップで編集・削除できます。</p>
 </section>
 
 <div class="calendar-modal-backdrop" id="calendarDayBackdrop" hidden>

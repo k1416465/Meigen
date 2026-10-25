@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block title %}迷言｜ホーム
+{% block title %}迷言｜ホーム{% endblock %}
+{% block content %}
+
 <script>
 (() => {
  const KEY='meigen.devicePersonalEvents.v1'; let events=[]; try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');events=Array.isArray(v)?v:[]}catch{}
