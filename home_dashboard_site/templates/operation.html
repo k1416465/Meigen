@@ -171,21 +171,67 @@
     >
 </button>
 
-<p
+<div id="noticeBackdrop" class="notice-backdrop" aria-hidden="true"></div>
+<div
     id="nearestStationMessage"
     class="nearest-station-message"
     aria-live="polite"
-></p>
+>
+    <span id="nearestStationMessageText"></span>
+    <button type="button" id="closeNoticeButton" class="notice-close-button" aria-label="通知を閉じる" title="閉じる">×</button>
+</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const button = document.getElementById("nearestStationButton");
     const message = document.getElementById("nearestStationMessage");
+    const messageText = document.getElementById("nearestStationMessageText");
+    const noticeBackdrop = document.getElementById("noticeBackdrop");
+    const closeNoticeButton = document.getElementById("closeNoticeButton");
     const icon = document.getElementById("nearest-station-icon");
     const myStationButton = document.getElementById("myStationButton");
     const myStationIcon = document.getElementById("my-station-icon");
 
     if (!button || !message) return;
+
+    function showCenteredNotice(text) {
+        messageText.textContent = text;
+        message.classList.add("is-visible");
+        noticeBackdrop.classList.add("is-visible");
+        document.body.classList.add("notice-open");
+        message.setAttribute("role", "alert");
+        closeNoticeButton.focus({ preventScroll: true });
+    }
+
+    function hideNotice() {
+        messageText.textContent = "";
+        message.classList.remove("is-visible");
+        noticeBackdrop.classList.remove("is-visible");
+        document.body.classList.remove("notice-open");
+        message.removeAttribute("role");
+    }
+
+    closeNoticeButton.addEventListener("click", hideNotice);
+    // 通知表示中は、×以外の操作やキーボード操作を受け付けない
+    document.addEventListener("click", event => {
+        if (document.body.classList.contains("notice-open") &&
+            !closeNoticeButton.contains(event.target)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, true);
+    document.addEventListener("keydown", event => {
+        if (!document.body.classList.contains("notice-open")) return;
+        if (event.key === "Escape") {
+            event.preventDefault();
+            hideNotice();
+            return;
+        }
+        if (event.target !== closeNoticeButton || !["Enter", " "].includes(event.key)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, true);
 
     function updateThemeIcons() {
         const isDark = document.body.classList.contains("dark");
@@ -214,11 +260,11 @@ document.addEventListener("DOMContentLoaded", () => {
         myStationButton.addEventListener("click", () => {
             const myStationId = myStationButton.dataset.stationId;
             if (!myStationId) {
-                message.textContent = "My駅が設定されていません。設定からMy駅を選択してください。";
+                showCenteredNotice("My駅が設定されていません。設定からMy駅を選択してください。");
                 return;
             }
             if (!/^[a-z0-9_]+$/i.test(myStationId)) {
-                message.textContent = "My駅の設定を確認してください。";
+                showCenteredNotice("My駅の設定を確認してください。");
                 return;
             }
             window.location.href = `https://ryomo-line-timetable.onrender.com/station/${myStationId}/timetable`;
@@ -259,12 +305,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     button.addEventListener("click", () => {
         if (!navigator.geolocation) {
-            message.textContent = "このブラウザでは位置情報を利用できません。";
+            showCenteredNotice("このブラウザでは位置情報を利用できません。");
             return;
         }
 
         button.disabled = true;
-        message.textContent = "";
+        hideNotice();
 
         navigator.geolocation.getCurrentPosition(
             position => {
@@ -286,12 +332,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 if (!nearest) {
-                    message.textContent = "最寄り駅を特定できませんでした。";
+                    showCenteredNotice("最寄り駅を特定できませんでした。");
                     button.disabled = false;
                     return;
                 }
 
-                message.textContent = "";
+                hideNotice();
                 window.location.href = `https://ryomo-line-timetable.onrender.com/station/${nearest.id}/timetable`;
             },
             error => {
@@ -301,9 +347,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     3: "位置情報の取得がタイムアウトしました。"
                 };
 
-                message.textContent =
+                showCenteredNotice(
                     messages[error.code] ||
-                    "位置情報を取得できませんでした。";
+                    "位置情報を取得できませんでした。"
+                );
 
                 button.disabled = false;
             },
