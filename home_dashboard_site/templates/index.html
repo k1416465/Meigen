@@ -2,6 +2,53 @@
 {% block title %}ホーム{% endblock %}
 {% block content %}
 
+
+<style>
+/* ホーム画面のスマートフォン表示 */
+@media (max-width: 600px) {
+  .hero-grid,
+  .school-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    align-items: stretch;
+  }
+  .hero-grid > *, .school-grid > *, .school-column { min-width: 0 !important; width: 100%; }
+  .clock-card, .weather-card, .schedule-card, #events .event-list { min-width: 0; }
+  .clock-card, .weather-card { padding: 10px !important; }
+  .card-heading { gap: 5px !important; font-size: .82rem !important; flex-wrap: wrap; }
+  .heading-icon-image { width: 18px !important; height: 18px !important; }
+  .clock { font-size: clamp(1.05rem, 4.8vw, 1.55rem) !important; line-height: 1.2; white-space: nowrap; }
+  .clock-bottom { font-size: .68rem !important; }
+  .weather-location { font-size: .68rem !important; }
+  .weather-main { gap: 5px !important; align-items: center; }
+  .weather-symbol, .weather-condition-icon { width: 36px !important; height: 36px !important; }
+  .weather-temp { font-size: 1.25rem !important; }
+  .weather-desc { font-size: .68rem !important; overflow-wrap: anywhere; }
+  .weather-details { gap: 4px !important; }
+  .weather-details > div { min-width: 0; }
+  .weather-details span { display: block; font-size: .58rem !important; }
+  .weather-details strong { font-size: .75rem !important; }
+  .section-heading { margin-bottom: 6px !important; }
+  .section-heading h2 { font-size: .95rem !important; line-height: 1.25; }
+  .class-caption { font-size: .68rem !important; }
+  .schedule-card { padding: 8px !important; }
+  .table-top { padding: 5px !important; }
+  .lesson-row { gap: 5px !important; padding: 6px 4px !important; }
+  .lesson-number { min-width: 18px !important; }
+  .lesson-name { font-size: .75rem !important; overflow-wrap: anywhere; }
+  .class-not-selected { font-size: .72rem !important; overflow-wrap: anywhere; }
+  #events .event-list { gap: 6px; }
+  #events .event-card { padding: 7px !important; gap: 6px !important; }
+  #events .event-date { min-width: 32px !important; padding: 4px !important; }
+  #events .event-month { font-size: .58rem !important; }
+  #events .event-date strong { font-size: 1rem !important; }
+  #events .event-copy strong { font-size: .72rem !important; overflow-wrap: anywhere; }
+  #events .empty-state { padding: 8px !important; font-size: .72rem !important; }
+}
+</style>
+
+
 <section class="hero-grid">
   <article class="card clock-card">
     <div class="card-heading">

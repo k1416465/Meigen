@@ -4,6 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f7fb">
+
+  <!-- サイト共通アイコン（ブラウザのタブ・ブックマーク） -->
+  <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='site-icon.png') }}"
+  >
+
+  <!-- iPhone/iPadで「ホーム画面に追加」したときのアイコン -->
+  <link
+    rel="apple-touch-icon"
+    href="{{ url_for('static', filename='site-icon.png') }}"
+  >
+
   <title>{% block title %}迷言{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>

@@ -7,35 +7,53 @@
         <h1>時刻表</h1>
     </header>
 
-    <!-- 駅選択 -->
+    <!-- 駅選択：PC・スマホ共通の順番とボタンサイズ -->
     <section class="station-selector">
         <div class="station-grid station-grid-large">
-            <a class="station-button station-tochigi" href="/station/oyama">
+            <a class="station-button" href="/station/oyama">
                 <span class="station-name">小山駅</span>
                 <span class="station-name-en">Oyama</span>
             </a>
-            <a class="station-button station-tochigi" href="/station/tochigi">
+            <a class="station-button" href="/station/omoigawa">
+                <span class="station-name">思川駅</span>
+                <span class="station-name-en">Omoigawa</span>
+            </a>
+            <a class="station-button" href="/station/tochigi">
                 <span class="station-name">栃木駅</span>
                 <span class="station-name-en">Tochigi</span>
             </a>
-            <a class="station-button station-sano" href="/station/sano">
+            <a class="station-button" href="/station/ohirashita">
+                <span class="station-name">大平下駅</span>
+                <span class="station-name-en">Ohirashita</span>
+            </a>
+            <a class="station-button" href="/station/iwafune">
+                <span class="station-name">岩舟駅</span>
+                <span class="station-name-en">Iwafune</span>
+            </a>
+            <a class="station-button" href="/station/sano">
                 <span class="station-name">佐野駅</span>
                 <span class="station-name-en">Sano</span>
             </a>
-            <a class="station-button station-ashikaga" href="/station/ashikaga">
+            <a class="station-button" href="/station/tomita">
+                <span class="station-name">富田駅</span>
+                <span class="station-name-en">Tomita</span>
+            </a>
+            <a class="station-button" href="/station/ashikaga_flower_park">
+                <span class="station-name">あしかがフラワーパーク駅</span>
+                <span class="station-name-en">Ashikaga Flower Park</span>
+            </a>
+            <a class="station-button" href="/station/ashikaga">
                 <span class="station-name">足利駅</span>
                 <span class="station-name-en">Ashikaga</span>
             </a>
-        </div>
-
-        <div class="station-grid station-grid-small">
-            <a class="station-button" href="/station/omoigawa">思川駅</a>
-            <a class="station-button" href="/station/ohirashita">大平下駅</a>
-            <a class="station-button" href="/station/iwafune">岩舟駅</a>
-            <a class="station-button" href="/station/tomita">富田駅</a>
-            <a class="station-button" href="/station/ashikaga_flower_park">あしかがフラワーパーク駅</a>
-            <a class="station-button" href="/station/yamamae">山前駅</a>
-            <a class="station-button" href="/station/omata">小俣駅</a>
+            <a class="station-button" href="/station/yamamae">
+                <span class="station-name">山前駅</span>
+                <span class="station-name-en">Yamamae</span>
+            </a>
+            <a class="station-button" href="/station/omata">
+                <span class="station-name">小俣駅</span>
+                <span class="station-name-en">Omata</span>
+            </a>
         </div>
     </section>
 
@@ -60,24 +78,22 @@
                 </div>
 
                 <div class="operation-alert-content">
-                <div class="operation-alert-heading">
-                    <h3 class="operation-alert-route">{{ alert.route }}</h3>
-                    <p class="operation-alert-status">{{ alert.status }}</p>
+                    <div class="operation-alert-heading">
+                        <h3 class="operation-alert-route">{{ alert.route }}</h3>
+                        <p class="operation-alert-status">{{ alert.status }}</p>
 
-                    {% if alert.updated_at %}
-                    <p class="operation-alert-updated">
-                         更新時刻：{{ alert.updated_at }}
-                    </p>
-                    {% endif %}
-                </div>
+                        {% if alert.updated_at %}
+                        <p class="operation-alert-updated">
+                            更新時刻：{{ alert.updated_at }}
+                        </p>
+                        {% endif %}
+                    </div>
 
                     {% if alert.detail %}
                     <p class="operation-alert-detail">{{ alert.detail }}</p>
                     {% endif %}
-
                 </div>
 
-                
                 {% if alert.source_url %}
                 <a
                     class="route-settings-button operation-alert-source"
@@ -91,7 +107,6 @@
                     <span aria-hidden="true">›</span>
                 </a>
                 {% endif %}
-
             </article>
             {% endfor %}
         </div>
@@ -100,13 +115,12 @@
             <p>概ね平常通りです</p>
         </section>
         {% endif %}
-
     </section>
 
     <!-- 路線の設定 -->
     <section class="card route-settings-card">
         <div class="route-settings-content">
-            <div>
+            <div class="route-settings-text">
                 <h2>路線の設定</h2>
                 <p>設定した路線を変更できます。</p>
             </div>
@@ -256,8 +270,61 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-<!-- 運行情報の詳細を左揃え・全文表示 -->
 <style>
+/* 時刻表ページのタイトル：他ページと揃った余白・サイズ */
+.operation-page > .page-header {
+    width: 100%;
+    margin: 0 0 24px !important;
+    padding: 0 !important;
+}
+
+.operation-page > .page-header h1 {
+    margin: 0 !important;
+    font-size: clamp(28px, 3vw, 36px) !important;
+    line-height: 1.3 !important;
+}
+
+/* 駅ボタン：全駅を同じグリッド・同じサイズに */
+.operation-page .station-selector {
+    width: 100%;
+}
+
+.operation-page .station-grid.station-grid-large {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+}
+
+.operation-page .station-grid.station-grid-large .station-button {
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 82px !important;
+    height: 100% !important;
+    padding: 12px 8px !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+}
+
+.operation-page .station-grid.station-grid-large .station-name {
+    display: block;
+    line-height: 1.35;
+}
+
+.operation-page .station-grid.station-grid-large .station-name-en {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+/* 運行情報：詳細文は省略せず左揃えで全文表示 */
 .operation-alert-card {
     display: grid !important;
     grid-template-columns: 44px minmax(0, 1fr) auto !important;
@@ -303,12 +370,12 @@ document.addEventListener("DOMContentLoaded", () => {
     padding: 0 !important;
 }
 
-/* 路線名・運行状況・更新時刻を同じ行に表示 */
+/* 路線名・運行状況・更新時刻 */
 .operation-alert-heading {
     display: flex !important;
     align-items: baseline !important;
     flex-wrap: wrap !important;
-    gap: 8px !important;
+    gap: 4px 8px !important;
     min-width: 0 !important;
 }
 
@@ -319,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
     font-weight: 700 !important;
     margin: 0 !important;
     padding: 0 !important;
-    line-height: 1.5 !important;
+    line-height: 1.3 !important;
 }
 
 .operation-alert-heading .operation-alert-updated {
@@ -329,18 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
     color: #888888 !important;
     margin: 0 !important;
     padding: 0 !important;
-    line-height: 1.5 !important;
-}
-
-@media (max-width: 480px) {
-    .operation-alert-card {
-        grid-template-columns: 36px minmax(0, 1fr) auto !important;
-        gap: 9px !important;
-    }
-
-    .operation-alert-detail {
-        font-size: 12px !important;
-    }
+    line-height: 1.25 !important;
 }
 
 /* 運行情報の「詳細」ボタン */
@@ -350,30 +406,23 @@ document.addEventListener("DOMContentLoaded", () => {
     justify-content: center !important;
     flex-shrink: 0 !important;
     gap: 7px !important;
-
     min-width: 100px !important;
     min-height: 42px !important;
     padding: 10px 18px !important;
-
     border: 1px solid #077AE3 !important;
     border-radius: 8px !important;
-
     background: transparent !important;
     color: #077AE3 !important;
-
     font-size: 15px !important;
     font-weight: 700 !important;
     line-height: 1.4 !important;
     text-decoration: none !important;
     white-space: nowrap !important;
-
     cursor: pointer !important;
     align-self: center !important;
-
     transition: background 0.2s ease, color 0.2s ease !important;
 }
 
-/* マウスを乗せたとき */
 .operation-alert-source:hover {
     background: #077AE3 !important;
     border-color: #077AE3 !important;
@@ -381,14 +430,12 @@ document.addEventListener("DOMContentLoaded", () => {
     opacity: 1 !important;
 }
 
-/* 右向き記号 */
 .operation-alert-source span {
     font-size: 20px !important;
     line-height: 1 !important;
     color: inherit !important;
 }
 
-/* ダークモード */
 [data-theme="dark"] .operation-alert-source {
     border-color: #58aaff !important;
     color: #58aaff !important;
@@ -400,6 +447,112 @@ document.addEventListener("DOMContentLoaded", () => {
     color: #ffffff !important;
 }
 
+/* 路線設定：説明文の右側にボタンを配置 */
+.route-settings-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+}
+
+.route-settings-text {
+    min-width: 0;
+}
+
+.route-settings-text p {
+    margin-bottom: 0;
+}
+
+.route-settings-content > .route-settings-button {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 768px) {
+    .operation-page > .page-header {
+        margin-bottom: 18px !important;
+    }
+
+    .operation-page .station-grid.station-grid-large {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .operation-page .station-grid.station-grid-large .station-button {
+        min-height: 72px !important;
+        padding: 10px 8px !important;
+    }
+
+    .operation-page .station-grid.station-grid-large .station-name {
+        font-size: 15px;
+    }
+
+    .operation-alert-card {
+        grid-template-columns: 36px minmax(0, 1fr) auto !important;
+        gap: 9px !important;
+    }
+
+    .operation-alert-heading {
+        gap: 2px 6px !important;
+        line-height: 1.2 !important;
+    }
+
+    .operation-alert-heading .operation-alert-route,
+    .operation-alert-heading .operation-alert-status {
+        font-size: 16px !important;
+        line-height: 1.25 !important;
+    }
+
+    .operation-alert-heading .operation-alert-updated {
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+    }
+
+    .operation-alert-detail {
+        font-size: 12px !important;
+    }
+
+    .route-settings-content {
+        gap: 10px !important;
+    }
+
+    .route-settings-content h2 {
+        font-size: 18px;
+    }
+
+    .route-settings-text p {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .route-settings-content > .route-settings-button {
+        padding: 9px 12px !important;
+        font-size: 13px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .operation-alert-card {
+        grid-template-columns: 30px minmax(0, 1fr) !important;
+    }
+
+    .operation-alert-source {
+        grid-column: 2;
+        justify-self: start;
+        min-width: 84px !important;
+        min-height: 36px !important;
+        padding: 7px 12px !important;
+    }
+
+    .route-settings-content {
+        align-items: flex-start !important;
+    }
+
+    .route-settings-content > .route-settings-button {
+        padding: 8px 9px !important;
+        font-size: 12px !important;
+    }
+}
 </style>
 
 {% endblock %}
