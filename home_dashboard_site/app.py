@@ -319,12 +319,14 @@ def _operation_result(route_key, ok, status, detail, source_url):
 @app.route("/")
 def home():
     now = datetime.now(JST)
-
-    weekday = (
-        WEEKDAYS[now.weekday()]
-        if now.weekday() < 5
-        else ("土曜日" if now.weekday() == 5 else "日曜日")
-    )
+    try:
+        day_offset = int(request.args.get("day_offset", "0"))
+    except (TypeError, ValueError):
+        day_offset = 0
+    day_offset = max(-365, min(365, day_offset))
+    displayed_day = (now + timedelta(days=day_offset)).date()
+    weekday_names = WEEKDAYS + ["土曜日", "日曜日"]
+    weekday = weekday_names[displayed_day.weekday()]
 
     class_name = selected_class()
     weather_place = selected_weather_place()
@@ -340,7 +342,9 @@ def home():
         weekday=weekday,
         today_lessons=today_lessons,
         events=filtered_events(now),
-        today=f"{now.year}年{now.month}月{now.day}日",
+        today=f"{displayed_day.year}年{displayed_day.month}月{displayed_day.day}日",
+        day_offset=day_offset,
+        displayed_date=displayed_day.isoformat(),
         class_name=class_name,
         class_names=CLASS_NAMES,
         weekday_short="月火水木金土日"[now.weekday()],
@@ -1080,6 +1084,7 @@ def calendar_page():
         action = request.form.get("action", "add")
         events = load_personal_events()
         target_date = request.form.get("return_date", "")
+        return_to = request.form.get("return_to", "")
 
         if action in ("edit", "delete"):
             # IDが一致するユーザー予定だけを操作する。祝日・学校行事は
@@ -1142,6 +1147,8 @@ def calendar_page():
                 save_personal_events(events)
                 target_date = event_date
 
+        if return_to == "home":
+            return redirect(url_for("home"))
         try:
             target = datetime.strptime(target_date, "%Y-%m-%d")
             return redirect(url_for(
