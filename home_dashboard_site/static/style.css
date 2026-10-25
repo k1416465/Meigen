@@ -3114,7 +3114,7 @@ body.dark .timetable-card th {
 
 /* 時刻表：駅選択の背景は全端末で薄い黄色 */
 .operation-page .station-grid.station-grid-large .station-button {
-    background: #FFF9C4 !important;
+    background: #FFFDE7 !important;
     border: 1px solid #FCD800 !important;
     color: #333333 !important;
 }
