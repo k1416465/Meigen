@@ -3538,3 +3538,19 @@ body.notice-open {
 .notice-close-button:hover {
     background: rgba(128, 128, 128, .18);
 }
+
+
+/* v28: My駅未設定の通知から設定画面へ移動できるリンク */
+.nearest-station-message .notice-settings-link {
+    display: block;
+    width: fit-content;
+    margin: 12px auto 0;
+    color: var(--accent, #2767c5);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+.nearest-station-message .notice-settings-link[hidden] {
+    display: none !important;
+}
