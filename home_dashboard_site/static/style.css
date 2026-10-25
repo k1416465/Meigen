@@ -2888,3 +2888,113 @@ body.dark .timetable-card th {
         font-size: 11px;
     }
 }
+
+/* ===== 依頼分のスマホ表示調整 ===== */
+@media (max-width: 620px) {
+    /* ホーム：時刻は大きく、数字の横幅は詰める */
+    .clock {
+        font-size: 62px;
+        letter-spacing: -3.5px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .weather-temp {
+        letter-spacing: -2.5px;
+    }
+
+    /* 最高気温・最低気温・降水確率は従来の数字サイズに固定 */
+    .weather-details strong {
+        font-size: 15px;
+        letter-spacing: normal;
+    }
+
+    /* 時刻表：駅名の日本語・英語を近づけ、ボタンの縦幅を縮める */
+    .station-grid-large .station-button {
+        min-height: 66px;
+        gap: 1px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    .station-grid-large .station-name {
+        line-height: 1.12;
+    }
+
+    .station-grid-large .station-name-en {
+        line-height: 1.05;
+    }
+
+    /* あしかがフラワーパークは1行表示 */
+    a.station-button[href="/station/ashikaga_flower_park"] .station-name {
+        font-size: 11px;
+        line-height: 1.1;
+        white-space: nowrap;
+        letter-spacing: -.45px;
+    }
+
+    a.station-button[href="/station/ashikaga_flower_park"] .station-name-en {
+        font-size: 9px;
+        white-space: nowrap;
+    }
+
+    /* 路線設定の説明は左、変更ボタンは右 */
+    .route-settings-content {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .route-settings-text {
+        min-width: 0;
+        text-align: left;
+    }
+
+    .route-settings-content p {
+        text-align: left;
+    }
+
+    .route-settings-button {
+        flex: 0 0 88px !important;
+        width: 88px !important;
+        min-width: 88px !important;
+        max-width: 88px !important;
+    }
+
+    /* カレンダー見出し：タイトルの右に追加ボタン */
+    .calendar-heading {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+    }
+
+    .calendar-heading h1 {
+        margin: 0;
+        font-size: clamp(23px, 6vw, 28px);
+        white-space: nowrap;
+    }
+
+    .calendar-add-toggle {
+        flex-shrink: 0;
+        padding: 9px 10px !important;
+        font-size: 12px !important;
+        white-space: nowrap;
+    }
+
+    /* 月間カレンダーを横スクロール可能にする */
+    .calendar-grid-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+    }
+
+    .calendar-grid-scroll .calendar-grid {
+        min-width: 560px;
+        width: 560px;
+    }
+}
