@@ -3252,3 +3252,48 @@ body.dark .timetable-card th {
         margin: 0 !important;
     }
 }
+
+/* v18: 駅選択を指定の青色で全端末共通にし、運行情報の余白を調整 */
+.operation-page .station-grid.station-grid-large .station-button,
+.operation-page .station-grid.station-grid-large .station-button:visited {
+    background: #077AE3 !important;
+    background-color: #077AE3 !important;
+    border: 1px solid #077AE3 !important;
+    border-color: #077AE3 !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+
+.operation-page .station-grid.station-grid-large .station-button .station-name,
+.operation-page .station-grid.station-grid-large .station-button .station-name-en {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* PC：路線名と説明文の間隔を狭める */
+@media (min-width: 621px) {
+    .operation-page .operation-alert-card {
+        row-gap: 4px !important;
+    }
+
+    .operation-page .operation-alert-detail {
+        line-height: 1.4 !important;
+        margin-top: 0 !important;
+    }
+}
+
+/* スマホ：遅延の文字を路線名と同じ大きさにし、詳細ボタンを少し低く */
+@media (max-width: 620px) {
+    .operation-page .operation-alert-title-row .operation-alert-status {
+        font-size: 15px !important;
+        line-height: 1.4 !important;
+    }
+
+    .operation-page .operation-alert-source {
+        height: 36px !important;
+        min-height: 36px !important;
+        padding: 5px 14px !important;
+        line-height: 1.2 !important;
+        box-sizing: border-box !important;
+    }
+}
