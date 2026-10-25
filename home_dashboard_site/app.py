@@ -345,6 +345,7 @@ def home():
         today_lessons=today_lessons,
         events=filtered_events(now),
         today=f"{now.year}/{now.month:02d}/{now.day:02d}",
+        clock_date_label=f"{now.year}/{now.month:02d}/{now.day:02d}({'月火水木金土日'[now.weekday()]})",
         day_offset=day_offset,
         displayed_date=displayed_day.isoformat(),
         class_name=class_name,
