@@ -80,8 +80,10 @@
 
                 <div class="operation-alert-content">
                     <div class="operation-alert-heading">
-                        <h3 class="operation-alert-route">{{ alert.route }}</h3>
-                        <p class="operation-alert-status">{{ alert.status }}</p>
+                        <div class="operation-alert-title-row">
+                            <h3 class="operation-alert-route">{{ alert.route }}</h3>
+                            <p class="operation-alert-status">{{ alert.status }}</p>
+                        </div>
 
                         {% if alert.updated_at %}
                         <p class="operation-alert-updated">
@@ -89,10 +91,6 @@
                         </p>
                         {% endif %}
                     </div>
-
-                    {% if alert.detail %}
-                    <p class="operation-alert-detail">{{ alert.detail }}</p>
-                    {% endif %}
                 </div>
 
                 {% if alert.source_url %}
@@ -106,6 +104,10 @@
                 >
                     詳細
                 </a>
+                {% endif %}
+
+                {% if alert.detail %}
+                <p class="operation-alert-detail">{{ alert.detail }}</p>
                 {% endif %}
             </article>
             {% endfor %}
