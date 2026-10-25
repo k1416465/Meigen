@@ -1,10 +1,71 @@
 {% extends "base.html" %}
-{% block title %}迷言｜カレンダー{% endblock %}
+{% block title %}カレンダー
+<script>
+(() => {
+  const KEY = 'meigen.devicePersonalEvents.v1';
+  const colors = {blue:'#077AE3',red:'#E53935',orange:'#F57C00',yellow:'#D6A400',green:'#2E7D32',purple:'#7B1FA2',pink:'#C2185B'};
+  const textColors = {blue:'#0563B5',red:'#C62828',orange:'#B45309',yellow:'#8A6D00',green:'#1B5E20',purple:'#6A1B9A',pink:'#AD1457'};
+  const load = () => { try { const v=JSON.parse(localStorage.getItem(KEY)||'[]'); return Array.isArray(v)?v:[]; } catch { return []; } };
+  const save = list => localStorage.setItem(KEY, JSON.stringify(list));
+  const validDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s||'') && !Number.isNaN(Date.parse(s+'T00:00:00'));
+  const safe = s => String(s ?? '');
+  const currentMonth = () => { const h=document.querySelector('.calendar-navigation h2')?.textContent.match(/(\d{4})年(\d{1,2})月/); return h?{year:+h[1],month:+h[2]}:null; };
+  const eventEl = ev => {
+    const el=document.createElement('div'); el.className='calendar-event personal device-personal-event';
+    el.style.setProperty('--personal-event-color',colors[ev.color]||colors.blue); el.style.setProperty('--personal-event-text-color',textColors[ev.color]||textColors.blue);
+    el.setAttribute('role','button'); el.tabIndex=0; el.dataset.personalEvent=''; el.dataset.deviceEvent='1';
+    el.dataset.eventId=ev.id; el.dataset.eventDate=ev.date; el.dataset.eventTitle=ev.title; el.dataset.eventDetail=ev.detail||''; el.dataset.eventColor=ev.color||'blue';
+    const title=document.createElement('div'); title.className='calendar-event-title'; title.textContent=ev.title; el.appendChild(title);
+    if(ev.detail){const d=document.createElement('div');d.className='calendar-event-detail';d.textContent=ev.detail;el.appendChild(d);}
+    const openEdit=()=>{const form=document.getElementById('calendarEditForm');if(!form)return;document.getElementById('editEventId').value=ev.id;document.getElementById('editEventDate').value=ev.date;document.getElementById('editEventTitle').value=ev.title;document.getElementById('editEventDetail').value=ev.detail||'';document.getElementById('editReturnDate').value=ev.date;document.getElementById('deleteEventId').value=ev.id;document.getElementById('deleteReturnDate').value=ev.date;const radio=form.querySelector(`input[name="color"][value="${ev.color||'blue'}"]`);if(radio)radio.checked=true;document.getElementById('calendarEditBackdrop').hidden=false;};
+    el.addEventListener('click',openEdit);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openEdit();}});
+    return el;
+  };
+  function renderCalendar(){
+    if(!document.querySelector('.calendar-grid')) return;
+    const month=currentMonth(); if(!month)return;
+    load().filter(e=>{const d=new Date(e.date+'T00:00:00');return d.getFullYear()===month.year&&d.getMonth()+1===month.month;}).forEach(ev=>{
+      const btn=document.querySelector(`[data-open-day="${ev.date}"]`); const cell=btn?.closest('.calendar-day'); if(!cell)return;
+      const el=eventEl(ev); cell.appendChild(el);
+      const count=cell.querySelectorAll('.calendar-event').length; const more=cell.querySelector('.calendar-more-events');
+      if(count>2){if(more)more.textContent=`ほか ${count-2} 件`;else{const m=document.createElement('div');m.className='calendar-more-events';m.textContent=`ほか ${count-2} 件`;cell.appendChild(m);}}
+    });
+  }
+  // Existing shared JSON events remain visible but are deliberately not editable.
+  renderCalendar();
+  const addForm=document.getElementById('calendarAddForm');
+  if(addForm) addForm.addEventListener('submit',e=>{
+    e.preventDefault();const f=new FormData(addForm);const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!validDate(date)||!title)return;
+    const list=load();list.push({id:'device-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)),date,title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);
+    const month=currentMonth();const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
+  });
+  const editForm=document.getElementById('calendarEditForm');
+  if(editForm) editForm.addEventListener('submit',e=>{
+    e.preventDefault();const f=new FormData(editForm);const id=safe(f.get('event_id'));const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!id.startsWith('device-')||!validDate(date)||!title)return;
+    const list=load();const ev=list.find(x=>x.id===id);if(!ev)return;Object.assign(ev,{date,title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
+  });
+  const delForm=document.getElementById('calendarDeleteForm');
+  const deleteButton=document.getElementById('deleteEventButton');
+  if(deleteButton) deleteButton.addEventListener('click',e=>{
+    const id=safe(document.getElementById('deleteEventId')?.value); if(!id.startsWith('device-')){e.stopImmediatePropagation();e.preventDefault();return;}
+    e.stopImmediatePropagation();e.preventDefault();if(!confirm('この端末で作成した予定を削除しますか？'))return;
+    save(load().filter(x=>x.id!==id));const d=safe(document.getElementById('deleteReturnDate')?.value);const [y,m]=d.split('-').map(Number);window.location.href=`/calendar?year=${y||new Date().getFullYear()}&month=${m||new Date().getMonth()+1}`;
+  },true);
+  // Disable actions for shared events; only device-prefixed entries can be edited.
+  document.addEventListener('click',e=>{const el=e.target.closest('[data-personal-event]');if(el&&!el.dataset.deviceEvent){e.preventDefault();e.stopImmediatePropagation();}},true);
+  document.addEventListener('keydown',e=>{const el=e.target.closest('[data-personal-event]');if(el&&!el.dataset.deviceEvent){e.preventDefault();e.stopImmediatePropagation();}},true);
+  // Open a specific local event when navigating from the home page.
+  const openId=new URLSearchParams(location.search).get('open_event');if(openId){const el=document.querySelector(`[data-event-id="${CSS.escape(openId)}"]`);if(el&&el.dataset.deviceEvent){el.click();}}
+})();
+</script>
+
+{% endblock %}
 
 {% block content %}
 <section class="welcome-row calendar-heading">
   <div>
     <h1>カレンダー</h1>
+    <p>学校行事・祝日・自分の予定</p>
   </div>
   <button type="button" class="calendar-add-toggle" id="calendarAddToggle" aria-expanded="false" aria-controls="calendarAddForm">＋ 予定を追加</button>
 </section>
@@ -23,9 +84,13 @@
   .calendar-add-form input[type="date"], .calendar-add-form input[type="text"],
   .calendar-add-form textarea, .calendar-edit-form input[type="date"],
   .calendar-edit-form input[type="text"], .calendar-edit-form textarea {
-    width:100%; min-width:0; padding:10px 12px; border:1px solid var(--border,#d7dce2);
-    border-radius:8px; background:var(--surface,#fff); color:var(--text,inherit); font:inherit;
+    box-sizing:border-box; width:100%; max-width:100%; min-width:0; padding:10px 12px;
+    border:1px solid var(--border-color,#d7dce2); border-radius:8px;
+    background:var(--card-bg,transparent); color:inherit; font:inherit;
   }
+  .calendar-add-form > label, .calendar-edit-form > label { min-width:0; }
+  .calendar-scroll { width:100%; min-width:0; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .calendar-scroll .calendar-grid { min-width:0; }
   .calendar-add-form .wide, .calendar-edit-form .wide { grid-column:1 / -1; }
   .calendar-add-form button[type="submit"], .calendar-edit-form button[type="submit"] {
     justify-self:start; border:0; border-radius:9px; padding:10px 14px; background:#077AE3; color:white; cursor:pointer; font:inherit;
@@ -48,7 +113,7 @@
     color:var(--personal-event-text-color,#0563B5);
     cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:pan-y;
   }
-  .calendar-event-title { display:block; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-weight:700; color:inherit; }
+  .calendar-event-title { font-weight:700; color:inherit; }
   .calendar-event-detail { display:none; margin-top:2px; font-size:.8em; white-space:pre-wrap; font-weight:400; color:inherit; }
   /* カレンダー上では各日の予定を2件まで表示し、残りは日付モーダルに表示 */
   .calendar-day > .calendar-event:nth-of-type(n+3) { display:none; }
@@ -57,11 +122,11 @@
   .calendar-event.personal:focus-visible { outline:2px solid #077AE3; outline-offset:2px; }
   .calendar-modal-backdrop { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.48); }
   .calendar-modal-backdrop[hidden] { display:none; }
-  .calendar-modal { width:min(520px,100%); max-height:min(85vh,760px); overflow:auto; padding:20px; border-radius:14px; background:var(--surface,#fff); color:var(--text,inherit); box-shadow:0 12px 40px rgba(0,0,0,.25); }
+  .calendar-modal { width:min(520px,100%); max-height:min(85vh,760px); overflow:auto; padding:20px; border-radius:14px; background:var(--card-bg,#fff); color:var(--text-color,inherit); box-shadow:0 12px 40px rgba(0,0,0,.25); }
   .calendar-modal h2 { margin:0 36px 14px 0; font-size:1.2rem; }
   .calendar-modal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
   .calendar-modal-close { border:0; border-radius:8px; padding:5px 10px; font:inherit; cursor:pointer; background:rgba(127,127,127,.15); color:inherit; }
-  .calendar-modal-event { padding:10px 11px; margin-top:9px; border-radius:8px; background:var(--surface-2,rgba(127,127,127,.08)); overflow-wrap:anywhere; }
+  .calendar-modal-event { padding:10px 11px; margin-top:9px; border-radius:8px; background:rgba(127,127,127,.08); overflow-wrap:anywhere; }
   .calendar-modal-event.school { border-left:4px solid #077AE3; }
   .calendar-modal-event.holiday { border-left:4px solid #d73545; }
   .calendar-modal-event.personal { border-left:4px solid var(--personal-event-color,#077AE3); }
@@ -74,28 +139,21 @@
   .calendar-edit-form { display:grid; grid-template-columns:1fr; gap:12px; }
   .calendar-edit-form[hidden] { display:none; }
   .calendar-modal-help { font-size:.88rem; opacity:.8; margin:0 0 12px; }
-  /* ライト／ダーク両テーマで日付選択モーダルとフォームを読みやすくする */
-  .calendar-modal input,
-  .calendar-modal textarea,
-  .calendar-add-form input,
-  .calendar-add-form textarea {
-    color:var(--text);
-    background:var(--surface);
-    border-color:var(--border);
-  }
-  .calendar-modal input::placeholder,
-  .calendar-modal textarea::placeholder,
-  .calendar-add-form input::placeholder,
-  .calendar-add-form textarea::placeholder { color:var(--muted); opacity:1; }
-  body.dark .calendar-modal-event { background:var(--surface-2); }
-  body.dark .calendar-color-swatch { box-shadow:0 0 0 1px var(--muted); }
-  body.dark .calendar-day-number:hover,
-  body.dark .calendar-day-number:focus-visible { background:rgba(7,122,227,.22); }
   @media (max-width:600px) {
     .calendar-heading { align-items:flex-start; }
     .calendar-add-toggle { padding:9px 11px; font-size:.9rem; }
-    .calendar-add-form { grid-template-columns:1fr; }
-    .calendar-add-form .wide { grid-column:auto; }
+    .calendar-add-form { grid-template-columns:minmax(0,1fr); }
+    .calendar-add-form .wide { grid-column:auto; min-width:0; }
+    .calendar-add-form input[type="date"], .calendar-edit-form input[type="date"] {
+      display:block; box-sizing:border-box; width:100%; max-width:100%; min-width:0;
+    }
+    .calendar-color-options {
+      flex-wrap:nowrap; justify-content:space-between; gap:2px; width:100%; min-width:0;
+    }
+    .calendar-color-option { flex:0 0 auto; gap:3px !important; font-size:.75rem; white-space:nowrap; }
+    .calendar-color-swatch { width:16px; height:16px; flex:0 0 16px; }
+    .calendar-scroll { max-width:100%; overflow-x:auto; }
+    .calendar-scroll .calendar-grid { min-width:700px; }
     .calendar-modal { padding:16px; }
   }
 </style>
@@ -136,8 +194,8 @@
     <a href="{{ url_for('calendar_page', year=next_year, month=next_month) }}">翌月 ›</a>
   </div>
 
-  <div class="calendar-grid-scroll">
-    <div class="calendar-grid">
+  <div class="calendar-scroll" aria-label="カレンダー。左右にスクロールできます">
+  <div class="calendar-grid">
     {% for weekday in ["日", "月", "火", "水", "木", "金", "土"] %}
       <div class="calendar-weekday">{{ weekday }}</div>
     {% endfor %}
@@ -154,12 +212,10 @@
             <div class="calendar-event {{ event.kind }}"
               {% if event.kind == 'personal' %}
                 style="--personal-event-color:{{ event_color }};--personal-event-text-color:{{ event_text_color }};"
-                role="button" tabindex="0" data-personal-event
                 data-event-id="{{ event.id }}" data-event-date="{{ event.date }}"
                 data-event-title="{{ event.title }}" data-event-detail="{{ event.detail }}"
                 data-event-color="{{ event.color }}"
-                aria-label="{{ event.title }}。タップまたは長押しで編集・削除"
-                title="タップまたは長押しで編集・削除"
+                aria-label="共有予定：{{ event.title }}"
               {% endif %}>
               <div class="calendar-event-title">{{ event.title }}</div>
               {% if event.detail %}<div class="calendar-event-detail">{{ event.detail }}</div>{% endif %}
@@ -171,9 +227,9 @@
         </div>
       {% endfor %}
     {% endfor %}
-    </div>
   </div>
-  <p class="calendar-modal-help">日付を押すと、その日の予定をすべて表示します。自分の予定はタップで編集・削除できます。</p>
+  </div>
+  <p class="calendar-modal-help">日付を押すと、その日の予定をすべて表示します。自分の予定はタップまたは長押しで編集・削除できます。</p>
 </section>
 
 <div class="calendar-modal-backdrop" id="calendarDayBackdrop" hidden>
@@ -414,17 +470,66 @@
       }
     });
   });
-
-  // ホームの予定カードから遷移してきた場合は、該当予定の編集・削除画面を開く。
-  const requestedEventId = new URLSearchParams(window.location.search).get('open_event');
-  if (requestedEventId) {
-    const requestedEvent = Array.from(document.querySelectorAll('[data-personal-event]'))
-      .find(el => el.dataset.eventId === requestedEventId);
-    if (requestedEvent) {
-      selectedEvent = requestedEvent;
-      openActions();
-    }
-  }
 })();
 </script>
+
+<script>
+(() => {
+  const KEY = 'meigen.devicePersonalEvents.v1';
+  const colors = {blue:'#077AE3',red:'#E53935',orange:'#F57C00',yellow:'#D6A400',green:'#2E7D32',purple:'#7B1FA2',pink:'#C2185B'};
+  const textColors = {blue:'#0563B5',red:'#C62828',orange:'#B45309',yellow:'#8A6D00',green:'#1B5E20',purple:'#6A1B9A',pink:'#AD1457'};
+  const load = () => { try { const v=JSON.parse(localStorage.getItem(KEY)||'[]'); return Array.isArray(v)?v:[]; } catch { return []; } };
+  const save = list => localStorage.setItem(KEY, JSON.stringify(list));
+  const validDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s||'') && !Number.isNaN(Date.parse(s+'T00:00:00'));
+  const safe = s => String(s ?? '');
+  const currentMonth = () => { const h=document.querySelector('.calendar-navigation h2')?.textContent.match(/(\d{4})年(\d{1,2})月/); return h?{year:+h[1],month:+h[2]}:null; };
+  const eventEl = ev => {
+    const el=document.createElement('div'); el.className='calendar-event personal device-personal-event';
+    el.style.setProperty('--personal-event-color',colors[ev.color]||colors.blue); el.style.setProperty('--personal-event-text-color',textColors[ev.color]||textColors.blue);
+    el.setAttribute('role','button'); el.tabIndex=0; el.dataset.personalEvent=''; el.dataset.deviceEvent='1';
+    el.dataset.eventId=ev.id; el.dataset.eventDate=ev.date; el.dataset.eventTitle=ev.title; el.dataset.eventDetail=ev.detail||''; el.dataset.eventColor=ev.color||'blue';
+    const title=document.createElement('div'); title.className='calendar-event-title'; title.textContent=ev.title; el.appendChild(title);
+    if(ev.detail){const d=document.createElement('div');d.className='calendar-event-detail';d.textContent=ev.detail;el.appendChild(d);}
+    const openEdit=()=>{const form=document.getElementById('calendarEditForm');if(!form)return;document.getElementById('editEventId').value=ev.id;document.getElementById('editEventDate').value=ev.date;document.getElementById('editEventTitle').value=ev.title;document.getElementById('editEventDetail').value=ev.detail||'';document.getElementById('editReturnDate').value=ev.date;document.getElementById('deleteEventId').value=ev.id;document.getElementById('deleteReturnDate').value=ev.date;const radio=form.querySelector(`input[name="color"][value="${ev.color||'blue'}"]`);if(radio)radio.checked=true;document.getElementById('calendarEditBackdrop').hidden=false;};
+    el.addEventListener('click',openEdit);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openEdit();}});
+    return el;
+  };
+  function renderCalendar(){
+    if(!document.querySelector('.calendar-grid')) return;
+    const month=currentMonth(); if(!month)return;
+    load().filter(e=>{const d=new Date(e.date+'T00:00:00');return d.getFullYear()===month.year&&d.getMonth()+1===month.month;}).forEach(ev=>{
+      const btn=document.querySelector(`[data-open-day="${ev.date}"]`); const cell=btn?.closest('.calendar-day'); if(!cell)return;
+      const el=eventEl(ev); cell.appendChild(el);
+      const count=cell.querySelectorAll('.calendar-event').length; const more=cell.querySelector('.calendar-more-events');
+      if(count>2){if(more)more.textContent=`ほか ${count-2} 件`;else{const m=document.createElement('div');m.className='calendar-more-events';m.textContent=`ほか ${count-2} 件`;cell.appendChild(m);}}
+    });
+  }
+  // Existing shared JSON events remain visible but are deliberately not editable.
+  renderCalendar();
+  const addForm=document.getElementById('calendarAddForm');
+  if(addForm) addForm.addEventListener('submit',e=>{
+    e.preventDefault();const f=new FormData(addForm);const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!validDate(date)||!title)return;
+    const list=load();list.push({id:'device-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)),date,title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);
+    const month=currentMonth();const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
+  });
+  const editForm=document.getElementById('calendarEditForm');
+  if(editForm) editForm.addEventListener('submit',e=>{
+    e.preventDefault();const f=new FormData(editForm);const id=safe(f.get('event_id'));const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!id.startsWith('device-')||!validDate(date)||!title)return;
+    const list=load();const ev=list.find(x=>x.id===id);if(!ev)return;Object.assign(ev,{date,title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
+  });
+  const delForm=document.getElementById('calendarDeleteForm');
+  const deleteButton=document.getElementById('deleteEventButton');
+  if(deleteButton) deleteButton.addEventListener('click',e=>{
+    const id=safe(document.getElementById('deleteEventId')?.value); if(!id.startsWith('device-')){e.stopImmediatePropagation();e.preventDefault();return;}
+    e.stopImmediatePropagation();e.preventDefault();if(!confirm('この端末で作成した予定を削除しますか？'))return;
+    save(load().filter(x=>x.id!==id));const d=safe(document.getElementById('deleteReturnDate')?.value);const [y,m]=d.split('-').map(Number);window.location.href=`/calendar?year=${y||new Date().getFullYear()}&month=${m||new Date().getMonth()+1}`;
+  },true);
+  // Disable actions for shared events; only device-prefixed entries can be edited.
+  document.addEventListener('click',e=>{const el=e.target.closest('[data-personal-event]');if(el&&!el.dataset.deviceEvent){e.preventDefault();e.stopImmediatePropagation();}},true);
+  document.addEventListener('keydown',e=>{const el=e.target.closest('[data-personal-event]');if(el&&!el.dataset.deviceEvent){e.preventDefault();e.stopImmediatePropagation();}},true);
+  // Open a specific local event when navigating from the home page.
+  const openId=new URLSearchParams(location.search).get('open_event');if(openId){const el=document.querySelector(`[data-event-id="${CSS.escape(openId)}"]`);if(el&&el.dataset.deviceEvent){el.click();}}
+})();
+</script>
+
 {% endblock %}

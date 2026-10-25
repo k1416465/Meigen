@@ -76,20 +76,6 @@ ROUTE_OPTIONS = {
     "tobu_sano": "東武佐野線",
 }
 
-STATION_OPTIONS = {
-    "oyama": "小山駅",
-    "omoigawa": "思川駅",
-    "tochigi": "栃木駅",
-    "ohirashita": "大平下駅",
-    "iwafune": "岩舟駅",
-    "sano": "佐野駅",
-    "tomita": "富田駅",
-    "ashikaga_flower_park": "あしかがフラワーパーク駅",
-    "ashikaga": "足利駅",
-    "yamamae": "山前駅",
-    "omata": "小俣駅",
-}
-
 WEATHER_OPTIONS = {
     "utsunomiya": "宇都宮市",
     "oyama": "小山市",
@@ -196,6 +182,8 @@ def inject_appearance():
     return {"appearance": selected_appearance()}
 
 
+
+
 def selected_class():
     value = request.cookies.get("myHomeClass")
     return value if value in CLASS_SCHEDULES else None
@@ -204,11 +192,6 @@ def selected_class():
 def selected_route():
     value = request.cookies.get("myHomeRoute", "ryomo")
     return value if value in ROUTE_OPTIONS else "ryomo"
-
-
-def selected_station():
-    value = request.cookies.get("myHomeStation", "")
-    return value if value in STATION_OPTIONS else ""
 
 
 def selected_weather_place():
@@ -254,7 +237,8 @@ def filtered_events(now):
         day += timedelta(days=1)
 
     # ユーザーがカレンダーで追加した予定（設定した色）
-    for event in load_personal_events():
+    personal_events = load_personal_events()  # 既存データは全員共通のまま
+    for event in personal_events:
         try:
             event_date = datetime.strptime(event["date"], "%Y-%m-%d").date()
         except (ValueError, TypeError, KeyError):
@@ -319,15 +303,17 @@ def _operation_result(route_key, ok, status, detail, source_url):
 @app.route("/")
 def home():
     now = datetime.now(JST)
-    try:
-        day_offset = int(request.args.get("day_offset", "0"))
-    except (TypeError, ValueError):
-        day_offset = 0
-    day_offset = max(-365, min(365, day_offset))
-    displayed_day = (now + timedelta(days=day_offset)).date()
-    weekday_names = WEEKDAYS + ["土曜日", "日曜日"]
-    weekday = weekday_names[displayed_day.weekday()]
-    schedule_date_label = f"{displayed_day.month}/{displayed_day.day}({'月火水木金土日'[displayed_day.weekday()]})"
+    # index.html の前日・翌日ボタンから渡される日付オフセット
+    day_offset = request.args.get("day_offset", default=0, type=int)
+    # URLに極端な値が渡されても過剰な日付計算にならないよう制限
+    day_offset = max(-3650, min(day_offset, 3650))
+    selected_day = now + timedelta(days=day_offset)
+
+    weekday = (
+        WEEKDAYS[selected_day.weekday()]
+        if selected_day.weekday() < 5
+        else ("土曜日" if selected_day.weekday() == 5 else "日曜日")
+    )
 
     class_name = selected_class()
     weather_place = selected_weather_place()
@@ -340,17 +326,14 @@ def home():
 
     return render_template(
         "index.html",
+        day_offset=day_offset,
         weekday=weekday,
-        schedule_date_label=schedule_date_label,
         today_lessons=today_lessons,
         events=filtered_events(now),
-        today=f"{now.year}/{now.month:02d}/{now.day:02d}",
-        clock_date_label=f"{now.year}/{now.month:02d}/{now.day:02d}({'月火水木金土日'[now.weekday()]})",
-        day_offset=day_offset,
-        displayed_date=displayed_day.isoformat(),
+        today=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日",
         class_name=class_name,
         class_names=CLASS_NAMES,
-        weekday_short="月火水木金土日"[now.weekday()],
+        weekday_short="月火水木金土日"[selected_day.weekday()],
         weather_place=weather_place,
         weather_label=WEATHER_OPTIONS[weather_place],
         railway_label=ROUTE_OPTIONS[selected_route()],
@@ -389,7 +372,6 @@ def settings():
     if request.method == "POST":
         class_name = request.form.get("class_name", "")
         my_route = request.form.get("my_route", "ryomo")
-        my_station = request.form.get("my_station", "")
         weather_place = request.form.get("weather_place", "sano")
         appearance = request.form.get("appearance", "system")
 
@@ -397,8 +379,6 @@ def settings():
             class_name = ""
         if my_route not in ROUTE_OPTIONS:
             my_route = "ryomo"
-        if my_station not in STATION_OPTIONS:
-            my_station = ""
         if weather_place not in WEATHER_OPTIONS:
             weather_place = "sano"
         if appearance not in ("light", "dark", "system"):
@@ -417,10 +397,6 @@ def settings():
             response.delete_cookie("myHomeClass")
 
         response.set_cookie("myHomeRoute", my_route, **cookie_options)
-        if my_station:
-            response.set_cookie("myHomeStation", my_station, **cookie_options)
-        else:
-            response.delete_cookie("myHomeStation")
         response.set_cookie("myHomeWeather", weather_place, **cookie_options)
         response.set_cookie("myHomeAppearance", appearance, **cookie_options)
 
@@ -432,8 +408,6 @@ def settings():
         class_names=CLASS_NAMES,
         my_route=selected_route(),
         route_options=ROUTE_OPTIONS,
-        my_station=selected_station(),
-        station_options=STATION_OPTIONS,
         weather_place=selected_weather_place(),
         weather_options=WEATHER_OPTIONS,
     )
@@ -659,14 +633,13 @@ def _extract_detail(text, status, status_index):
     if status == "平常運転":
         return "事故・遅延に関する情報はありません。"
 
-    # 更新日時を除去（ページ内UIの「更新時刻：14:15」も含む）
+    # 更新日時を除去
     text = re.sub(
         r"\d{1,2}月\d{1,2}日\s*"
         r"\d{1,2}時\d{1,2}分\s*(?:更新|現在)",
         "",
         text,
     )
-    text = re.sub(r"更新時刻\s*[:：]?\s*\d{1,2}:\d{2}", "", text)
 
     # 掲載日時を除去
     text = re.sub(
@@ -682,14 +655,10 @@ def _extract_detail(text, status, status_index):
     if marker_index >= 0:
         text = text[marker_index + len(marker):]
 
-    # サイトの操作案内・周辺UIの文言を詳細文から除去
-    # 「路線を登録」「列車遅延」は本文ではなくページ上のUIラベルとして混入することがある
-    text = text.replace("路線を登録すると", "")
-    text = text.replace("路線を登録", "")
-    text = text.replace("列車遅延", "")
-
+    # 迂回ルート検索や登録案内以降を除去
     stop_markers = (
         "迂回ルート検索",
+        "路線を登録すると",
         "この路線に関するつぶやき",
         "みんなの運行情報",
         "運行情報を投稿",
@@ -726,8 +695,6 @@ def _extract_detail(text, status, status_index):
             text = text[len(route_name):].strip()
             break
 
-    # 見出し側に表示する状態ラベルが本文の先頭に混入した場合は除去
-    text = re.sub(r"^(?:列車遅延|遅延)\s*", "", text)
     text = _normalise_text(text)
 
     if not text:
@@ -1012,8 +979,6 @@ def operation_page():
         operation=operation,
         operation_alerts=operation_alerts,
         railway_label=ROUTE_OPTIONS[route_key],
-        my_station=selected_station(),
-        my_station_name=STATION_OPTIONS.get(selected_station(), ""),
         weather_place=selected_weather_place(),
     )
 
@@ -1084,81 +1049,9 @@ def calendar_page():
     now = datetime.now(JST)
 
     if request.method == "POST":
-        action = request.form.get("action", "add")
-        events = load_personal_events()
-        target_date = request.form.get("return_date", "")
-        return_to = request.form.get("return_to", "")
-
-        if action in ("edit", "delete"):
-            # IDが一致するユーザー予定だけを操作する。祝日・学校行事は
-            # SCHOOL_EVENTS / jpholiday 由来なので、このリストには存在しない。
-            event_id = request.form.get("event_id", "")
-            event = next((item for item in events if item.get("id") == event_id), None)
-
-            if event is not None and action == "delete":
-                events = [item for item in events if item.get("id") != event_id]
-                save_personal_events(events)
-
-            elif event is not None and action == "edit":
-                event_date = request.form.get("event_date", "").strip()
-                title = request.form.get("title", "").strip()
-                detail = request.form.get("detail", "").strip()
-                color = request.form.get("color", "blue").strip()
-                if color not in PERSONAL_EVENT_COLORS:
-                    color = "blue"
-
-                try:
-                    parsed_date = datetime.strptime(event_date, "%Y-%m-%d").date()
-                    valid_date = parsed_date.isoformat() == event_date
-                except (ValueError, TypeError):
-                    valid_date = False
-
-                if valid_date and title:
-                    event.update({
-                        "date": event_date,
-                        "title": title[:80],
-                        "detail": detail[:300],
-                        "color": color,
-                        "kind": "personal",
-                    })
-                    save_personal_events(events)
-                    target_date = event_date
-
-        elif action == "add":
-            event_date = request.form.get("event_date", "").strip()
-            title = request.form.get("title", "").strip()
-            detail = request.form.get("detail", "").strip()
-            color = request.form.get("color", "blue").strip()
-            if color not in PERSONAL_EVENT_COLORS:
-                color = "blue"
-
-            try:
-                parsed_date = datetime.strptime(event_date, "%Y-%m-%d").date()
-                valid_date = parsed_date.isoformat() == event_date
-            except (ValueError, TypeError):
-                valid_date = False
-
-            if valid_date and title:
-                events.append({
-                    "id": uuid.uuid4().hex,
-                    "date": event_date,
-                    "title": title[:80],
-                    "detail": detail[:300],
-                    "color": color,
-                    "kind": "personal",
-                })
-                save_personal_events(events)
-                target_date = event_date
-
-        if return_to == "home":
-            return redirect(url_for("home"))
-        try:
-            target = datetime.strptime(target_date, "%Y-%m-%d")
-            return redirect(url_for(
-                "calendar_page", year=target.year, month=target.month
-            ))
-        except (ValueError, TypeError):
-            return redirect(url_for("calendar_page", year=now.year, month=now.month))
+        # 個人予定の新規作成・編集・削除はブラウザーの localStorage で処理する。
+        # 旧フォームからのPOSTで共有予定JSONを書き換えない。
+        return redirect(url_for("calendar_page", year=now.year, month=now.month))
 
     try:
         year = int(request.args.get("year", now.year))
@@ -1184,8 +1077,9 @@ def calendar_page():
             **event, "kind": "school"
         })
 
-    # ユーザーが追加した予定
-    for event in load_personal_events():
+    # personal_events.json の既存予定は全員共通。新規予定はブラウザー側で追加する。
+    personal_events = load_personal_events()
+    for event in personal_events:
         try:
             event_date = datetime.strptime(event["date"], "%Y-%m-%d").date()
         except (ValueError, TypeError, KeyError):

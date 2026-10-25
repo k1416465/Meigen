@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f7fb">
 
   <!-- サイト共通アイコン（ブラウザのタブ・ブックマーク） -->
@@ -20,7 +20,7 @@
   >
 
   <title>{% block title %}迷言{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v=20) }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     /* テーマ切り替えアイコンをボタンの中央に配置 */
     #themeToggle { display: inline-flex; align-items: center; justify-content: center; }
@@ -61,8 +61,7 @@
           取得中…
         </span>
       </a>
-
-      <a
+<a
         class="settings-top-link"
         href="{{ url_for('settings') }}"
         aria-label="設定"
@@ -92,6 +91,15 @@
   </header>
 
   <main class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <section aria-live="polite" style="margin:0 0 12px;">
+          {% for category, message in messages %}
+            <div style="padding:10px 12px;margin:6px 0;border-radius:10px;background:rgba(127,127,127,.14);">{{ message }}</div>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endwith %}
     {% block content %}{% endblock %}
   </main>
 
