@@ -3111,3 +3111,68 @@ body.dark .timetable-card th {
 .nearest-station-message:empty {
     display: none !important;
 }
+
+/* 時刻表：駅選択の背景は全端末で薄い黄色 */
+.operation-page .station-grid.station-grid-large .station-button {
+    background: #FFF9C4 !important;
+    border: 1px solid #FCD800 !important;
+    color: #333333 !important;
+}
+
+/* スマホ版：駅を1行3列にして、駅選択と運行情報の間隔を詰める */
+@media (max-width: 620px) {
+    .operation-page .station-selector {
+        padding: 10px 10px 8px !important;
+        gap: 6px !important;
+    }
+
+    .operation-page .station-grid.station-grid-large {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+    }
+
+    .operation-page .station-grid.station-grid-large .station-button {
+        min-width: 0 !important;
+        min-height: 52px !important;
+        padding: 5px 2px !important;
+        gap: 2px !important;
+        border-width: 1px !important;
+    }
+
+    .operation-page .station-grid.station-grid-large .station-name {
+        max-width: 100%;
+        font-size: 13px;
+        line-height: 1.1;
+        overflow-wrap: anywhere;
+    }
+
+    .operation-page .station-grid.station-grid-large .station-name-en {
+        max-width: 100%;
+        font-size: 9px;
+        line-height: 1.05;
+        overflow-wrap: anywhere;
+    }
+
+    .operation-page .station-grid.station-grid-large a.station-button[href="/station/ashikaga_flower_park"] .station-name {
+        font-size: 8px !important;
+        white-space: nowrap !important;
+        letter-spacing: -0.45px !important;
+        overflow-wrap: normal !important;
+    }
+
+    .operation-page .station-grid.station-grid-large a.station-button[href="/station/ashikaga_flower_park"] .station-name-en {
+        font-size: 7px !important;
+        white-space: nowrap !important;
+        letter-spacing: -0.2px;
+        overflow-wrap: normal !important;
+    }
+
+    .operation-page .operation-alert-section {
+        margin-top: 4px !important;
+    }
+
+    .operation-page .operation-section-heading {
+        margin-top: 8px !important;
+        margin-bottom: 8px !important;
+    }
+}
