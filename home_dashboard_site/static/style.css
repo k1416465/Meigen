@@ -3100,3 +3100,14 @@ body.dark .timetable-card th {
         }
     }
 }
+
+
+/* 時刻表：駅選択の黄色い枠線は全端末共通（細め） */
+.operation-page .station-grid.station-grid-large .station-button {
+    border: 1px solid #FCD800 !important;
+}
+
+/* 現在地メッセージは失敗時のみ表示。空の場合は表示領域も隠す */
+.nearest-station-message:empty {
+    display: none !important;
+}
