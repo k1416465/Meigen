@@ -3074,3 +3074,29 @@ body.dark .timetable-card th {
         max-width: 76px !important;
     }
 }
+
+/* スマートフォン版カレンダー：表をカード内で縦スクロールし、
+   Safariの動的な表示領域に合わせてページ全体の縦伸びを抑える */
+@media (max-width: 620px) {
+    .page:has(.calendar-grid-scroll) {
+        min-height: 0;
+    }
+
+    .page:has(.calendar-grid-scroll) .calendar-grid-scroll {
+        height: auto;
+        min-height: 180px;
+        max-height: calc(100dvh - 390px);
+        overflow-x: auto;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    /* 100dvh非対応ブラウザ向けの予備指定 */
+    @supports not (height: 100dvh) {
+        .page:has(.calendar-grid-scroll) .calendar-grid-scroll {
+            max-height: calc(100vh - 390px);
+        }
+    }
+}
