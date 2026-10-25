@@ -178,6 +178,7 @@
     aria-live="polite"
 >
     <span id="nearestStationMessageText"></span>
+    <a id="noticeSettingsLink" class="notice-settings-link" href="{{ url_for('settings') }}" hidden>設定画面を開く</a>
     <button type="button" id="closeNoticeButton" class="notice-close-button" aria-label="通知を閉じる" title="閉じる">×</button>
 </div>
 
@@ -188,14 +189,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageText = document.getElementById("nearestStationMessageText");
     const noticeBackdrop = document.getElementById("noticeBackdrop");
     const closeNoticeButton = document.getElementById("closeNoticeButton");
+    const noticeSettingsLink = document.getElementById("noticeSettingsLink");
     const icon = document.getElementById("nearest-station-icon");
     const myStationButton = document.getElementById("myStationButton");
     const myStationIcon = document.getElementById("my-station-icon");
 
     if (!button || !message) return;
 
-    function showCenteredNotice(text) {
+    function showCenteredNotice(text, includeSettingsLink = false) {
         messageText.textContent = text;
+        noticeSettingsLink.hidden = !includeSettingsLink;
         message.classList.add("is-visible");
         noticeBackdrop.classList.add("is-visible");
         document.body.classList.add("notice-open");
@@ -205,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function hideNotice() {
         messageText.textContent = "";
+        noticeSettingsLink.hidden = true;
         message.classList.remove("is-visible");
         noticeBackdrop.classList.remove("is-visible");
         document.body.classList.remove("notice-open");
@@ -215,7 +219,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // 通知表示中は、×以外の操作やキーボード操作を受け付けない
     document.addEventListener("click", event => {
         if (document.body.classList.contains("notice-open") &&
-            !closeNoticeButton.contains(event.target)) {
+            !closeNoticeButton.contains(event.target) &&
+            !(noticeSettingsLink && !noticeSettingsLink.hidden && noticeSettingsLink.contains(event.target))) {
             event.preventDefault();
             event.stopPropagation();
         }
@@ -227,7 +232,18 @@ document.addEventListener("DOMContentLoaded", () => {
             hideNotice();
             return;
         }
-        if (event.target !== closeNoticeButton || !["Enter", " "].includes(event.key)) {
+        const onCloseButton = event.target === closeNoticeButton;
+        const onSettingsLink = noticeSettingsLink && !noticeSettingsLink.hidden && event.target === noticeSettingsLink;
+        if (event.key === "Tab" && noticeSettingsLink && !noticeSettingsLink.hidden) {
+            event.preventDefault();
+            if (event.shiftKey) {
+                (onSettingsLink ? closeNoticeButton : noticeSettingsLink).focus({ preventScroll: true });
+            } else {
+                (onCloseButton ? noticeSettingsLink : closeNoticeButton).focus({ preventScroll: true });
+            }
+            return;
+        }
+        if (!(event.key === "Enter" || event.key === " ") || (!onCloseButton && !onSettingsLink)) {
             event.preventDefault();
             event.stopPropagation();
         }
@@ -260,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
         myStationButton.addEventListener("click", () => {
             const myStationId = myStationButton.dataset.stationId;
             if (!myStationId) {
-                showCenteredNotice("My駅が設定されていません。設定からMy駅を選択してください。");
+                showCenteredNotice("My駅が設定されていません。設定画面でMy駅を選択してください。", true);
                 return;
             }
             if (!/^[a-z0-9_]+$/i.test(myStationId)) {
