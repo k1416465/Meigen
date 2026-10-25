@@ -3871,7 +3871,7 @@ body.dark .page-refresh-button {
 
     /* 閉じているときの「クラスの選択」「My路線」などの見出し部分 */
     .settings-form .setting-accordion:not([open]) > summary {
-        min-height: 60px !important;
+        min-height: 46px !important;
         padding: 10px 12px !important;
         line-height: 1.3 !important;
         font-size: 15px !important;
@@ -3885,7 +3885,7 @@ body.dark .page-refresh-button {
 
     /* 開いたときの見出しは読みやすさを維持 */
     .settings-form .setting-accordion[open] > summary {
-        min-height: 60px !important;
+        min-height: 46px !important;
         padding: 10px 12px !important;
         line-height: 1.3 !important;
         font-size: 15px !important;
