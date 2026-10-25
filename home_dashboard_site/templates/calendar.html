@@ -23,8 +23,8 @@
   .calendar-add-form input[type="date"], .calendar-add-form input[type="text"],
   .calendar-add-form textarea, .calendar-edit-form input[type="date"],
   .calendar-edit-form input[type="text"], .calendar-edit-form textarea {
-    width:100%; min-width:0; padding:10px 12px; border:1px solid var(--border-color,#d7dce2);
-    border-radius:8px; background:var(--card-bg,transparent); color:inherit; font:inherit;
+    width:100%; min-width:0; padding:10px 12px; border:1px solid var(--border,#d7dce2);
+    border-radius:8px; background:var(--surface,#fff); color:var(--text,inherit); font:inherit;
   }
   .calendar-add-form .wide, .calendar-edit-form .wide { grid-column:1 / -1; }
   .calendar-add-form button[type="submit"], .calendar-edit-form button[type="submit"] {
@@ -57,11 +57,11 @@
   .calendar-event.personal:focus-visible { outline:2px solid #077AE3; outline-offset:2px; }
   .calendar-modal-backdrop { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.48); }
   .calendar-modal-backdrop[hidden] { display:none; }
-  .calendar-modal { width:min(520px,100%); max-height:min(85vh,760px); overflow:auto; padding:20px; border-radius:14px; background:var(--card-bg,#fff); color:var(--text-color,inherit); box-shadow:0 12px 40px rgba(0,0,0,.25); }
+  .calendar-modal { width:min(520px,100%); max-height:min(85vh,760px); overflow:auto; padding:20px; border-radius:14px; background:var(--surface,#fff); color:var(--text,inherit); box-shadow:0 12px 40px rgba(0,0,0,.25); }
   .calendar-modal h2 { margin:0 36px 14px 0; font-size:1.2rem; }
   .calendar-modal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
   .calendar-modal-close { border:0; border-radius:8px; padding:5px 10px; font:inherit; cursor:pointer; background:rgba(127,127,127,.15); color:inherit; }
-  .calendar-modal-event { padding:10px 11px; margin-top:9px; border-radius:8px; background:rgba(127,127,127,.08); overflow-wrap:anywhere; }
+  .calendar-modal-event { padding:10px 11px; margin-top:9px; border-radius:8px; background:var(--surface-2,rgba(127,127,127,.08)); overflow-wrap:anywhere; }
   .calendar-modal-event.school { border-left:4px solid #077AE3; }
   .calendar-modal-event.holiday { border-left:4px solid #d73545; }
   .calendar-modal-event.personal { border-left:4px solid var(--personal-event-color,#077AE3); }
@@ -74,6 +74,23 @@
   .calendar-edit-form { display:grid; grid-template-columns:1fr; gap:12px; }
   .calendar-edit-form[hidden] { display:none; }
   .calendar-modal-help { font-size:.88rem; opacity:.8; margin:0 0 12px; }
+  /* ライト／ダーク両テーマで日付選択モーダルとフォームを読みやすくする */
+  .calendar-modal input,
+  .calendar-modal textarea,
+  .calendar-add-form input,
+  .calendar-add-form textarea {
+    color:var(--text);
+    background:var(--surface);
+    border-color:var(--border);
+  }
+  .calendar-modal input::placeholder,
+  .calendar-modal textarea::placeholder,
+  .calendar-add-form input::placeholder,
+  .calendar-add-form textarea::placeholder { color:var(--muted); opacity:1; }
+  body.dark .calendar-modal-event { background:var(--surface-2); }
+  body.dark .calendar-color-swatch { box-shadow:0 0 0 1px var(--muted); }
+  body.dark .calendar-day-number:hover,
+  body.dark .calendar-day-number:focus-visible { background:rgba(7,122,227,.22); }
   @media (max-width:600px) {
     .calendar-heading { align-items:flex-start; }
     .calendar-add-toggle { padding:9px 11px; font-size:.9rem; }
