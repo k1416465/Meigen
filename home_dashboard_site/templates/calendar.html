@@ -119,7 +119,8 @@
     <a href="{{ url_for('calendar_page', year=next_year, month=next_month) }}">翌月 ›</a>
   </div>
 
-  <div class="calendar-grid">
+  <div class="calendar-grid-scroll">
+    <div class="calendar-grid">
     {% for weekday in ["日", "月", "火", "水", "木", "金", "土"] %}
       <div class="calendar-weekday">{{ weekday }}</div>
     {% endfor %}
@@ -153,6 +154,7 @@
         </div>
       {% endfor %}
     {% endfor %}
+    </div>
   </div>
   <p class="calendar-modal-help">日付を押すと、その日の予定をすべて表示します。自分の予定はタップで編集・削除できます。</p>
 </section>

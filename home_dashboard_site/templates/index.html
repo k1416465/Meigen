@@ -166,19 +166,20 @@
           href="{{ url_for('settings') }}"
         >設定から時間割のクラス選択ができます</a>
 
-      {% elif today_lessons %}
+      {% else %}
         <div class="lesson-list">
-          {% for lesson in today_lessons %}
+          {% for period in range(7) %}
             <div class="lesson-row">
               <span class="lesson-number">{{ loop.index }}</span>
-              <span class="lesson-name">{{ lesson }}</span>
+              {% if today_lessons and period < today_lessons|length %}
+                <span class="lesson-name">{{ today_lessons[period] }}</span>
+              {% elif not today_lessons and period == 0 %}
+                <span class="lesson-name">今日は授業がありません</span>
+              {% else %}
+                <span class="lesson-name lesson-empty-slot" aria-hidden="true">&nbsp;</span>
+              {% endif %}
             </div>
           {% endfor %}
-        </div>
-
-      {% else %}
-        <div class="empty-state">
-          <strong>今日は授業がありません</strong>
         </div>
       {% endif %}
     </section>
