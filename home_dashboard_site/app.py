@@ -451,11 +451,16 @@ def logout():
 @app.route("/")
 def home():
     now = datetime.now(JST)
+    # index.html の前日・翌日ボタンから渡される日付オフセット
+    day_offset = request.args.get("day_offset", default=0, type=int)
+    # URLに極端な値が渡されても過剰な日付計算にならないよう制限
+    day_offset = max(-3650, min(day_offset, 3650))
+    selected_day = now + timedelta(days=day_offset)
 
     weekday = (
-        WEEKDAYS[now.weekday()]
-        if now.weekday() < 5
-        else ("土曜日" if now.weekday() == 5 else "日曜日")
+        WEEKDAYS[selected_day.weekday()]
+        if selected_day.weekday() < 5
+        else ("土曜日" if selected_day.weekday() == 5 else "日曜日")
     )
 
     class_name = selected_class()
@@ -469,13 +474,14 @@ def home():
 
     return render_template(
         "index.html",
+        day_offset=day_offset,
         weekday=weekday,
         today_lessons=today_lessons,
         events=filtered_events(now),
-        today=f"{now.year}年{now.month}月{now.day}日",
+        today=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日",
         class_name=class_name,
         class_names=CLASS_NAMES,
-        weekday_short="月火水木金土日"[now.weekday()],
+        weekday_short="月火水木金土日"[selected_day.weekday()],
         weather_place=weather_place,
         weather_label=WEATHER_OPTIONS[weather_place],
         railway_label=ROUTE_OPTIONS[selected_route()],
