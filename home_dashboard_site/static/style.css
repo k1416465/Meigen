@@ -3666,3 +3666,22 @@ body.dark .page-refresh-button {
         padding: 10px 18px;
     }
 }
+
+/* v32: 通知の×は通知が表示されている間だけ表示する */
+.nearest-station-message {
+    display: none !important;
+}
+.nearest-station-message.is-visible {
+    display: block !important;
+}
+
+/* v32: PC版の運行情報で見出し行と詳細文の間隔をさらに縮める */
+@media (min-width: 621px) {
+    .operation-page .operation-alert-card {
+        row-gap: 0 !important;
+    }
+    .operation-page .operation-alert-detail {
+        margin-top: 0 !important;
+        line-height: 1.35 !important;
+    }
+}
