@@ -3300,3 +3300,28 @@ body.dark .timetable-card th {
         box-sizing: border-box !important;
     }
 }
+
+/* v20: スマホでも全駅のボタンを黄色で確実に塗りつぶす（状態・ブラウザ既定スタイルを上書き） */
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:link,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:visited,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:hover,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:active,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:focus,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:focus-visible {
+    background: #FCD800 !important;
+    background-color: #FCD800 !important;
+    background-image: none !important;
+    border: 1px solid #000000 !important;
+    border-color: #000000 !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button .station-name,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button .station-name-en {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
