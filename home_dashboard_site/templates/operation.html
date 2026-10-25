@@ -119,16 +119,22 @@
     </section>
 
     <!-- 路線の設定 -->
-    <section class="card route-settings-card">
-        <div class="route-settings-content">
-            <div class="route-settings-text">
+    <section class="route-settings-section">
+        <div class="operation-section-heading">
+            <div>
                 <h2>路線の設定</h2>
-                <p>設定した路線を変更できます。</p>
             </div>
-            <a class="route-settings-button" href="{{ url_for('settings') }}">
-                路線を変更
-                <span aria-hidden="true">›</span>
-            </a>
+        </div>
+        <div class="card route-settings-card">
+            <div class="route-settings-content">
+                <div class="route-settings-text">
+                    <p>設定した路線を変更できます。</p>
+                </div>
+                <a class="route-settings-button" href="{{ url_for('settings') }}">
+                    路線を変更
+                    <span aria-hidden="true">›</span>
+                </a>
+            </div>
         </div>
     </section>
 </div>
@@ -480,12 +486,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     .operation-page .station-grid.station-grid-large .station-button {
-        min-height: 72px !important;
-        padding: 10px 8px !important;
+        min-height: 38px !important;
+        height: auto !important;
+        padding: 4px 6px !important;
+        border: 2px solid #FCD800 !important;
+        gap: 0 !important;
     }
 
     .operation-page .station-grid.station-grid-large .station-name {
-        font-size: 15px;
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+    }
+
+    .operation-page .station-grid.station-grid-large .station-name-en {
+        margin-top: 0 !important;
+        font-size: 9px !important;
+        line-height: 1.1 !important;
     }
 
     .operation-alert-card {
@@ -521,14 +537,35 @@ document.addEventListener("DOMContentLoaded", () => {
         font-size: 18px;
     }
 
+    .route-settings-section .operation-section-heading {
+        margin-bottom: 12px !important;
+    }
+
     .route-settings-text p {
         font-size: 13px;
         line-height: 1.4;
     }
 
     .route-settings-content > .route-settings-button {
-        padding: 9px 12px !important;
+        box-sizing: border-box !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100px !important;
+        min-width: 100px !important;
+        height: 42px !important;
+        min-height: 42px !important;
+        padding: 8px 8px !important;
         font-size: 13px !important;
+    }
+
+    .operation-alert-source {
+        box-sizing: border-box !important;
+        width: 100px !important;
+        min-width: 100px !important;
+        height: 42px !important;
+        min-height: 42px !important;
+        padding: 8px !important;
     }
 }
 
@@ -540,9 +577,11 @@ document.addEventListener("DOMContentLoaded", () => {
     .operation-alert-source {
         grid-column: 2;
         justify-self: start;
-        min-width: 84px !important;
-        min-height: 36px !important;
-        padding: 7px 12px !important;
+        width: 100px !important;
+        min-width: 100px !important;
+        height: 42px !important;
+        min-height: 42px !important;
+        padding: 8px !important;
     }
 
     .route-settings-content {
@@ -550,7 +589,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     .route-settings-content > .route-settings-button {
-        padding: 8px 9px !important;
+        width: 100px !important;
+        min-width: 100px !important;
+        height: 42px !important;
+        min-height: 42px !important;
+        padding: 8px !important;
         font-size: 12px !important;
     }
 }
