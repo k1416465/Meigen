@@ -7,16 +7,93 @@ import calendar as calendar_module
 import re
 import traceback
 import json
+import os
 import uuid
+import secrets
 from pathlib import Path
+
+try:
+    import psycopg
+    from psycopg.rows import dict_row
+except ImportError:
+    psycopg = None
+    dict_row = None
 
 import jpholiday
 
 import requests
 from bs4 import BeautifulSoup
+try:
+    import qrcode
+    from io import BytesIO
+except ImportError:
+    qrcode = None
+    BytesIO = None
 
 
 app = Flask(__name__)
+
+# Cross-device sync: PostgreSQL is used on Render when DATABASE_URL is configured.
+# A share token is a bearer secret: anyone holding it can access the shared space.
+SYNC_COOKIE = "meigenShareToken"
+SYNC_TOKEN_QUERY = "share"
+
+def _db_connect():
+    url = os.environ.get("DATABASE_URL", "").strip()
+    if not url or psycopg is None:
+        return None
+    # Render may provide postgres://; psycopg accepts postgresql:// reliably.
+    if url.startswith("postgres://"):
+        url = "postgresql://" + url[len("postgres://"): ]
+    return psycopg.connect(url, row_factory=dict_row)
+
+def _init_sync_db():
+    conn = _db_connect()
+    if conn is None:
+        return
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute("CREATE TABLE IF NOT EXISTS meigen_spaces (token TEXT PRIMARY KEY, settings JSONB NOT NULL DEFAULT '{}'::jsonb, events JSONB NOT NULL DEFAULT '[]'::jsonb, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())")
+    finally:
+        conn.close()
+
+def _share_token():
+    return (request.cookies.get(SYNC_COOKIE) or request.args.get(SYNC_TOKEN_QUERY) or "").strip()
+
+def _shared_space(token=None):
+    token = token if token is not None else _share_token()
+    if not token or len(token) > 200:
+        return None
+    conn = _db_connect()
+    if conn is None:
+        return None
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT token, settings, events FROM meigen_spaces WHERE token = %s", (token,))
+            row = cur.fetchone()
+            return dict(row) if row else None
+    finally:
+        conn.close()
+
+def _save_shared_settings(settings):
+    token = _share_token()
+    conn = _db_connect()
+    if not token or conn is None:
+        if conn is not None: conn.close()
+        return False
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute("UPDATE meigen_spaces SET settings = %s::jsonb WHERE token = %s", (json.dumps(settings, ensure_ascii=False), token))
+            return cur.rowcount > 0
+    finally:
+        conn.close()
+
+def _settings_value(key, fallback):
+    space = _shared_space()
+    if space:
+        return space.get("settings", {}).get(key, fallback)
+    return fallback
+
 
 JST = timezone(timedelta(hours=9))
 WEEKDAYS = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"]
@@ -173,7 +250,7 @@ SCHOOL_EVENTS = [
 # ==================================================
 
 def selected_appearance():
-    value = request.cookies.get("myHomeAppearance", "system")
+    value = _settings_value("appearance", request.cookies.get("myHomeAppearance", "system"))
     return value if value in ("light", "dark", "system") else "system"
 
 
@@ -185,17 +262,17 @@ def inject_appearance():
 
 
 def selected_class():
-    value = request.cookies.get("myHomeClass")
+    value = _settings_value("class_name", request.cookies.get("myHomeClass"))
     return value if value in CLASS_SCHEDULES else None
 
 
 def selected_route():
-    value = request.cookies.get("myHomeRoute", "ryomo")
+    value = _settings_value("my_route", request.cookies.get("myHomeRoute", "ryomo"))
     return value if value in ROUTE_OPTIONS else "ryomo"
 
 
 def selected_weather_place():
-    value = request.cookies.get("myHomeWeather", "sano")
+    value = _settings_value("weather_place", request.cookies.get("myHomeWeather", "sano"))
     return value if value in WEATHER_OPTIONS else "sano"
 
 
@@ -385,6 +462,10 @@ def settings():
             appearance = "system"
 
         response = make_response(redirect(url_for("settings")))
+
+        # When connected to a shared space, persist preferences for every joined device.
+        if _share_token():
+            _save_shared_settings({"class_name": class_name or None, "my_route": my_route, "weather_place": weather_place, "appearance": appearance})
 
         cookie_options = {
             "max_age": 60 * 60 * 24 * 365,
@@ -1044,6 +1125,74 @@ def save_personal_events(events):
 # カレンダー
 # ==================================================
 
+@app.route("/share/create", methods=["POST"])
+def share_create():
+    """Create a private shared space. Requires Render PostgreSQL."""
+    conn = _db_connect()
+    if conn is None:
+        return jsonify({"error": "Render PostgreSQLを接続する必要があります。"}), 503
+    token = secrets.token_urlsafe(32)
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute("INSERT INTO meigen_spaces (token) VALUES (%s)", (token,))
+    finally:
+        conn.close()
+    response = make_response(redirect(url_for("share_page")))
+    response.set_cookie(SYNC_COOKIE, token, max_age=60*60*24*365, httponly=True, secure=request.is_secure, samesite="Lax")
+    return response
+
+@app.route("/share/join")
+def share_join():
+    token = (request.args.get("share") or "").strip()
+    space = _shared_space(token)
+    if not space:
+        return "共有リンクが無効か、PostgreSQLが未設定です。", 404
+    response = make_response(redirect(url_for("home")))
+    response.set_cookie(SYNC_COOKIE, token, max_age=60*60*24*365, httponly=True, secure=request.is_secure, samesite="Lax")
+    return response
+
+@app.route("/share/qr.png")
+def share_qr():
+    token = _share_token()
+    space = _shared_space(token)
+    if not space or qrcode is None:
+        return "QRコードを生成できません。共有スペースと依存パッケージを確認してください。", 503
+    target = request.url_root.rstrip("/") + url_for("share_join") + "?share=" + token
+    image = qrcode.make(target)
+    output = BytesIO()
+    image.save(output, format="PNG")
+    return app.response_class(output.getvalue(), mimetype="image/png", headers={"Cache-Control": "no-store"})
+
+@app.route("/share", methods=["GET"])
+def share_page():
+    token = _share_token()
+    space = _shared_space(token)
+    return render_template("share.html", connected=bool(space), share_url=(request.url_root.rstrip("/") + url_for("share_join") + "?share=" + token if space else ""))
+
+@app.route("/api/shared-events", methods=["GET", "PUT"])
+def api_shared_events():
+    token = _share_token()
+    space = _shared_space(token)
+    if not space:
+        return jsonify({"error": "共有スペースに接続されていません"}), 401
+    if request.method == "GET":
+        return jsonify(space.get("events", []))
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, list) or len(payload) > 2000:
+        return jsonify({"error": "予定データが不正です"}), 400
+    cleaned = []
+    for ev in payload:
+        if not isinstance(ev, dict) or not ev.get("id") or not ev.get("date") or not str(ev.get("title", "")).strip():
+            continue
+        cleaned.append({"id": str(ev["id"])[:120], "date": str(ev["date"])[:10], "title": str(ev["title"])[:80], "detail": str(ev.get("detail", ""))[:300], "color": str(ev.get("color", "blue"))[:20]})
+    conn = _db_connect()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute("UPDATE meigen_spaces SET events = %s::jsonb WHERE token = %s", (json.dumps(cleaned, ensure_ascii=False), token))
+    finally:
+        conn.close()
+    return jsonify({"ok": True, "count": len(cleaned)})
+
 @app.route("/calendar", methods=["GET", "POST"])
 def calendar_page():
     now = datetime.now(JST)
@@ -1257,3 +1406,10 @@ def api_time():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+# Create the small sync table automatically when DATABASE_URL is configured.
+try:
+    _init_sync_db()
+except Exception:
+    # Render startup should still succeed; /share explains setup if the database is unavailable.
+    traceback.print_exc()

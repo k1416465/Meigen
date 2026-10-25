@@ -418,7 +418,9 @@
   const colors = {blue:'#077AE3',red:'#E53935',orange:'#F57C00',yellow:'#D6A400',green:'#2E7D32',purple:'#7B1FA2',pink:'#C2185B'};
   const textColors = {blue:'#0563B5',red:'#C62828',orange:'#B45309',yellow:'#8A6D00',green:'#1B5E20',purple:'#6A1B9A',pink:'#AD1457'};
   const load = () => { try { const v=JSON.parse(localStorage.getItem(KEY)||'[]'); return Array.isArray(v)?v:[]; } catch { return []; } };
-  const save = list => localStorage.setItem(KEY, JSON.stringify(list));
+  const save = list => { localStorage.setItem(KEY, JSON.stringify(list)); fetch('/api/shared-events',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(list)}).catch(()=>{}); };
+  // Load the shared copy from PostgreSQL when this device has joined a share space.
+  fetch('/api/shared-events').then(r=>r.ok?r.json():null).then(v=>{if(Array.isArray(v)){localStorage.setItem(KEY,JSON.stringify(v));if(sessionStorage.getItem('meigenSyncReload')!=='1'){sessionStorage.setItem('meigenSyncReload','1');location.reload();}}}).catch(()=>{});sessionStorage.removeItem('meigenSyncReload');
   const validDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s||'') && !Number.isNaN(Date.parse(s+'T00:00:00'));
   const safe = s => String(s ?? '');
   const currentMonth = () => { const h=document.querySelector('.calendar-navigation h2')?.textContent.match(/(\d{4})年(\d{1,2})月/); return h?{year:+h[1],month:+h[2]}:null; };

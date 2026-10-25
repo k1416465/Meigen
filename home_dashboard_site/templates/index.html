@@ -546,6 +546,8 @@
 <script>
 (() => {
  const KEY='meigen.devicePersonalEvents.v1'; let events=[]; try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');events=Array.isArray(v)?v:[]}catch{}
+ // Shared-space sync: pull the server copy on page load.
+ fetch('/api/shared-events').then(r=>r.ok?r.json():null).then(v=>{if(Array.isArray(v)){localStorage.setItem(KEY,JSON.stringify(v));if(sessionStorage.getItem('meigenSyncReload')!=='1'){sessionStorage.setItem('meigenSyncReload','1');location.reload();}}}).catch(()=>{});sessionStorage.removeItem('meigenSyncReload');
  const list=document.querySelector('#events .event-list');if(!list)return;
  const colors={blue:'#E8F2FC',red:'#FDECEC',orange:'#FFF0E2',yellow:'#FFF8D6',green:'#E8F5EA',purple:'#F2E8FA',pink:'#FCE8F1'};
  const text={blue:'#0563B5',red:'#C62828',orange:'#B45309',yellow:'#8A6D00',green:'#1B5E20',purple:'#6A1B9A',pink:'#AD1457'};
