@@ -3804,3 +3804,56 @@ body.dark .page-refresh-button {
         grid-row: 3 !important;
     }
 }
+
+/* v37: スマホ版設定画面の項目カード・選択肢の縦幅をさらに縮小 */
+@media (max-width: 600px) {
+    .settings-form {
+        gap: 5px !important;
+    }
+
+    .settings-form .settings-card {
+        margin: 0 !important;
+        border-radius: 9px !important;
+    }
+
+    .settings-form .setting-accordion summary {
+        min-height: 29px !important;
+        padding: 4px 10px !important;
+        line-height: 1.15 !important;
+        font-size: 12px !important;
+    }
+
+    .settings-form .setting-accordion summary::after {
+        font-size: 14px !important;
+    }
+
+    .settings-form .setting-options {
+        padding: 0 9px 7px !important;
+        gap: 3px !important;
+    }
+
+    .settings-form .setting-choice-list {
+        gap: 3px !important;
+    }
+
+    .settings-form .choice-option {
+        min-height: 25px !important;
+        padding: 3px 6px !important;
+        gap: 5px !important;
+        border-radius: 6px !important;
+        font-size: 10px !important;
+        line-height: 1.15 !important;
+    }
+
+    .settings-form .choice-option input {
+        width: 12px !important;
+        height: 12px !important;
+        margin: 0 !important;
+        flex: 0 0 12px !important;
+    }
+
+    .settings-form .primary-button {
+        margin-top: 1px !important;
+        padding: 8px 14px !important;
+    }
+}
