@@ -139,11 +139,13 @@
     </section>
 </div>
 
-<!-- My駅ボタン（My駅設定機能は後日追加予定） -->
+<!-- My駅ボタン -->
 <button
     type="button"
     class="my-station-button"
     id="myStationButton"
+    data-station-id="{{ my_station }}"
+    data-station-name="{{ my_station_name }}"
     aria-label="My駅を開く"
     title="My駅を開く"
 >
@@ -207,12 +209,12 @@ document.addEventListener("DOMContentLoaded", () => {
         attributeFilter: ["class"]
     });
 
-    // My駅設定が実装されたら localStorage の myStationId に駅IDを保存する想定
+    // 設定画面で保存したMy駅を開く
     if (myStationButton) {
         myStationButton.addEventListener("click", () => {
-            const myStationId = localStorage.getItem("myStationId");
+            const myStationId = myStationButton.dataset.stationId;
             if (!myStationId) {
-                message.textContent = "My駅の設定機能は今後追加予定です。";
+                message.textContent = "My駅が設定されていません。設定からMy駅を選択してください。";
                 return;
             }
             if (!/^[a-z0-9_]+$/i.test(myStationId)) {
