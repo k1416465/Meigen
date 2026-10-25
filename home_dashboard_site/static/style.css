@@ -3325,3 +3325,51 @@ html body .page-container.operation-page .station-selector .station-grid.station
     color: #000000 !important;
     -webkit-text-fill-color: #000000 !important;
 }
+
+/* v22: 駅名を読みやすく拡大（PCはあしかがフラワーパークを維持） */
+@media (min-width: 621px) {
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button .station-name {
+        font-size: 19px !important;
+        line-height: 1.15 !important;
+    }
+
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button .station-name-en {
+        font-size: 12px !important;
+        line-height: 1.1 !important;
+    }
+
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="/station/ashikaga_flower_park"] .station-name {
+        font-size: 17px !important;
+    }
+}
+
+/* v22: スマホは駅名を拡大し、ボタンの縦幅も広げる */
+@media (max-width: 620px) {
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button {
+        min-height: 64px !important;
+        padding: 7px 2px !important;
+        gap: 3px !important;
+    }
+
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button .station-name {
+        font-size: 15px !important;
+        line-height: 1.15 !important;
+    }
+
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button .station-name-en {
+        font-size: 10px !important;
+        line-height: 1.1 !important;
+    }
+
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="/station/ashikaga_flower_park"] .station-name {
+        font-size: 9.5px !important;
+        white-space: nowrap !important;
+        letter-spacing: -0.3px !important;
+    }
+
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="/station/ashikaga_flower_park"] .station-name-en {
+        font-size: 8.5px !important;
+        white-space: nowrap !important;
+        letter-spacing: -0.1px !important;
+    }
+}
