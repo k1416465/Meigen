@@ -3253,21 +3253,24 @@ body.dark .timetable-card th {
     }
 }
 
-/* v18: 駅選択を指定の青色で全端末共通にし、運行情報の余白を調整 */
+/* v19: 駅選択を全端末で黄色塗りつぶし・黒文字に統一 */
 .operation-page .station-grid.station-grid-large .station-button,
-.operation-page .station-grid.station-grid-large .station-button:visited {
-    background: #077AE3 !important;
-    background-color: #077AE3 !important;
-    border: 1px solid #077AE3 !important;
-    border-color: #077AE3 !important;
-    color: #FFFFFF !important;
-    -webkit-text-fill-color: #FFFFFF !important;
+.operation-page .station-grid.station-grid-large .station-button:visited,
+.operation-page .station-grid.station-grid-large .station-button:hover,
+.operation-page .station-grid.station-grid-large .station-button:active,
+.operation-page .station-grid.station-grid-large .station-button:focus {
+    background: #FCD800 !important;
+    background-color: #FCD800 !important;
+    border: 1px solid #FCD800 !important;
+    border-color: #FCD800 !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
 }
 
 .operation-page .station-grid.station-grid-large .station-button .station-name,
 .operation-page .station-grid.station-grid-large .station-button .station-name-en {
-    color: #FFFFFF !important;
-    -webkit-text-fill-color: #FFFFFF !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
 }
 
 /* PC：路線名と説明文の間隔を狭める */
