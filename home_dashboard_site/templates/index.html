@@ -147,7 +147,7 @@
   }
 }
 
-/* スマホ：今日の時間割を7時間目まで画面内に収める */
+/* スマホ：時間割を7時間目まで画面内に収める */
 @media (max-width: 600px) {
   body:has(.hero-grid) #today-schedule {
     display: flex !important;
@@ -353,7 +353,7 @@
   <section class="school-column" id="today-schedule">
     <div class="section-heading">
       <div style="display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; min-width:0;">
-        <h2 style="margin:0;"><a href="{{ url_for('schedule') }}" style="color: inherit; text-decoration: none;">今日の時間割</a></h2>
+        <h2 style="margin:0;"><a href="{{ url_for('schedule') }}" style="color: inherit; text-decoration: none;">時間割</a></h2>
         {% if class_name %}
           <p class="class-caption" style="margin:0; white-space:nowrap;">表示中：{{ class_name }}</p>
         {% endif %}
