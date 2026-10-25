@@ -3871,10 +3871,11 @@ body.dark .page-refresh-button {
 
     /* 閉じているときの「クラスの選択」「My路線」などの見出し部分 */
     .settings-form .setting-accordion:not([open]) > summary {
-        min-height: 34px !important;
-        padding: 6px 10px !important;
-        line-height: 1.2 !important;
-        font-size: 14px !important;
+        min-height: 46px !important;
+        padding: 10px 12px !important;
+        line-height: 1.3 !important;
+        font-size: 15px !important;
+        box-sizing: border-box !important;
     }
 
     .settings-form .setting-accordion:not([open]) > summary::after {
@@ -3884,14 +3885,16 @@ body.dark .page-refresh-button {
 
     /* 開いたときの見出しは読みやすさを維持 */
     .settings-form .setting-accordion[open] > summary {
-        min-height: 38px !important;
-        padding: 8px 14px !important;
-        line-height: 1.25 !important;
-        font-size: 13px !important;
+        min-height: 46px !important;
+        padding: 10px 12px !important;
+        line-height: 1.3 !important;
+        font-size: 15px !important;
+        box-sizing: border-box !important;
     }
 
     .settings-form .setting-accordion[open] > summary::after {
-        font-size: 17px !important;
+        font-size: 18px !important;
+        line-height: 1 !important;
     }
 
     /* 選択肢は小さくせず、通常のタップしやすいサイズに戻す */
