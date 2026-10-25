@@ -3437,3 +3437,18 @@ body.dark .my-station-button {
         height: 25px;
     }
 }
+
+
+/* v25: スマートフォンでは設定アコーディオンの閉じた高さをコンパクトに */
+@media (max-width: 600px) {
+    .setting-accordion summary {
+        min-height: 38px;
+        padding: 8px 14px;
+        line-height: 1.25;
+    }
+
+    .setting-accordion summary::after {
+        font-size: 17px;
+        line-height: 1;
+    }
+}
