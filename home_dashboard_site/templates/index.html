@@ -185,6 +185,10 @@
 }
   #events details.event-card > summary::-webkit-details-marker { display:none; }
   #events details.event-card > summary::marker { content:""; }
+
+/* インストール済みアプリとして開いた場合だけ、時間割の数字と教科名を拡大 */
+body.app-standalone:has(.hero-grid) #today-schedule .lesson-number { font-size: 1rem !important; }
+body.app-standalone:has(.hero-grid) #today-schedule .lesson-name { font-size: .9rem !important; line-height: 1.2 !important; }
 </style>
 
 
@@ -202,7 +206,7 @@
     <div class="clock" id="clock">--:--:--</div>
 
     <div class="clock-bottom">
-      <span id="clockDate">{{ today }}({{ weekday_short }})</span>
+      <span id="clockDate">{{ clock_date_label }}</span>
     </div>
   </article>
 
@@ -228,7 +232,7 @@
 
       <div>
         <div class="weather-temp" id="weatherTemp">--°</div>
-        <div class="weather-desc" id="weatherDesc">天気を取得中</div>
+        <div class="weather-desc" id="weatherDesc">天気情報を取得中</div>
       </div>
     </div>
 
@@ -398,6 +402,13 @@
 })();
 
 (function () {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches ||
+    window.navigator.standalone === true;
+  if (isStandalone) document.body.classList.add('app-standalone');
+})();
+
+(function () {
   const backdrop = document.getElementById('homeEventModalBackdrop');
   if (!backdrop) return;
   const closeButton = document.getElementById('homeEventModalClose');
@@ -417,10 +428,18 @@
     backdrop.hidden = false;
     document.getElementById('homeEditEventTitle').focus();
   }
+  function goToCalendarFor(card) {
+    const eventDate = card.dataset.eventDate || '';
+    const eventId = card.dataset.eventId || '';
+    if (!eventDate || !eventId) return;
+    const [year, month] = eventDate.split('-');
+    const params = new URLSearchParams({ year, month: String(Number(month)), open_event: eventId });
+    window.location.href = '{{ url_for("calendar_page") }}?' + params.toString();
+  }
   document.querySelectorAll('.home-personal-event').forEach(card => {
-    card.addEventListener('click', () => openFor(card));
+    card.addEventListener('click', () => goToCalendarFor(card));
     card.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openFor(card); }
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToCalendarFor(card); }
     });
   });
   closeButton.addEventListener('click', closeModal);
