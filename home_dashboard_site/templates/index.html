@@ -29,10 +29,29 @@
   .weather-card:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
   .weather-details { display: none !important; gap: 4px !important; }
   .weather-card.show-details .weather-details { display: grid !important; }
-  .weather-card.show-details .weather-main,
-  .weather-card.show-details #weatherLocation { display: none !important; }
-  .weather-card.show-details .card-heading { margin-bottom: 0; }
-  .weather-details > div { min-width: 0; }
+  .weather-card.show-details .weather-main { display: none !important; }
+  /* 詳細表示でも市区町村名は見出しの横に残す */
+  .weather-card.show-details #weatherLocation { display: inline !important; }
+  /* 見出しの位置は保ち、区切り線と詳細項目を少し下げる */
+  .weather-card.show-details .card-heading { margin-bottom: 5px !important; }
+  .weather-card.show-details .weather-details {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    align-items: stretch;
+    padding-top: 12px !important;
+    gap: 0 !important;
+  }
+  .weather-details > div {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 3px !important;
+  }
+  .weather-details > div + div { padding-left: 3px !important; }
   .weather-details span { display: block; font-size: .58rem !important; }
   .weather-details strong { font-size: .75rem !important; letter-spacing: .015em; font-variant-numeric: tabular-nums; }
   .section-heading { margin-bottom: 6px !important; }
