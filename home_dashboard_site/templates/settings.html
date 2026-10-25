@@ -2,6 +2,21 @@
 {% block title %}迷言｜設定{% endblock %}
 {% block content %}
 <section class="welcome-row"><div><h1>設定</h1></div><a class="back-link" href="{{ url_for('home') }}">ホームへ戻る</a></section>
+<section class="card settings-card" style="margin-bottom:16px; padding:16px;">
+  <h2 style="margin-top:0;">ユーザーアカウント</h2>
+  {% if logged_in_user %}
+    <p>ログイン中：<strong>{{ logged_in_user.username }}</strong></p>
+    <form method="post" action="{{ url_for('logout') }}">
+      <button class="primary-button" type="submit">ログアウト</button>
+    </form>
+  {% else %}
+    <p>ログインすると、自分で作成した予定をアカウントごとに管理できます。</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <a class="primary-button" href="{{ url_for('login') }}" style="text-decoration:none;">ログイン</a>
+      <a class="primary-button" href="{{ url_for('register') }}" style="text-decoration:none;">新規登録</a>
+    </div>
+  {% endif %}
+</section>
 <form method="post" class="settings-form">
   <details class="card settings-card setting-accordion">
     <summary>クラスの選択</summary>
@@ -14,13 +29,6 @@
     <summary>My路線</summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My路線">
       {% for key, label in route_options.items() %}<label class="choice-option"><input type="radio" name="my_route" value="{{ key }}" {% if key == my_route %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
-    </div>
-  </details>
-  <details class="card settings-card setting-accordion">
-    <summary>My駅</summary>
-    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My駅">
-      <label class="choice-option"><input type="radio" name="my_station" value="" {% if not my_station %}checked{% endif %}><span>設定しない</span></label>
-      {% for key, label in station_options.items() %}<label class="choice-option"><input type="radio" name="my_station" value="{{ key }}" {% if key == my_station %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
     </div>
   </details>
   <details class="card settings-card setting-accordion">

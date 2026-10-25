@@ -62,15 +62,6 @@
         </span>
       </a>
 
-      {% if logged_in_user %}
-        <span class="account-top-label" style="font-size:.85rem; align-self:center;">{{ logged_in_user.username }}</span>
-        <form method="post" action="{{ url_for('logout') }}" style="display:inline; align-self:center;">
-          <button type="submit" style="border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;padding:6px;">ログアウト</button>
-        </form>
-      {% else %}
-        <a href="{{ url_for('login') }}" style="align-self:center;color:inherit;text-decoration:none;padding:6px;">ログイン</a>
-        <a href="{{ url_for('register') }}" style="align-self:center;color:inherit;text-decoration:none;padding:6px;">新規登録</a>
-      {% endif %}
       <a
         class="settings-top-link"
         href="{{ url_for('settings') }}"
