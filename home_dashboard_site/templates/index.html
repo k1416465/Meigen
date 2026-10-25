@@ -1,26 +1,5 @@
 {% extends "base.html" %}
 {% block title %}迷言｜ホーム{% endblock %}
-
-<script>
-(() => {
- const KEY='meigen.devicePersonalEvents.v1'; let events=[]; try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');events=Array.isArray(v)?v:[]}catch{}
- const list=document.querySelector('#events .event-list');if(!list)return;
- const colors={blue:'#E8F2FC',red:'#FDECEC',orange:'#FFF0E2',yellow:'#FFF8D6',green:'#E8F5EA',purple:'#F2E8FA',pink:'#FCE8F1'};
- const text={blue:'#0563B5',red:'#C62828',orange:'#B45309',yellow:'#8A6D00',green:'#1B5E20',purple:'#6A1B9A',pink:'#AD1457'};
- const now=new Date();now.setHours(0,0,0,0);const end=new Date(now);end.setDate(end.getDate()+7);
- events.filter(e=>{const d=new Date(e.date+'T00:00:00');return d>=now&&d<=end;}).sort((a,b)=>a.date.localeCompare(b.date)).forEach(ev=>{
-  const card=document.createElement('article');card.className='card event-card event-card-personal home-personal-event';card.setAttribute('role','button');card.tabIndex=0;card.style.cssText='flex:0 0 auto;cursor:pointer;';
-  Object.assign(card.dataset,{eventId:ev.id,eventDate:ev.date,eventTitle:ev.title,eventDetail:ev.detail||'',eventColor:ev.color||'blue',deviceEvent:'1'});
-  const date=document.createElement('div');date.className='event-date';date.style.cssText=`background-color:${colors[ev.color]||colors.blue};color:${text[ev.color]||text.blue};`;date.innerHTML=`<span class="event-month">${ev.date.slice(5,7)}月</span><strong>${ev.date.slice(8,10)}</strong>`;
-  const copy=document.createElement('div');copy.className='event-copy';copy.style.cssText='min-width:0;flex:1;';const title=document.createElement('strong');title.textContent=ev.title;copy.appendChild(title);if(ev.detail){const d=document.createElement('div');d.style.cssText='font-size:.8rem;margin-top:3px;';d.textContent=ev.detail;copy.appendChild(d);}card.append(date,copy);list.appendChild(card);
-  const go=()=>{const [y,m]=ev.date.split('-');location.href=`/calendar?year=${y}&month=${Number(m)}&open_event=${encodeURIComponent(ev.id)}`;};card.addEventListener('click',go);card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
- });
- // Shared legacy events must not offer editing; local events are edited from the calendar.
- document.querySelectorAll('.home-personal-event:not([data-device-event])').forEach(card=>{card.addEventListener('click',e=>{e.stopImmediatePropagation();location.href='/calendar';},true);});
-})();
-</script>
-
-{% endblock %}
 {% block content %}
 
 
