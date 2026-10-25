@@ -2930,14 +2930,14 @@ body.dark .timetable-card th {
     }
 
     /* あしかがフラワーパークは1行表示 */
-    a.station-button[href="/station/ashikaga_flower_park"] .station-name {
+    a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name {
         font-size: 11px;
         line-height: 1.1;
         white-space: nowrap;
         letter-spacing: -.45px;
     }
 
-    a.station-button[href="/station/ashikaga_flower_park"] .station-name-en {
+    a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name-en {
         font-size: 9px;
         white-space: nowrap;
     }
@@ -3155,14 +3155,14 @@ body.dark .timetable-card th {
         overflow-wrap: anywhere;
     }
 
-    .operation-page .station-grid.station-grid-large a.station-button[href="/station/ashikaga_flower_park"] .station-name {
+    .operation-page .station-grid.station-grid-large a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name {
         font-size: 8px !important;
         white-space: nowrap !important;
         letter-spacing: -0.45px !important;
         overflow-wrap: normal !important;
     }
 
-    .operation-page .station-grid.station-grid-large a.station-button[href="/station/ashikaga_flower_park"] .station-name-en {
+    .operation-page .station-grid.station-grid-large a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name-en {
         font-size: 7px !important;
         white-space: nowrap !important;
         letter-spacing: -0.2px;
@@ -3338,7 +3338,7 @@ html body .page-container.operation-page .station-selector .station-grid.station
         line-height: 1.1 !important;
     }
 
-    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="/station/ashikaga_flower_park"] .station-name {
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name {
         font-size: 17px !important;
     }
 }
@@ -3361,13 +3361,13 @@ html body .page-container.operation-page .station-selector .station-grid.station
         line-height: 1.1 !important;
     }
 
-    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="/station/ashikaga_flower_park"] .station-name {
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name {
         font-size: 9.5px !important;
         white-space: nowrap !important;
         letter-spacing: -0.3px !important;
     }
 
-    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="/station/ashikaga_flower_park"] .station-name-en {
+    html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name-en {
         font-size: 8.5px !important;
         white-space: nowrap !important;
         letter-spacing: -0.1px !important;
@@ -3387,4 +3387,53 @@ html body .page-container.operation-page .station-selector .station-grid.station
     border-color: transparent !important;
     outline: none !important;
     box-shadow: none !important;
+}
+
+
+/* v24: My駅ハートボタン（現在地ボタンの上） */
+.my-station-button {
+    position: fixed;
+    right: 18px;
+    bottom: calc(142px + env(safe-area-inset-bottom, 0px));
+    z-index: 10000;
+    width: 54px;
+    height: 54px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 3px 12px rgba(0,0,0,.2);
+    cursor: pointer;
+}
+
+.my-station-button img {
+    display: block;
+    width: 27px;
+    height: 27px;
+    object-fit: contain;
+}
+
+.my-station-button:active {
+    transform: scale(.96);
+}
+
+body.dark .my-station-button {
+    background: var(--surface);
+}
+
+@media (max-width: 600px) {
+    .my-station-button {
+        right: 14px;
+        bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+        width: 48px;
+        height: 48px;
+    }
+
+    .my-station-button img {
+        width: 25px;
+        height: 25px;
+    }
 }
