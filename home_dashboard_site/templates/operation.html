@@ -91,6 +91,10 @@
                         </p>
                         {% endif %}
                     </div>
+
+                    {% if alert.detail %}
+                    <p class="operation-alert-detail">{{ alert.detail }}</p>
+                    {% endif %}
                 </div>
 
                 {% if alert.source_url %}
@@ -106,9 +110,6 @@
                 </a>
                 {% endif %}
 
-                {% if alert.detail %}
-                <p class="operation-alert-detail">{{ alert.detail }}</p>
-                {% endif %}
             </article>
             {% endfor %}
         </div>
