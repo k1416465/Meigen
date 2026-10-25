@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response
 from datetime import datetime, timezone, timedelta
 import time
@@ -330,7 +329,20 @@ def home():
         weekday=weekday,
         today_lessons=today_lessons,
         events=filtered_events(now),
+
         today=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日",
+
+        # 時間割部分の日付（例：10/26(月)）
+        schedule_date_label=(
+            f"{selected_day.month}/{selected_day.day}"
+            f"({'月火水木金土日'[selected_day.weekday()]})"
+        ),
+
+        clock_date_label=(
+            f"{selected_day.year}年{selected_day.month}月{selected_day.day}日"
+            f"({'月火水木金土日'[selected_day.weekday()]})"
+        ),
+
         class_name=class_name,
         class_names=CLASS_NAMES,
         weekday_short="月火水木金土日"[selected_day.weekday()],
