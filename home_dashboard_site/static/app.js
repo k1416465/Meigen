@@ -33,7 +33,7 @@ function updateClock() {
       weekday: "short"
     }).format(now);
 
-    date.textContent = `${dateText}（${weekday}）`;
+    date.textContent = `${dateText}(${weekday})`;
   }
 }
 
