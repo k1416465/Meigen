@@ -76,6 +76,20 @@ ROUTE_OPTIONS = {
     "tobu_sano": "東武佐野線",
 }
 
+STATION_OPTIONS = {
+    "oyama": "小山駅",
+    "omoigawa": "思川駅",
+    "tochigi": "栃木駅",
+    "ohirashita": "大平下駅",
+    "iwafune": "岩舟駅",
+    "sano": "佐野駅",
+    "tomita": "富田駅",
+    "ashikaga_flower_park": "あしかがフラワーパーク駅",
+    "ashikaga": "足利駅",
+    "yamamae": "山前駅",
+    "omata": "小俣駅",
+}
+
 WEATHER_OPTIONS = {
     "utsunomiya": "宇都宮市",
     "oyama": "小山市",
@@ -190,6 +204,11 @@ def selected_class():
 def selected_route():
     value = request.cookies.get("myHomeRoute", "ryomo")
     return value if value in ROUTE_OPTIONS else "ryomo"
+
+
+def selected_station():
+    value = request.cookies.get("myHomeStation", "")
+    return value if value in STATION_OPTIONS else ""
 
 
 def selected_weather_place():
@@ -363,6 +382,7 @@ def settings():
     if request.method == "POST":
         class_name = request.form.get("class_name", "")
         my_route = request.form.get("my_route", "ryomo")
+        my_station = request.form.get("my_station", "")
         weather_place = request.form.get("weather_place", "sano")
         appearance = request.form.get("appearance", "system")
 
@@ -370,6 +390,8 @@ def settings():
             class_name = ""
         if my_route not in ROUTE_OPTIONS:
             my_route = "ryomo"
+        if my_station not in STATION_OPTIONS:
+            my_station = ""
         if weather_place not in WEATHER_OPTIONS:
             weather_place = "sano"
         if appearance not in ("light", "dark", "system"):
@@ -388,6 +410,10 @@ def settings():
             response.delete_cookie("myHomeClass")
 
         response.set_cookie("myHomeRoute", my_route, **cookie_options)
+        if my_station:
+            response.set_cookie("myHomeStation", my_station, **cookie_options)
+        else:
+            response.delete_cookie("myHomeStation")
         response.set_cookie("myHomeWeather", weather_place, **cookie_options)
         response.set_cookie("myHomeAppearance", appearance, **cookie_options)
 
@@ -399,6 +425,8 @@ def settings():
         class_names=CLASS_NAMES,
         my_route=selected_route(),
         route_options=ROUTE_OPTIONS,
+        my_station=selected_station(),
+        station_options=STATION_OPTIONS,
         weather_place=selected_weather_place(),
         weather_options=WEATHER_OPTIONS,
     )
@@ -977,6 +1005,8 @@ def operation_page():
         operation=operation,
         operation_alerts=operation_alerts,
         railway_label=ROUTE_OPTIONS[route_key],
+        my_station=selected_station(),
+        my_station_name=STATION_OPTIONS.get(selected_station(), ""),
         weather_place=selected_weather_place(),
     )
 
