@@ -3373,3 +3373,18 @@ html body .page-container.operation-page .station-selector .station-grid.station
         letter-spacing: -0.1px !important;
     }
 }
+
+/* v23: 駅選択ボタンの枠線を全端末・全状態で非表示 */
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:link,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:visited,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:hover,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:active,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:focus,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:focus-visible {
+    border: none !important;
+    border-width: 0 !important;
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
