@@ -3923,11 +3923,4 @@ body.dark .page-refresh-button {
         margin: revert !important;
         flex: initial !important;
     }
-
-    .setting-accordion {
-        padding: 0;
-        max-width: 680px;
-        overflow: hidden;
-        border-radius: 12px;
-    }
 }
