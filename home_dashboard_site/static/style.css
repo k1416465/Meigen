@@ -3748,3 +3748,59 @@ body.dark .page-refresh-button {
         justify-self: end !important;
     }
 }
+
+/* v35: 路線名・遅延の下に更新時刻、右端に詳細ボタンを配置 */
+.operation-page .operation-alert-heading {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 3px !important;
+}
+
+.operation-page .operation-alert-title-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: baseline !important;
+    flex-wrap: wrap !important;
+    column-gap: 8px !important;
+    row-gap: 2px !important;
+}
+
+.operation-page .operation-alert-updated {
+    display: block !important;
+    margin: 0 !important;
+    line-height: 1.35 !important;
+}
+
+@media (min-width: 621px) {
+    .operation-page .operation-alert-source {
+        grid-column: 3 !important;
+        grid-row: 1 / span 2 !important;
+        align-self: start !important;
+        justify-self: end !important;
+        margin: 0 !important;
+    }
+}
+
+@media (max-width: 620px) {
+    .operation-page .operation-alert-heading {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        min-width: 0 !important;
+    }
+
+    /* 詳細ボタンは右端に置き、路線名・更新時刻の2段分に合わせる */
+    .operation-page .operation-alert-source {
+        grid-column: 3 !important;
+        grid-row: 1 / span 2 !important;
+        align-self: center !important;
+        justify-self: end !important;
+        margin: 0 !important;
+    }
+
+    .operation-page .operation-alert-detail {
+        grid-column: 1 / -1 !important;
+        grid-row: 3 !important;
+    }
+}
