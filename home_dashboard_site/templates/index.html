@@ -195,6 +195,11 @@
    文字サイズは通常のスマートフォン表示と同じ */
 @media (max-width: 600px) {
   body.app-standalone:has(.hero-grid) #today-schedule .schedule-card {
+    flex: 0 0 250px !important;
+    height: 250px !important;
+    min-height: 250px !important;
+    max-height: 250px !important;
+    box-sizing: border-box !important;
     padding-top: 6px !important;
     padding-bottom: 6px !important;
   }
