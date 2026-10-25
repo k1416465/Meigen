@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-{% block title %}迷言｜設定<p style="margin-top:1rem"><a class="back-link" href="{{ url_for('share_page') }}">スマホ・PC間の設定共有はこちら</a></p>
-{% endblock %}
+{% block title %}迷言｜設定{% endblock %}
 {% block content %}
 <section class="welcome-row"><div><h1>設定</h1></div><a class="back-link" href="{{ url_for('home') }}">ホームへ戻る</a></section>
 <form method="post" class="settings-form">
@@ -33,6 +32,4 @@
   </details>
   <button class="primary-button" type="submit">設定を保存</button>
 </form>
-<p style="margin-top:1rem"><a class="back-link" href="{{ url_for('share_page') }}">スマホ・PC間の設定共有はこちら</a></p>
 {% endblock %}
-
