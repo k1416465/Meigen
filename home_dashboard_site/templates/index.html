@@ -140,7 +140,10 @@
     min-height: 22px !important;
     font-size: .65rem !important;
   }
-  body:has(.hero-grid) #today-schedule .schedule-date-label { font-size: .95rem !important; font-weight: 800; }
+  body:has(.hero-grid) #today-schedule .schedule-date-label {
+    font-size: .95rem !important;
+    font-weight: 800;
+  }
   body:has(.hero-grid) #today-schedule .lesson-list {
     flex: 1 1 auto !important;
     display: flex !important;
@@ -183,31 +186,38 @@
     line-height: 1.25 !important;
   }
 }
-  #events details.event-card > summary::-webkit-details-marker { display:none; }
-  #events details.event-card > summary::marker { content:""; }
 
-/* インストール済みアプリとして開いた場合だけ、時間割の縦方向の余裕を調整。文字サイズは通常表示と同じ */
+/* 予定カードのマーカーを非表示 */
+#events details.event-card > summary::-webkit-details-marker { display:none; }
+#events details.event-card > summary::marker { content:""; }
+
+/* インストール済みアプリとして開いた場合だけ時間割の縦方向を調整。
+   文字サイズは通常のスマートフォン表示と同じ */
 @media (max-width: 600px) {
   body.app-standalone:has(.hero-grid) #today-schedule .schedule-card {
     padding-top: 6px !important;
     padding-bottom: 6px !important;
   }
+
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-list {
+    flex: 0 0 auto !important;
     justify-content: flex-start !important;
-    gap: 2px !important;
+    gap: 0 !important;
   }
+
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-row {
-    flex: 0 0 30px !important;
-    height: 30px !important;
-    min-height: 30px !important;
-    max-height: 30px !important;
-    padding-top: 1px !important;
-    padding-bottom: 1px !important;
+    flex: 0 0 26px !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    max-height: 26px !important;
+    padding: 0 !important;
     box-sizing: border-box !important;
   }
+
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-number {
     font-size: .62rem !important;
   }
+
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-name {
     font-size: .65rem !important;
     line-height: 1.1 !important;
