@@ -224,7 +224,7 @@
 
       <div>
         <div class="weather-temp" id="weatherTemp">--°</div>
-        <div class="weather-desc" id="weatherDesc">天気を取得中</div>
+        <div class="weather-desc" id="weatherDesc">天気情報を取得しています</div>
       </div>
     </div>
 
@@ -257,8 +257,13 @@
     </div>
 
     <section class="card schedule-card">
-      <div class="table-top">
-        <strong>{{ weekday }}</strong>
+      <div class="table-top" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <a href="{{ url_for('home', day_offset=day_offset - 1) }}" aria-label="前日の時間割" title="前日" style="text-decoration:none; font-size:1.8rem; line-height:1; padding:2px 10px;">‹</a>
+        <div style="text-align:center; min-width:0;">
+          <strong>{{ weekday }}</strong>
+          <div style="font-size:.78rem; opacity:.75;">{{ today }}</div>
+        </div>
+        <a href="{{ url_for('home', day_offset=day_offset + 1) }}" aria-label="翌日の時間割" title="翌日" style="text-decoration:none; font-size:1.8rem; line-height:1; padding:2px 10px;">›</a>
       </div>
 
       {% if not class_name %}
@@ -305,8 +310,37 @@
             <span class="event-month">{{ event.date[5:7] }}月</span>
             <strong>{{ event.date[8:10] }}</strong>
           </div>
-          <div class="event-copy">
+          <div class="event-copy" style="min-width:0; flex:1;">
             <strong>{{ event.title }}</strong>
+            {% if event.kind|default('school') == 'personal' %}
+              <details style="margin-top:6px;">
+                <summary style="cursor:pointer; font-size:.8rem;">編集・削除</summary>
+                <form method="post" action="{{ url_for('calendar_page') }}" style="display:grid; gap:7px; margin-top:8px;">
+                  <input type="hidden" name="action" value="edit">
+                  <input type="hidden" name="event_id" value="{{ event.id }}">
+                  <input type="hidden" name="return_to" value="home">
+                  <input type="hidden" name="return_date" value="{{ event.date }}">
+                  <label style="font-size:.8rem;">日付 <input type="date" name="event_date" value="{{ event.date }}" required style="max-width:100%;"></label>
+                  <label style="font-size:.8rem;">予定名 <input type="text" name="title" value="{{ event.title }}" maxlength="80" required style="width:100%; box-sizing:border-box;"></label>
+                  <label style="font-size:.8rem;">詳細 <textarea name="detail" rows="2" maxlength="300" style="width:100%; box-sizing:border-box;">{{ event.detail|default('') }}</textarea></label>
+                  <label style="font-size:.8rem;">色
+                    <select name="color" style="max-width:100%;">
+                      {% for color_key, color_label in [('blue','青'),('red','赤'),('orange','橙'),('yellow','黄'),('green','緑'),('purple','紫'),('pink','桃')] %}
+                        <option value="{{ color_key }}" {% if event.color|default('blue') == color_key %}selected{% endif %}>{{ color_label }}</option>
+                      {% endfor %}
+                    </select>
+                  </label>
+                  <button type="submit" style="padding:6px 10px;">変更を保存</button>
+                </form>
+                <form method="post" action="{{ url_for('calendar_page') }}" onsubmit="return confirm('「{{ event.title|e }}」を削除しますか？');" style="margin-top:6px;">
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="event_id" value="{{ event.id }}">
+                  <input type="hidden" name="return_to" value="home">
+                  <input type="hidden" name="return_date" value="{{ event.date }}">
+                  <button type="submit" style="padding:6px 10px;">この予定を削除</button>
+                </form>
+              </details>
+            {% endif %}
           </div>
         </article>
       {% endfor %}
