@@ -328,6 +328,12 @@ def home():
     weekday_names = WEEKDAYS + ["土曜日", "日曜日"]
     weekday = weekday_names[displayed_day.weekday()]
 
+    schedule_date_label = (
+        f"{displayed_day.year}/{displayed_day.month:02d}/"
+        f"{displayed_day.day:02d}"
+        f"({'月火水木金土日'[displayed_day.weekday()]})"
+    )
+
     class_name = selected_class()
     weather_place = selected_weather_place()
 
@@ -345,6 +351,7 @@ def home():
         today=f"{displayed_day.year}年{displayed_day.month}月{displayed_day.day}日",
         day_offset=day_offset,
         displayed_date=displayed_day.isoformat(),
+        schedule_date_label=schedule_date_label,
         class_name=class_name,
         class_names=CLASS_NAMES,
         weekday_short="月火水木金土日"[now.weekday()],
