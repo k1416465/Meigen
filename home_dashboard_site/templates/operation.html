@@ -171,6 +171,21 @@
     >
 </button>
 
+<!-- ページ更新ボタン（アイコンは icons/light/refresh.png と icons/dark/refresh.png） -->
+<button
+    type="button"
+    class="page-refresh-button"
+    id="pageRefreshButton"
+    aria-label="ページを更新"
+    title="ページを更新"
+>
+    <img
+        id="page-refresh-icon"
+        src="{{ url_for('static', filename='icons/light/refresh.png') }}"
+        alt=""
+    >
+</button>
+
 <div id="noticeBackdrop" class="notice-backdrop" aria-hidden="true"></div>
 <div
     id="nearestStationMessage"
@@ -193,6 +208,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const icon = document.getElementById("nearest-station-icon");
     const myStationButton = document.getElementById("myStationButton");
     const myStationIcon = document.getElementById("my-station-icon");
+    const refreshButton = document.getElementById("pageRefreshButton");
+    const refreshIcon = document.getElementById("page-refresh-icon");
 
     if (!button || !message) return;
 
@@ -261,9 +278,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 ? "{{ url_for('static', filename='icons/dark/heart.png') }}"
                 : "{{ url_for('static', filename='icons/light/heart.png') }}";
         }
+        if (refreshIcon) {
+            refreshIcon.src = isDark
+                ? "{{ url_for('static', filename='icons/dark/refresh.png') }}"
+                : "{{ url_for('static', filename='icons/light/refresh.png') }}";
+        }
     }
 
     updateThemeIcons();
+
+    if (refreshButton) {
+        refreshButton.addEventListener("click", () => {
+            window.location.reload();
+        });
+    }
 
     const observer = new MutationObserver(updateThemeIcons);
     observer.observe(document.body, {
