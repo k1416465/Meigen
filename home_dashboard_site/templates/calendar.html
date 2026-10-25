@@ -48,7 +48,7 @@
     color:var(--personal-event-text-color,#0563B5);
     cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:pan-y;
   }
-  .calendar-event-title { font-weight:700; color:inherit; }
+  .calendar-event-title { display:block; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-weight:700; color:inherit; }
   .calendar-event-detail { display:none; margin-top:2px; font-size:.8em; white-space:pre-wrap; font-weight:400; color:inherit; }
   /* カレンダー上では各日の予定を2件まで表示し、残りは日付モーダルに表示 */
   .calendar-day > .calendar-event:nth-of-type(n+3) { display:none; }

@@ -624,13 +624,14 @@ def _extract_detail(text, status, status_index):
     if status == "平常運転":
         return "事故・遅延に関する情報はありません。"
 
-    # 更新日時を除去
+    # 更新日時を除去（ページ内UIの「更新時刻：14:15」も含む）
     text = re.sub(
         r"\d{1,2}月\d{1,2}日\s*"
         r"\d{1,2}時\d{1,2}分\s*(?:更新|現在)",
         "",
         text,
     )
+    text = re.sub(r"更新時刻\s*[:：]?\s*\d{1,2}:\d{2}", "", text)
 
     # 掲載日時を除去
     text = re.sub(
@@ -646,10 +647,14 @@ def _extract_detail(text, status, status_index):
     if marker_index >= 0:
         text = text[marker_index + len(marker):]
 
-    # 迂回ルート検索や登録案内以降を除去
+    # サイトの操作案内・周辺UIの文言を詳細文から除去
+    # 「路線を登録」「列車遅延」は本文ではなくページ上のUIラベルとして混入することがある
+    text = text.replace("路線を登録すると", "")
+    text = text.replace("路線を登録", "")
+    text = text.replace("列車遅延", "")
+
     stop_markers = (
         "迂回ルート検索",
-        "路線を登録すると",
         "この路線に関するつぶやき",
         "みんなの運行情報",
         "運行情報を投稿",
@@ -686,6 +691,8 @@ def _extract_detail(text, status, status_index):
             text = text[len(route_name):].strip()
             break
 
+    # 見出し側に表示する状態ラベルが本文の先頭に混入した場合は除去
+    text = re.sub(r"^(?:列車遅延|遅延)\s*", "", text)
     text = _normalise_text(text)
 
     if not text:
