@@ -1848,6 +1848,8 @@ body:not(.dark) .operation-source-button {
 }
 
 .operation-alert-detail {
+    /* PC版では路線名・ステータスの下に説明文を配置 */
+    grid-column: 2 / 3 !important;
     display: block !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -3115,7 +3117,7 @@ body.dark .timetable-card th {
 /* 時刻表：駅選択は全端末で青系の配色 */
 .operation-page .station-grid.station-grid-large .station-button {
     background: #EAF3FF !important;
-    border: 1px solid #3B82F6 !important;
+    border: 1px solid #077AE3 !important;
     color: #17365D !important;
 }
 
@@ -3181,7 +3183,7 @@ body.dark .timetable-card th {
 /* 時刻表：駅選択を青色に統一し、スマホの運行情報を読みやすく配置 */
 .operation-page .station-grid.station-grid-large .station-button {
     background: #EAF3FF !important;
-    border-color: #3B82F6 !important;
+    border-color: #077AE3 !important;
     color: #17365D !important;
 }
 
