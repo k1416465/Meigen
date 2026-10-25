@@ -3857,3 +3857,67 @@ body.dark .page-refresh-button {
         padding: 8px 14px !important;
     }
 }
+
+/* v38: スマホ版は閉じている見出しだけをコンパクトにし、選択肢の大きさは戻す */
+@media (max-width: 600px) {
+    .settings-form {
+        gap: 5px !important;
+    }
+
+    .settings-form .setting-accordion {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 閉じているときの「クラスの選択」「My路線」などの見出し部分 */
+    .settings-form .setting-accordion:not([open]) > summary {
+        min-height: 25px !important;
+        padding: 2px 10px !important;
+        line-height: 1.15 !important;
+        font-size: 12px !important;
+    }
+
+    .settings-form .setting-accordion:not([open]) > summary::after {
+        font-size: 14px !important;
+        line-height: 1 !important;
+    }
+
+    /* 開いたときの見出しは読みやすさを維持 */
+    .settings-form .setting-accordion[open] > summary {
+        min-height: 38px !important;
+        padding: 8px 14px !important;
+        line-height: 1.25 !important;
+        font-size: 13px !important;
+    }
+
+    .settings-form .setting-accordion[open] > summary::after {
+        font-size: 17px !important;
+    }
+
+    /* 選択肢は小さくせず、通常のタップしやすいサイズに戻す */
+    .settings-form .setting-options {
+        padding: 0 20px 16px !important;
+        gap: 10px !important;
+    }
+
+    .settings-form .setting-choice-list {
+        gap: 7px !important;
+    }
+
+    .settings-form .choice-option {
+        min-height: 36px !important;
+        padding: 7px 10px !important;
+        gap: 8px !important;
+        border-radius: 11px !important;
+        font-size: 13px !important;
+        line-height: normal !important;
+        transform: none !important;
+    }
+
+    .settings-form .choice-option input {
+        width: auto !important;
+        height: auto !important;
+        margin: revert !important;
+        flex: initial !important;
+    }
+}
