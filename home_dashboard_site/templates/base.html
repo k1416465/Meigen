@@ -12,14 +12,20 @@
     href="{{ url_for('static', filename='site-icon.png') }}"
   >
 
-  <!-- iPhone/iPadで「ホーム画面に追加」したときのアイコン -->
+  <!-- iPhone/iPadで「ホーム画面に追加」したときだけ別の画像を使用 -->
   <link
     rel="apple-touch-icon"
-    href="{{ url_for('static', filename='site-icon.png') }}"
+    sizes="180x180"
+    href="{{ url_for('static', filename='apple-touch-icon.png') }}"
   >
 
   <title>{% block title %}迷言{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* テーマ切り替えアイコンをボタンの中央に配置 */
+    #themeToggle { display: inline-flex; align-items: center; justify-content: center; }
+    #themeToggle #themeIcon { display: block; flex: 0 0 auto; margin: 0 auto; object-fit: contain; }
+  </style>
 </head>
 
 <body

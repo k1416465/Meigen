@@ -2864,3 +2864,27 @@ body.dark .timetable-card th {
         flex-basis: 52px;
     }
 }
+/* 週間時間割：スマホでもタイトルと「ホームへ戻る」を横並びにする */
+@media (max-width: 620px) {
+    .schedule-welcome {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 10px;
+    }
+
+    .schedule-welcome h1 {
+        margin: 0;
+        font-size: clamp(20px, 5.2vw, 26px);
+        letter-spacing: -.6px;
+        white-space: nowrap;
+    }
+
+    .schedule-welcome .back-link {
+        align-self: auto;
+        flex-shrink: 0;
+        padding: 9px 11px;
+        font-size: 11px;
+    }
+}

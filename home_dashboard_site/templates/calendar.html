@@ -1,11 +1,10 @@
 {% extends "base.html" %}
-{% block title %}カレンダー{% endblock %}
+{% block title %}迷言｜カレンダー{% endblock %}
 
 {% block content %}
 <section class="welcome-row calendar-heading">
   <div>
     <h1>カレンダー</h1>
-    <p>学校行事・祝日・自分の予定</p>
   </div>
   <button type="button" class="calendar-add-toggle" id="calendarAddToggle" aria-expanded="false" aria-controls="calendarAddForm">＋ 予定を追加</button>
 </section>
@@ -24,13 +23,9 @@
   .calendar-add-form input[type="date"], .calendar-add-form input[type="text"],
   .calendar-add-form textarea, .calendar-edit-form input[type="date"],
   .calendar-edit-form input[type="text"], .calendar-edit-form textarea {
-    box-sizing:border-box; width:100%; max-width:100%; min-width:0; padding:10px 12px;
-    border:1px solid var(--border-color,#d7dce2); border-radius:8px;
-    background:var(--card-bg,transparent); color:inherit; font:inherit;
+    width:100%; min-width:0; padding:10px 12px; border:1px solid var(--border-color,#d7dce2);
+    border-radius:8px; background:var(--card-bg,transparent); color:inherit; font:inherit;
   }
-  .calendar-add-form > label, .calendar-edit-form > label { min-width:0; }
-  .calendar-scroll { width:100%; min-width:0; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  .calendar-scroll .calendar-grid { min-width:0; }
   .calendar-add-form .wide, .calendar-edit-form .wide { grid-column:1 / -1; }
   .calendar-add-form button[type="submit"], .calendar-edit-form button[type="submit"] {
     justify-self:start; border:0; border-radius:9px; padding:10px 14px; background:#077AE3; color:white; cursor:pointer; font:inherit;
@@ -82,18 +77,8 @@
   @media (max-width:600px) {
     .calendar-heading { align-items:flex-start; }
     .calendar-add-toggle { padding:9px 11px; font-size:.9rem; }
-    .calendar-add-form { grid-template-columns:minmax(0,1fr); }
-    .calendar-add-form .wide { grid-column:auto; min-width:0; }
-    .calendar-add-form input[type="date"], .calendar-edit-form input[type="date"] {
-      display:block; box-sizing:border-box; width:100%; max-width:100%; min-width:0;
-    }
-    .calendar-color-options {
-      flex-wrap:nowrap; justify-content:space-between; gap:2px; width:100%; min-width:0;
-    }
-    .calendar-color-option { flex:0 0 auto; gap:3px !important; font-size:.75rem; white-space:nowrap; }
-    .calendar-color-swatch { width:16px; height:16px; flex:0 0 16px; }
-    .calendar-scroll { max-width:100%; overflow-x:auto; }
-    .calendar-scroll .calendar-grid { min-width:700px; }
+    .calendar-add-form { grid-template-columns:1fr; }
+    .calendar-add-form .wide { grid-column:auto; }
     .calendar-modal { padding:16px; }
   }
 </style>
@@ -134,7 +119,6 @@
     <a href="{{ url_for('calendar_page', year=next_year, month=next_month) }}">翌月 ›</a>
   </div>
 
-  <div class="calendar-scroll" aria-label="カレンダー。左右にスクロールできます">
   <div class="calendar-grid">
     {% for weekday in ["日", "月", "火", "水", "木", "金", "土"] %}
       <div class="calendar-weekday">{{ weekday }}</div>
@@ -170,8 +154,7 @@
       {% endfor %}
     {% endfor %}
   </div>
-  </div>
-  <p class="calendar-modal-help">日付を押すと、その日の予定をすべて表示します。自分の予定はタップまたは長押しで編集・削除できます。</p>
+  <p class="calendar-modal-help">日付を押すと、その日の予定をすべて表示します。自分の予定はタップで編集・削除できます。</p>
 </section>
 
 <div class="calendar-modal-backdrop" id="calendarDayBackdrop" hidden>

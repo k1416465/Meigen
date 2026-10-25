@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}ホーム{% endblock %}
+{% block title %}迷言｜ホーム{% endblock %}
 {% block content %}
 
 
@@ -18,20 +18,22 @@
   .clock-card, .weather-card { padding: 10px !important; }
   .card-heading { gap: 5px !important; font-size: .82rem !important; flex-wrap: wrap; }
   .heading-icon-image { width: 18px !important; height: 18px !important; }
-  .clock { font-size: clamp(1.05rem, 4.8vw, 1.55rem) !important; line-height: 1.2; white-space: nowrap; }
+  .clock { font-size: clamp(1.02rem, 4.4vw, 1.48rem) !important; line-height: 1.3; letter-spacing: .025em; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .clock-bottom { font-size: .68rem !important; }
   .weather-location { font-size: .68rem !important; }
-  .weather-main { gap: 5px !important; align-items: center; }
+  .weather-main { gap: 9px !important; align-items: center; }
   .weather-symbol, .weather-condition-icon { width: 36px !important; height: 36px !important; }
-  .weather-temp { font-size: 1.25rem !important; }
+  .weather-temp { font-size: 1.25rem !important; line-height: 1.3; letter-spacing: .025em; font-variant-numeric: tabular-nums; margin-bottom: 3px; }
   .weather-desc { font-size: .68rem !important; overflow-wrap: anywhere; }
   .weather-details { gap: 4px !important; }
   .weather-details > div { min-width: 0; }
   .weather-details span { display: block; font-size: .58rem !important; }
-  .weather-details strong { font-size: .75rem !important; }
+  .weather-details strong { font-size: .75rem !important; letter-spacing: .015em; font-variant-numeric: tabular-nums; }
   .section-heading { margin-bottom: 6px !important; }
   .section-heading h2 { font-size: .95rem !important; line-height: 1.25; }
-  .class-caption { font-size: .68rem !important; }
+  .class-caption { font-size: .68rem !important; margin:0 !important; white-space:nowrap; }
+  #today-schedule .section-heading > div { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; min-width:0; }
+  #today-schedule .section-heading h2 { margin:0 !important; }
   .schedule-card { padding: 8px !important; }
   .table-top { padding: 5px !important; }
   .lesson-row { gap: 5px !important; padding: 6px 4px !important; }
@@ -45,6 +47,38 @@
   #events .event-date strong { font-size: 1rem !important; }
   #events .event-copy strong { font-size: .72rem !important; overflow-wrap: anywhere; }
   #events .empty-state { padding: 8px !important; font-size: .72rem !important; }
+}
+
+/* スマホのホームは画面内に固定し、「今週の予定」一覧だけをスクロール */
+@media (max-width: 600px) {
+  body:has(.hero-grid) {
+    height:100vh; height:100dvh; overflow:hidden !important;
+    display:flex; flex-direction:column;
+  }
+  body:has(.hero-grid) > .topbar,
+  body:has(.hero-grid) > .bottom-nav { flex:0 0 auto; }
+  body:has(.hero-grid) > .page {
+    flex:1 1 auto; min-height:0; overflow:hidden !important;
+    display:flex; flex-direction:column; gap:8px;
+    box-sizing:border-box;
+  }
+  body:has(.hero-grid) .hero-grid { flex:0 0 auto; min-height:0; }
+  body:has(.hero-grid) .school-grid {
+    flex:1 1 0; min-height:0; overflow:hidden;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    align-items:stretch;
+  }
+  body:has(.hero-grid) .school-column,
+  body:has(.hero-grid) #today-schedule,
+  body:has(.hero-grid) #events { min-height:0; overflow:hidden; }
+  body:has(.hero-grid) #today-schedule .schedule-card { min-height:0; overflow:hidden; }
+  body:has(.hero-grid) #events { display:flex; flex-direction:column; }
+  body:has(.hero-grid) #events .section-heading { flex:0 0 auto; }
+  body:has(.hero-grid) #events .event-list {
+    flex:1 1 0; min-height:0; height:auto !important; max-height:none !important;
+    overflow-y:auto !important; overflow-x:hidden; -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
 }
 </style>
 
@@ -113,10 +147,10 @@
 <div class="school-grid">
   <section class="school-column" id="today-schedule">
     <div class="section-heading">
-      <div>
-        <h2><a href="{{ url_for('schedule') }}" style="color: inherit; text-decoration: none;">今日の時間割</a></h2>
+      <div style="display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; min-width:0;">
+        <h2 style="margin:0;"><a href="{{ url_for('schedule') }}" style="color: inherit; text-decoration: none;">今日の時間割</a></h2>
         {% if class_name %}
-          <p class="class-caption">表示中：{{ class_name }}</p>
+          <p class="class-caption" style="margin:0; white-space:nowrap;">表示中：{{ class_name }}</p>
         {% endif %}
       </div>
     </div>
