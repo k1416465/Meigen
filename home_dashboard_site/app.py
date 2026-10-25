@@ -8,12 +8,6 @@ import re
 import traceback
 import json
 import uuid
-import os
-import sqlite3
-import secrets
-from functools import wraps
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask import session, g, flash
 from pathlib import Path
 
 import jpholiday
@@ -23,79 +17,6 @@ from bs4 import BeautifulSoup
 
 
 app = Flask(__name__)
-# 本番環境では環境変数 SECRET_KEY に十分長いランダム文字列を設定する。
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
-app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = os.environ.get("COOKIE_SECURE", "0") == "1"
-
-DATABASE_FILE = Path(__file__).with_name("meigen_users.sqlite3")
-
-
-def get_db():
-    if "db" not in g:
-        g.db = sqlite3.connect(DATABASE_FILE)
-        g.db.row_factory = sqlite3.Row
-        g.db.execute("PRAGMA foreign_keys = ON")
-    return g.db
-
-
-@app.teardown_appcontext
-def close_db(_error=None):
-    db = g.pop("db", None)
-    if db is not None:
-        db.close()
-
-
-def init_auth_db():
-    with sqlite3.connect(DATABASE_FILE) as db:
-        db.execute("PRAGMA foreign_keys = ON")
-        db.execute("""CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL COLLATE NOCASE UNIQUE,
-            password_hash TEXT NOT NULL,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )""")
-        db.execute("""CREATE TABLE IF NOT EXISTS personal_events (
-            id TEXT PRIMARY KEY,
-            user_id INTEGER NOT NULL,
-            date TEXT NOT NULL,
-            title TEXT NOT NULL,
-            detail TEXT NOT NULL DEFAULT '',
-            color TEXT NOT NULL DEFAULT 'blue',
-            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-        )""")
-        db.commit()
-
-
-init_auth_db()
-
-
-def current_user():
-    user_id = session.get("user_id")
-    if not user_id:
-        return None
-    return get_db().execute(
-        "SELECT id, username FROM users WHERE id = ?", (user_id,)
-    ).fetchone()
-
-
-def login_required(view):
-    @wraps(view)
-    def wrapped(*args, **kwargs):
-        if current_user() is None:
-            flash("予定を追加・編集するにはログインしてください。", "info")
-            return redirect(url_for("login", next=request.full_path if request.query_string else request.path))
-        return view(*args, **kwargs)
-    return wrapped
-
-
-def load_account_events(user_id):
-    rows = get_db().execute(
-        "SELECT id, date, title, detail, color FROM personal_events WHERE user_id = ? ORDER BY date, rowid",
-        (user_id,),
-    ).fetchall()
-    return [dict(row, kind="personal") for row in rows]
 
 JST = timezone(timedelta(hours=9))
 WEEKDAYS = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"]
@@ -153,6 +74,20 @@ ROUTE_OPTIONS = {
     "tobu_utsunomiya": "東武宇都宮線",
     "tobu_isesaki": "東武伊勢崎線",
     "tobu_sano": "東武佐野線",
+}
+
+STATION_OPTIONS = {
+    "oyama": "小山駅",
+    "omoigawa": "思川駅",
+    "tochigi": "栃木駅",
+    "ohirashita": "大平下駅",
+    "iwafune": "岩舟駅",
+    "sano": "佐野駅",
+    "tomita": "富田駅",
+    "ashikaga_flower_park": "あしかがフラワーパーク駅",
+    "ashikaga": "足利駅",
+    "yamamae": "山前駅",
+    "omata": "小俣駅",
 }
 
 WEATHER_OPTIONS = {
@@ -261,11 +196,6 @@ def inject_appearance():
     return {"appearance": selected_appearance()}
 
 
-@app.context_processor
-def inject_auth_user():
-    return {"logged_in_user": current_user()}
-
-
 def selected_class():
     value = request.cookies.get("myHomeClass")
     return value if value in CLASS_SCHEDULES else None
@@ -274,6 +204,11 @@ def selected_class():
 def selected_route():
     value = request.cookies.get("myHomeRoute", "ryomo")
     return value if value in ROUTE_OPTIONS else "ryomo"
+
+
+def selected_station():
+    value = request.cookies.get("myHomeStation", "")
+    return value if value in STATION_OPTIONS else ""
 
 
 def selected_weather_place():
@@ -319,11 +254,7 @@ def filtered_events(now):
         day += timedelta(days=1)
 
     # ユーザーがカレンダーで追加した予定（設定した色）
-    personal_events = load_personal_events()  # 既存データは全員共通のまま
-    user = current_user()
-    if user is not None:
-        personal_events += load_account_events(user["id"])
-    for event in personal_events:
+    for event in load_personal_events():
         try:
             event_date = datetime.strptime(event["date"], "%Y-%m-%d").date()
         except (ValueError, TypeError, KeyError):
@@ -382,86 +313,21 @@ def _operation_result(route_key, ok, status, detail, source_url):
 
 
 # ==================================================
-# ユーザー登録・ログイン
-# ==================================================
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if current_user() is not None:
-        return redirect(url_for("home"))
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-        if not re.fullmatch(r"[A-Za-z0-9_ぁ-んァ-ヶ一-龠ー-]{3,24}", username):
-            flash("ユーザー名は3〜24文字で入力してください（日本語・英数字・_ が使えます）。", "error")
-        elif len(password) < 8 or len(password) > 128:
-            flash("パスワードは8〜128文字で設定してください。", "error")
-        else:
-            try:
-                db = get_db()
-                cur = db.execute(
-                    "INSERT INTO users (username, password_hash) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
-                )
-                db.commit()
-                session.clear()
-                session["user_id"] = cur.lastrowid
-                flash("アカウントを作成しました。", "success")
-                return redirect(url_for("home"))
-            except sqlite3.IntegrityError:
-                flash("そのユーザー名はすでに使われています。", "error")
-    return render_template("auth.html", mode="register")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if current_user() is not None:
-        return redirect(url_for("home"))
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-        user = get_db().execute(
-            "SELECT id, username, password_hash FROM users WHERE username = ? COLLATE NOCASE",
-            (username,),
-        ).fetchone()
-        if user is None or not check_password_hash(user["password_hash"], password):
-            flash("ユーザー名またはパスワードが違います。", "error")
-        else:
-            session.clear()
-            session["user_id"] = user["id"]
-            flash("ログインしました。", "success")
-            destination = request.args.get("next", "")
-            if not destination.startswith("/") or destination.startswith("//"):
-                destination = url_for("home")
-            return redirect(destination)
-    return render_template("auth.html", mode="login")
-
-
-@app.route("/logout", methods=["POST"])
-def logout():
-    session.clear()
-    flash("ログアウトしました。", "success")
-    return redirect(url_for("home"))
-
-
-# ==================================================
 # ホーム
 # ==================================================
 
 @app.route("/")
 def home():
     now = datetime.now(JST)
-    # index.html の前日・翌日ボタンから渡される日付オフセット
-    day_offset = request.args.get("day_offset", default=0, type=int)
-    # URLに極端な値が渡されても過剰な日付計算にならないよう制限
-    day_offset = max(-3650, min(day_offset, 3650))
-    selected_day = now + timedelta(days=day_offset)
-
-    weekday = (
-        WEEKDAYS[selected_day.weekday()]
-        if selected_day.weekday() < 5
-        else ("土曜日" if selected_day.weekday() == 5 else "日曜日")
-    )
+    try:
+        day_offset = int(request.args.get("day_offset", "0"))
+    except (TypeError, ValueError):
+        day_offset = 0
+    day_offset = max(-365, min(365, day_offset))
+    displayed_day = (now + timedelta(days=day_offset)).date()
+    weekday_names = WEEKDAYS + ["土曜日", "日曜日"]
+    weekday = weekday_names[displayed_day.weekday()]
+    schedule_date_label = f"{displayed_day.month}/{displayed_day.day}({'月火水木金土日'[displayed_day.weekday()]})"
 
     class_name = selected_class()
     weather_place = selected_weather_place()
@@ -474,17 +340,17 @@ def home():
 
     return render_template(
         "index.html",
-        day_offset=day_offset,
         weekday=weekday,
+        schedule_date_label=schedule_date_label,
         today_lessons=today_lessons,
         events=filtered_events(now),
-        today=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日",
+        today=f"{now.year}/{now.month:02d}/{now.day:02d}",
+        clock_date_label=f"{now.year}/{now.month:02d}/{now.day:02d}({'月火水木金土日'[now.weekday()]})",
+        day_offset=day_offset,
+        displayed_date=displayed_day.isoformat(),
         class_name=class_name,
         class_names=CLASS_NAMES,
-        weekday_short="月火水木金土日"[selected_day.weekday()],
-        # index.html の時計・時間割の日付ラベルに渡す
-        clock_date_label=f"{now.year}年{now.month}月{now.day}日（{'月火水木金土日'[now.weekday()]}）",
-        schedule_date_label=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日（{'月火水木金土日'[selected_day.weekday()]}）",
+        weekday_short="月火水木金土日"[now.weekday()],
         weather_place=weather_place,
         weather_label=WEATHER_OPTIONS[weather_place],
         railway_label=ROUTE_OPTIONS[selected_route()],
@@ -523,6 +389,7 @@ def settings():
     if request.method == "POST":
         class_name = request.form.get("class_name", "")
         my_route = request.form.get("my_route", "ryomo")
+        my_station = request.form.get("my_station", "")
         weather_place = request.form.get("weather_place", "sano")
         appearance = request.form.get("appearance", "system")
 
@@ -530,6 +397,8 @@ def settings():
             class_name = ""
         if my_route not in ROUTE_OPTIONS:
             my_route = "ryomo"
+        if my_station not in STATION_OPTIONS:
+            my_station = ""
         if weather_place not in WEATHER_OPTIONS:
             weather_place = "sano"
         if appearance not in ("light", "dark", "system"):
@@ -548,6 +417,10 @@ def settings():
             response.delete_cookie("myHomeClass")
 
         response.set_cookie("myHomeRoute", my_route, **cookie_options)
+        if my_station:
+            response.set_cookie("myHomeStation", my_station, **cookie_options)
+        else:
+            response.delete_cookie("myHomeStation")
         response.set_cookie("myHomeWeather", weather_place, **cookie_options)
         response.set_cookie("myHomeAppearance", appearance, **cookie_options)
 
@@ -559,6 +432,8 @@ def settings():
         class_names=CLASS_NAMES,
         my_route=selected_route(),
         route_options=ROUTE_OPTIONS,
+        my_station=selected_station(),
+        station_options=STATION_OPTIONS,
         weather_place=selected_weather_place(),
         weather_options=WEATHER_OPTIONS,
     )
@@ -784,13 +659,14 @@ def _extract_detail(text, status, status_index):
     if status == "平常運転":
         return "事故・遅延に関する情報はありません。"
 
-    # 更新日時を除去
+    # 更新日時を除去（ページ内UIの「更新時刻：14:15」も含む）
     text = re.sub(
         r"\d{1,2}月\d{1,2}日\s*"
         r"\d{1,2}時\d{1,2}分\s*(?:更新|現在)",
         "",
         text,
     )
+    text = re.sub(r"更新時刻\s*[:：]?\s*\d{1,2}:\d{2}", "", text)
 
     # 掲載日時を除去
     text = re.sub(
@@ -806,10 +682,14 @@ def _extract_detail(text, status, status_index):
     if marker_index >= 0:
         text = text[marker_index + len(marker):]
 
-    # 迂回ルート検索や登録案内以降を除去
+    # サイトの操作案内・周辺UIの文言を詳細文から除去
+    # 「路線を登録」「列車遅延」は本文ではなくページ上のUIラベルとして混入することがある
+    text = text.replace("路線を登録すると", "")
+    text = text.replace("路線を登録", "")
+    text = text.replace("列車遅延", "")
+
     stop_markers = (
         "迂回ルート検索",
-        "路線を登録すると",
         "この路線に関するつぶやき",
         "みんなの運行情報",
         "運行情報を投稿",
@@ -846,6 +726,8 @@ def _extract_detail(text, status, status_index):
             text = text[len(route_name):].strip()
             break
 
+    # 見出し側に表示する状態ラベルが本文の先頭に混入した場合は除去
+    text = re.sub(r"^(?:列車遅延|遅延)\s*", "", text)
     text = _normalise_text(text)
 
     if not text:
@@ -1130,6 +1012,8 @@ def operation_page():
         operation=operation,
         operation_alerts=operation_alerts,
         railway_label=ROUTE_OPTIONS[route_key],
+        my_station=selected_station(),
+        my_station_name=STATION_OPTIONS.get(selected_station(), ""),
         weather_place=selected_weather_place(),
     )
 
@@ -1200,14 +1084,10 @@ def calendar_page():
     now = datetime.now(JST)
 
     if request.method == "POST":
-        user = current_user()
-        if user is None:
-            flash("予定の追加・編集・削除にはログインが必要です。", "info")
-            return redirect(url_for("login", next=url_for("calendar_page")))
-        user_id = user["id"]
         action = request.form.get("action", "add")
-        events = load_account_events(user_id)
+        events = load_personal_events()
         target_date = request.form.get("return_date", "")
+        return_to = request.form.get("return_to", "")
 
         if action in ("edit", "delete"):
             # IDが一致するユーザー予定だけを操作する。祝日・学校行事は
@@ -1216,8 +1096,8 @@ def calendar_page():
             event = next((item for item in events if item.get("id") == event_id), None)
 
             if event is not None and action == "delete":
-                get_db().execute("DELETE FROM personal_events WHERE id = ? AND user_id = ?", (event_id, user_id))
-                get_db().commit()
+                events = [item for item in events if item.get("id") != event_id]
+                save_personal_events(events)
 
             elif event is not None and action == "edit":
                 event_date = request.form.get("event_date", "").strip()
@@ -1241,11 +1121,7 @@ def calendar_page():
                         "color": color,
                         "kind": "personal",
                     })
-                    get_db().execute(
-                        "UPDATE personal_events SET date=?, title=?, detail=?, color=? WHERE id=? AND user_id=?",
-                        (event_date, title[:80], detail[:300], color, event_id, user_id),
-                    )
-                    get_db().commit()
+                    save_personal_events(events)
                     target_date = event_date
 
         elif action == "add":
@@ -1263,13 +1139,19 @@ def calendar_page():
                 valid_date = False
 
             if valid_date and title:
-                get_db().execute(
-                    "INSERT INTO personal_events (id, user_id, date, title, detail, color) VALUES (?, ?, ?, ?, ?, ?)",
-                    (uuid.uuid4().hex, user_id, event_date, title[:80], detail[:300], color),
-                )
-                get_db().commit()
+                events.append({
+                    "id": uuid.uuid4().hex,
+                    "date": event_date,
+                    "title": title[:80],
+                    "detail": detail[:300],
+                    "color": color,
+                    "kind": "personal",
+                })
+                save_personal_events(events)
                 target_date = event_date
 
+        if return_to == "home":
+            return redirect(url_for("home"))
         try:
             target = datetime.strptime(target_date, "%Y-%m-%d")
             return redirect(url_for(
@@ -1302,12 +1184,8 @@ def calendar_page():
             **event, "kind": "school"
         })
 
-    # 既存の予定は全員共通。新規の予定はログインユーザーごとに表示する。
-    personal_events = load_personal_events()
-    user = current_user()
-    if user is not None:
-        personal_events += load_account_events(user["id"])
-    for event in personal_events:
+    # ユーザーが追加した予定
+    for event in load_personal_events():
         try:
             event_date = datetime.strptime(event["date"], "%Y-%m-%d").date()
         except (ValueError, TypeError, KeyError):
