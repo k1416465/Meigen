@@ -3112,11 +3112,11 @@ body.dark .timetable-card th {
     display: none !important;
 }
 
-/* 時刻表：駅選択の背景は全端末で薄い黄色 */
+/* 時刻表：駅選択は全端末で青系の配色 */
 .operation-page .station-grid.station-grid-large .station-button {
-    background: #FFFDE7 !important;
-    border: 1px solid #FCD800 !important;
-    color: #333333 !important;
+    background: #EAF3FF !important;
+    border: 1px solid #3B82F6 !important;
+    color: #17365D !important;
 }
 
 /* スマホ版：駅を1行3列にして、駅選択と運行情報の間隔を詰める */
@@ -3174,5 +3174,79 @@ body.dark .timetable-card th {
     .operation-page .operation-section-heading {
         margin-top: 8px !important;
         margin-bottom: 8px !important;
+    }
+}
+
+
+/* 時刻表：駅選択を青色に統一し、スマホの運行情報を読みやすく配置 */
+.operation-page .station-grid.station-grid-large .station-button {
+    background: #EAF3FF !important;
+    border-color: #3B82F6 !important;
+    color: #17365D !important;
+}
+
+.operation-alert-title-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    column-gap: 8px;
+    row-gap: 2px;
+    min-width: 0;
+}
+
+.operation-alert-title-row .operation-alert-route,
+.operation-alert-title-row .operation-alert-status {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+@media (max-width: 620px) {
+    .operation-page .operation-alert-card {
+        grid-template-columns: 32px minmax(0, 1fr) auto !important;
+        column-gap: 8px !important;
+        row-gap: 8px !important;
+    }
+
+    .operation-page .operation-alert-title-row {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        column-gap: 7px !important;
+        row-gap: 2px !important;
+    }
+
+    .operation-page .operation-alert-title-row .operation-alert-route {
+        font-size: 15px !important;
+        line-height: 1.4 !important;
+        margin: 0 !important;
+    }
+
+    .operation-page .operation-alert-title-row .operation-alert-status {
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+        margin: 0 !important;
+    }
+
+    .operation-page .operation-alert-heading {
+        min-width: 0;
+    }
+
+    .operation-page .operation-alert-detail {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 8px 0 0 !important;
+        border-top: 1px solid var(--border);
+        box-sizing: border-box !important;
+        font-size: 12px !important;
+        line-height: 1.65 !important;
+        text-align: left !important;
+    }
+
+    .operation-page .operation-alert-source {
+        align-self: start !important;
+        justify-self: end !important;
+        margin: 0 !important;
     }
 }
