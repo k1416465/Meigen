@@ -3452,3 +3452,89 @@ body.dark .my-station-button {
         line-height: 1;
     }
 }
+
+
+/* v26: My駅未設定・位置情報エラーの通知を画面中央に表示 */
+.nearest-station-message.is-visible {
+    position: fixed !important;
+    inset: 50% auto auto 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: 20000 !important;
+    display: block !important;
+    width: max-content;
+    max-width: min( calc(100vw - 36px), 440px ) !important;
+    margin: 0 !important;
+    padding: 18px 22px !important;
+    transform: translate(-50%, -50%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--text) !important;
+    box-shadow: 0 12px 38px rgba(0, 0, 0, .28);
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+    text-align: center;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    animation: centeredNoticeIn .16s ease-out;
+}
+
+.nearest-station-message.is-visible::before {
+    content: \"\";
+    position: fixed;
+    inset: -100vh -100vw;
+    z-index: -1;
+    background: rgba(0, 0, 0, .28);
+}
+
+@keyframes centeredNoticeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+/* v27: 通知表示中は背景を操作不可にし、右上の×で閉じる */
+.notice-backdrop {
+    display: none;
+}
+.notice-backdrop.is-visible {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 19999;
+    background: rgba(0, 0, 0, .38);
+    cursor: not-allowed;
+}
+body.notice-open {
+    overflow: hidden;
+}
+.nearest-station-message.is-visible {
+    z-index: 20000 !important;
+    padding: 24px 42px 20px 22px !important;
+    cursor: default;
+}
+.nearest-station-message.is-visible::before {
+    display: none;
+}
+.notice-close-button {
+    position: absolute;
+    top: 5px;
+    right: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text);
+    font-size: 25px;
+    line-height: 1;
+    cursor: pointer;
+}
+.notice-close-button:hover {
+    background: rgba(128, 128, 128, .18);
+}
