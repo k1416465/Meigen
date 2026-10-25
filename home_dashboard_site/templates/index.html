@@ -86,6 +86,81 @@
     overscroll-behavior:contain;
   }
 }
+
+/* スマホ：今日の時間割を7時間目まで画面内に収める */
+@media (max-width: 600px) {
+  body:has(.hero-grid) #today-schedule {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  body:has(.hero-grid) #today-schedule .section-heading {
+    flex: 0 0 auto !important;
+    margin: 0 0 4px !important;
+    min-height: 0 !important;
+  }
+  body:has(.hero-grid) #today-schedule .section-heading h2 {
+    font-size: .88rem !important;
+    line-height: 1.15 !important;
+  }
+  body:has(.hero-grid) #today-schedule .class-caption {
+    font-size: .58rem !important;
+  }
+  body:has(.hero-grid) #today-schedule .schedule-card {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 4px !important;
+    overflow: hidden !important;
+  }
+  body:has(.hero-grid) #today-schedule .table-top {
+    flex: 0 0 auto !important;
+    padding: 3px 5px !important;
+    min-height: 22px !important;
+    font-size: .65rem !important;
+  }
+  body:has(.hero-grid) #today-schedule .lesson-list {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0 3px !important;
+    overflow: hidden !important;
+  }
+  body:has(.hero-grid) #today-schedule .lesson-row {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    gap: 5px !important;
+    padding: 0 !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  body:has(.hero-grid) #today-schedule .lesson-row:last-child {
+    border-bottom: 0 !important;
+  }
+  body:has(.hero-grid) #today-schedule .lesson-number {
+    flex: 0 0 21px !important;
+    width: 21px !important;
+    min-width: 21px !important;
+    height: 21px !important;
+    font-size: .62rem !important;
+    border-radius: 6px !important;
+  }
+  body:has(.hero-grid) #today-schedule .lesson-name {
+    min-width: 0 !important;
+    font-size: .65rem !important;
+    line-height: 1.1 !important;
+    overflow-wrap: anywhere !important;
+  }
+  body:has(.hero-grid) #today-schedule .no-lessons-today,
+  body:has(.hero-grid) #today-schedule .class-not-selected {
+    padding: 8px 5px !important;
+    font-size: .65rem !important;
+    line-height: 1.25 !important;
+  }
+}
 </style>
 
 
@@ -129,7 +204,7 @@
 
       <div>
         <div class="weather-temp" id="weatherTemp">--°</div>
-        <div class="weather-desc" id="weatherDesc">天気情報取得中</div>
+        <div class="weather-desc" id="weatherDesc">天気を取得中</div>
       </div>
     </div>
 
