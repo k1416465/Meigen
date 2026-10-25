@@ -2998,3 +2998,76 @@ body.dark .timetable-card th {
         width: 560px;
     }
 }
+
+
+/* 追加調整：時間割・カレンダー・運行情報（2026-10） */
+.lesson-number {
+    box-sizing: border-box !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+}
+.no-lessons-today {
+    margin: 0;
+    padding: 16px 12px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    /* 7時間目まで見られるように時間割の中をスクロール可能にする */
+    body:has(.hero-grid) #today-schedule .schedule-card {
+        height: 100% !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    body:has(.hero-grid) #today-schedule .lesson-list {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding: 0 4px !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    body:has(.hero-grid) #today-schedule .lesson-row {
+        min-height: 32px !important;
+        gap: 6px !important;
+        padding: 2px 0 !important;
+    }
+    body:has(.hero-grid) #today-schedule .lesson-number {
+        flex-basis: 25px !important;
+        width: 25px !important;
+        min-width: 25px !important;
+        height: 25px !important;
+        border-radius: 7px !important;
+    }
+    body:has(.hero-grid) #today-schedule .lesson-name {
+        min-width: 0;
+        font-size: .7rem !important;
+        line-height: 1.25;
+    }
+    .calendar-grid-scroll .calendar-grid {
+        min-width: 1120px !important;
+        width: 1120px !important;
+    }
+}
+
+@media (max-width: 620px) {
+    .route-settings-content > .route-settings-button {
+        flex: 0 0 76px !important;
+        width: 76px !important;
+        min-width: 76px !important;
+        max-width: 76px !important;
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
+    .operation-alert-source {
+        flex: 0 0 76px !important;
+        width: 76px !important;
+        min-width: 76px !important;
+        max-width: 76px !important;
+    }
+}
