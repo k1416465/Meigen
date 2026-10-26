@@ -150,6 +150,19 @@
     </a>
   </nav>
 
+  <script>
+    /* ホーム画面に追加したiPhoneアプリとして開いている場合だけ識別 */
+    (function () {
+      const isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.matchMedia('(display-mode: fullscreen)').matches ||
+        window.navigator.standalone === true;
+
+      if (isStandalone) {
+        document.body.classList.add('app-standalone');
+      }
+    })();
+  </script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
