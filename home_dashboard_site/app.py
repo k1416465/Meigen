@@ -1,4 +1,6 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response
+from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response, session, flash
+import os
+import secrets
 from datetime import datetime, timezone, timedelta
 import time
 import threading
@@ -17,6 +19,14 @@ from bs4 import BeautifulSoup
 
 
 app = Flask(__name__)
+# ==================================================
+# 録音管理画面の設定
+# 下の2つの値を、運用前に自分だけが知る値へ変更してください。
+# ==================================================
+RECORDING_ADMIN_PASSWORD = "Meigen123"
+FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
+
+app.secret_key = FLASK_SESSION_SECRET
 
 JST = timezone(timedelta(hours=9))
 WEEKDAYS = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"]
@@ -1311,6 +1321,80 @@ def recording_page():
         weather_place=selected_weather_place(),
         railway_label=ROUTE_OPTIONS[selected_route()],
     )
+
+
+# ==================================================
+# 録音管理（タイトル・人物名・日付・タグの編集）
+# 管理用パスワードは環境変数 RECORDING_ADMIN_PASSWORD に設定する。
+# ==================================================
+
+@app.route("/recording/admin/login", methods=["GET", "POST"])
+def recording_admin_login():
+    configured_password = RECORDING_ADMIN_PASSWORD
+
+    error = ""
+    if request.method == "POST":
+        submitted = request.form.get("password", "")
+        if secrets.compare_digest(submitted, configured_password):
+            session["recording_admin_authenticated"] = True
+            return redirect(url_for("recording_admin"))
+        error = "パスワードが違います。"
+    return render_template("recording_admin_login.html", error=error)
+
+
+@app.route("/recording/admin/logout", methods=["POST"])
+def recording_admin_logout():
+    session.pop("recording_admin_authenticated", None)
+    return redirect(url_for("recording_admin_login"))
+
+
+@app.route("/recording/admin", methods=["GET", "POST"])
+def recording_admin():
+    if not session.get("recording_admin_authenticated"):
+        return redirect(url_for("recording_admin_login"))
+
+    init_recording_db()
+    if request.method == "POST":
+        rec_id = request.form.get("id", type=int)
+        title = request.form.get("title", "").strip()
+        people = request.form.get("people", "").strip()
+        recorded_at = request.form.get("recorded_at", "").strip()
+        raw_tags = request.form.get("tags", "")
+        tags = ",".join(
+            dict.fromkeys(
+                tag.strip() for tag in raw_tags.replace("、", ",").split(",")
+                if tag.strip()
+            )
+        )
+        if not rec_id or not title:
+            flash("録音IDとタイトルを確認してください。", "error")
+        else:
+            with get_recording_db() as conn:
+                result = conn.execute(
+                    "UPDATE recordings SET title = ?, people = ?, recorded_at = ?, tags = ? WHERE id = ?",
+                    (title, people, recorded_at, tags, rec_id),
+                )
+                if result.rowcount:
+                    flash("録音情報を保存しました。", "success")
+                else:
+                    flash("対象の録音が見つかりませんでした。", "error")
+        return redirect(url_for("recording_admin", q=request.form.get("q", "")))
+
+    query = request.args.get("q", "").strip()
+    with get_recording_db() as conn:
+        if query:
+            like = f"%{query}%"
+            rows = conn.execute(
+                """SELECT * FROM recordings
+                   WHERE title LIKE ? OR filename LIKE ? OR people LIKE ? OR tags LIKE ?
+                   ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE""",
+                (like, like, like, like),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM recordings ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE"
+            ).fetchall()
+    return render_template("recording_admin.html", recordings=rows, query=query)
 
 
 @app.route("/stamp")
