@@ -14,41 +14,36 @@
     <button type="submit">検索</button>
   </form>
 
-  <form method="post" id="recordingAdminBulkForm" class="recording-admin-bulk-form">
-    <input type="hidden" name="action" value="save_all">
-    <input type="hidden" name="q" value="{{ query }}">
     {% for rec in recordings %}
     <article class="recording-admin-card">
       <div class="recording-admin-file"><strong>{{ rec['title'] or rec['filename'] }}</strong><small>ID: {{ rec['id'] }} ・ {{ rec['filename'] }}</small></div>
-      <input type="hidden" name="recording_ids" value="{{ rec['id'] }}">
+      <input type="hidden" name="recording_ids" value="{{ rec['id'] }}" form="recordingAdminBulkForm">
       <div class="recording-admin-edit">
-        <label>タイトル<input name="title_{{ rec['id'] }}" value="{{ rec['title'] }}" required maxlength="200"></label>
-        <label>人物名<input name="people_{{ rec['id'] }}" value="{{ rec['people'] }}" maxlength="200" placeholder="例：先生、友人"></label>
-        <label>録音日<input name="recorded_at_{{ rec['id'] }}" value="{{ rec['recorded_at'] }}" placeholder="例：2026-10-27"></label>
-        <label>タグ（カンマ区切り）<input name="tags_{{ rec['id'] }}" value="{{ rec['tags'] }}" placeholder="学校, 爆笑, 先生"></label>
+        <label>タイトル<input name="title_{{ rec['id'] }}" form="recordingAdminBulkForm" value="{{ rec['title'] }}" required maxlength="200"></label>
+        <label>人物名<input name="people_{{ rec['id'] }}" form="recordingAdminBulkForm" value="{{ rec['people'] }}" maxlength="200" placeholder="例：先生、友人"></label>
+        <label>録音日<input name="recorded_at_{{ rec['id'] }}" form="recordingAdminBulkForm" value="{{ rec['recorded_at'] }}" placeholder="例：2026-10-27"></label>
+        <label>タグ（カンマ区切り）<input name="tags_{{ rec['id'] }}" form="recordingAdminBulkForm" value="{{ rec['tags'] }}" placeholder="学校, 爆笑, 先生"></label>
       </div>
       <div class="recording-admin-card-actions">
-        <button type="button" class="recording-admin-delete" onclick="deleteRecording({{ rec['id'] }}, {{ (rec['title'] or rec['filename'])|tojson }})">この録音を削除</button>
+        <form method="post" class="recording-admin-delete-form" onsubmit="return confirm('この録音情報と音声ファイルを削除します。この操作は元に戻せません。削除しますか？');">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="q" value="{{ query }}">
+          <input type="hidden" name="id" value="{{ rec['id'] }}">
+          <button type="submit" class="recording-admin-delete">この録音を削除</button>
+        </form>
       </div>
     </article>
     {% else %}
     <p>該当する録音がありません。</p>
     {% endfor %}
-    {% if recordings %}<div class="recording-admin-savebar"><span>入力内容を確認してから保存してください。</span><button type="submit" class="recording-admin-save-all">すべて保存</button></div>{% endif %}
-  </form>
-
-  <form method="post" id="recordingAdminDeleteForm" class="recording-admin-hidden-form" hidden>
-    <input type="hidden" name="action" value="delete">
-    <input type="hidden" name="q" value="{{ query }}">
-    <input type="hidden" name="id" id="recordingAdminDeleteId" value="">
-  </form>
+    {% if recordings %}<div class="recording-admin-savebar"><span>入力内容を確認してから保存してください。</span>
+      <form method="post" id="recordingAdminBulkForm" class="recording-admin-bulk-form">
+        <input type="hidden" name="action" value="save_all">
+        <input type="hidden" name="q" value="{{ query }}">
+        <button type="submit" class="recording-admin-save-all">すべて保存</button>
+      </form>
+    </div>{% endif %}
   <p class="recording-admin-note">タグはカンマ（,）で区切って入力してください。削除すると録音情報と音声ファイルが削除されます。必要な音声は事前にバックアップしてください。</p>
 </section>
-<script>
-function deleteRecording(id, title) {
-  if (!window.confirm('「' + title + '」を削除しますか？\n録音情報と音声ファイルの両方が削除され、この操作は元に戻せません。')) return;
-  document.getElementById('recordingAdminDeleteId').value = id;
-  document.getElementById('recordingAdminDeleteForm').submit();
-}
-</script>
+
 {% endblock %}
