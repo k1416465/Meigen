@@ -4277,3 +4277,22 @@ a.recording-tag:hover { opacity: .8; }
 .recording-admin-login { max-width:420px; display:grid; gap:14px; }
 .recording-admin-error { color:#c62828; }
 @media(max-width:600px) { .recording-admin-edit { grid-template-columns:1fr; } .recording-admin-edit button { width:100%; } .recording-admin-heading { align-items:center; } .recording-admin-search button { flex:0 0 auto; } }
+
+/* 録音管理：一括保存・削除ボタン */
+.recording-admin-bulk-form { margin: 0; }
+.recording-admin-edit { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.recording-admin-edit label { display:flex; flex-direction:column; gap:6px; font-size:13px; min-width:0; }
+.recording-admin-card-actions { display:flex; justify-content:flex-end; margin-top:12px; }
+.recording-admin-card-actions .recording-admin-delete { border:1px solid #c62828; border-radius:10px; padding:9px 13px; color:#c62828; background:transparent; cursor:pointer; }
+.recording-admin-savebar { position:sticky; bottom:10px; z-index:5; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:20px 0; padding:12px; border:1px solid var(--border); border-radius:14px; background:var(--surface); box-shadow:0 4px 18px rgba(0,0,0,.12); }
+.recording-admin-savebar span { color:var(--muted); font-size:13px; }
+.recording-admin-save-all { border:0; border-radius:10px; padding:12px 20px; background:var(--purple); color:#fff; font-weight:700; cursor:pointer; white-space:nowrap; }
+.recording-admin-message { padding:10px 12px; border-radius:10px; background:var(--surface); border:1px solid var(--border); }
+.recording-admin-message.error { color:#c62828; }
+.recording-admin-message.success { color:#218838; }
+@media(max-width:600px) {
+  .recording-admin-edit { grid-template-columns:1fr; }
+  .recording-admin-savebar { align-items:stretch; flex-direction:column; }
+  .recording-admin-save-all { width:100%; }
+  .recording-admin-card-actions .recording-admin-delete { width:100%; }
+}
