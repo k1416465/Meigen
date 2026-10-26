@@ -495,31 +495,4 @@
 })();
 </script>
 
-/* スマホ版：カレンダーのマス幅を確保 */
-@media (max-width: 600px) {
-  .calendar-scroll {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    box-sizing: border-box;
-  }
-
-  .calendar-scroll .calendar-grid {
-    width: 1050px !important;
-    min-width: 1050px !important;
-    max-width: none !important;
-    grid-template-columns: repeat(7, minmax(150px, 1fr)) !important;
-    box-sizing: border-box;
-  }
-
-  .calendar-scroll .calendar-day,
-  .calendar-scroll .calendar-weekday {
-    min-width: 0;
-    box-sizing: border-box;
-  }
-}
-
 {% endblock %}
