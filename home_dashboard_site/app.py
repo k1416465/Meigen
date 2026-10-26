@@ -23,8 +23,8 @@ app = Flask(__name__)
 # 録音管理画面の設定
 # 下の2つの値を、運用前に自分だけが知る値へ変更してください。
 # ==================================================
-RECORDING_ADMIN_PASSWORD = "Meigen123"
-FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
+RECORDING_ADMIN_PASSWORD = "ここを自分の管理用パスワードに変更"
+FLASK_SESSION_SECRET = "ここを長くランダムな秘密文字列に変更してください"
 
 app.secret_key = FLASK_SESSION_SECRET
 
@@ -1355,30 +1355,70 @@ def recording_admin():
 
     init_recording_db()
     if request.method == "POST":
-        rec_id = request.form.get("id", type=int)
-        title = request.form.get("title", "").strip()
-        people = request.form.get("people", "").strip()
-        recorded_at = request.form.get("recorded_at", "").strip()
-        raw_tags = request.form.get("tags", "")
-        tags = ",".join(
-            dict.fromkeys(
-                tag.strip() for tag in raw_tags.replace("、", ",").split(",")
-                if tag.strip()
-            )
-        )
-        if not rec_id or not title:
-            flash("録音IDとタイトルを確認してください。", "error")
-        else:
+        action = request.form.get("action", "save_all")
+        query = request.form.get("q", "")
+
+        if action == "delete":
+            rec_id = request.form.get("id", type=int)
             with get_recording_db() as conn:
-                result = conn.execute(
-                    "UPDATE recordings SET title = ?, people = ?, recorded_at = ?, tags = ? WHERE id = ?",
-                    (title, people, recorded_at, tags, rec_id),
-                )
-                if result.rowcount:
-                    flash("録音情報を保存しました。", "success")
+                row = conn.execute(
+                    "SELECT filename FROM recordings WHERE id = ?", (rec_id,)
+                ).fetchone()
+                if row is None:
+                    flash("削除対象の録音が見つかりませんでした。", "error")
                 else:
-                    flash("対象の録音が見つかりませんでした。", "error")
-        return redirect(url_for("recording_admin", q=request.form.get("q", "")))
+                    filename = row["filename"]
+                    # DBの記録と音声ファイルを一緒に削除する。誤削除防止の確認は画面側で行う。
+                    conn.execute("DELETE FROM recordings WHERE id = ?", (rec_id,))
+                    conn.commit()
+                    audio_path = (RECORDING_DIR / filename).resolve()
+                    recording_dir = RECORDING_DIR.resolve()
+                    if audio_path.parent == recording_dir and audio_path.is_file():
+                        try:
+                            audio_path.unlink()
+                        except OSError:
+                            flash("録音情報は削除しましたが、音声ファイルを削除できませんでした。", "error")
+                        else:
+                            flash("録音情報と音声ファイルを削除しました。", "success")
+                    else:
+                        flash("録音情報を削除しました。", "success")
+            return redirect(url_for("recording_admin", q=query))
+
+        if action == "save_all":
+            # 画面に表示されている録音をまとめて保存する。
+            saved = 0
+            errors = 0
+            with get_recording_db() as conn:
+                ids = request.form.getlist("recording_ids")
+                for raw_id in ids:
+                    try:
+                        rec_id = int(raw_id)
+                    except (TypeError, ValueError):
+                        errors += 1
+                        continue
+                    title = request.form.get(f"title_{rec_id}", "").strip()
+                    people = request.form.get(f"people_{rec_id}", "").strip()
+                    recorded_at = request.form.get(f"recorded_at_{rec_id}", "").strip()
+                    raw_tags = request.form.get(f"tags_{rec_id}", "")
+                    tags = ",".join(dict.fromkeys(
+                        tag.strip() for tag in raw_tags.replace("、", ",").split(",")
+                        if tag.strip()
+                    ))
+                    if not title:
+                        errors += 1
+                        continue
+                    result = conn.execute(
+                        "UPDATE recordings SET title = ?, people = ?, recorded_at = ?, tags = ? WHERE id = ?",
+                        (title, people, recorded_at, tags, rec_id),
+                    )
+                    if result.rowcount:
+                        saved += 1
+                conn.commit()
+            if errors:
+                flash(f"{saved}件を保存しました。{errors}件はタイトル未入力などのため保存できませんでした。", "error")
+            else:
+                flash(f"{saved}件の録音情報をまとめて保存しました。", "success")
+        return redirect(url_for("recording_admin", q=query))
 
     query = request.args.get("q", "").strip()
     with get_recording_db() as conn:
