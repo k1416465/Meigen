@@ -186,21 +186,30 @@
   #events details.event-card > summary::-webkit-details-marker { display:none; }
   #events details.event-card > summary::marker { content:""; }
 
-/* インストール済みアプリとして開いた場合だけ、時間割の縦方向の余裕を調整。文字サイズは通常表示と同じ */
+/* インストール済みアプリとして開いた場合だけ時間割の縦方向を調整。
+   文字サイズは通常のスマートフォン表示と同じ */
 @media (max-width: 600px) {
   body.app-standalone:has(.hero-grid) #today-schedule .schedule-card {
+    flex: 0 0 350px !important;
+    height: 350px !important;
+    min-height: 350px !important;
+    max-height: 350px !important;
+    box-sizing: border-box !important;
     padding-top: 6px !important;
     padding-bottom: 6px !important;
   }
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-list {
+    flex: 0 0 auto !important;
     justify-content: flex-start !important;
-    gap: 2px !important;
+    gap: 0 !important;
   }
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-row {
-    flex: 1 0 34px !important;
-    min-height: 34px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
+    flex: 0 0 43px !important;
+    height: 43px !important;
+    min-height: 43px !important;
+    max-height: 43px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
   }
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-number {
     font-size: .62rem !important;
@@ -211,7 +220,6 @@
   }
 }
 </style>
-
 
 <section class="hero-grid">
   <article class="card clock-card">
