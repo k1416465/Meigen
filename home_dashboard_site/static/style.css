@@ -4035,180 +4035,143 @@ a.recording-tag:hover { opacity: .8; }
 }
 
 
-/* スマホ版カレンダー：ページ全体は固定し、カレンダー表だけスクロール */
-@media (max-width: 620px) {
-    body:has(.calendar-scroll) {
-        overflow: hidden !important;
-        height: 100%;
-        overscroll-behavior: none;
-    }
-
-    body:has(.calendar-scroll) .page {
-        height: calc(100dvh - 62px - 90px - env(safe-area-inset-bottom, 0px));
-        min-height: 0 !important;
-        max-height: calc(100dvh - 62px - 90px - env(safe-area-inset-bottom, 0px));
-        overflow: hidden !important;
-        display: flex;
-        flex-direction: column;
-    }
-
-    body:has(.calendar-scroll) .page > .calendar-card {
-        flex: 0 0 auto;
-        min-height: 0;
-    }
-
-    body:has(.calendar-scroll) .page > .calendar-card:has(.calendar-scroll) {
-        flex: 1 1 auto;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        min-height: 0;
-    }
-
-    body:has(.calendar-scroll) .calendar-scroll {
-        flex: 1 1 auto;
-        min-height: 0;
-        max-height: none !important;
-        overflow: auto !important;
-        overscroll-behavior: contain;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-    }
-
-    body:has(.calendar-scroll) .calendar-grid {
-        min-width: 560px;
-        width: 560px;
-    }
-
-    /* 予定の追加・編集画面の日付入力が横にはみ出さないようにする */
-    .calendar-modal,
-    .calendar-modal form,
-    .calendar-edit-form,
-    .calendar-add-form {
-        min-width: 0;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-
-    .calendar-modal input[type="date"],
-    .calendar-edit-form input[type="date"],
-    .calendar-add-form input[type="date"] {
-        display: block;
-        width: 100%;
-        min-width: 0;
-        max-width: 100%;
-        box-sizing: border-box;
-        font: inherit;
-    }
+/* 録音ページ改善：検索ボタンの文字はみ出し防止、スマホ見出し左寄せ */
+.recording-search-form { display:flex; align-items:stretch; gap:8px; min-width:0; }
+.recording-search-form input[type="search"] { flex:1 1 auto; width:0; min-width:0; box-sizing:border-box; }
+.recording-search-submit { flex:0 0 auto; min-width:64px; max-width:100%; padding:10px 12px; white-space:nowrap; text-align:center; box-sizing:border-box; line-height:1.2; }
+@media (max-width:600px) {
+  .recording-welcome { margin-left:-4px; margin-right:0; justify-content:flex-start; gap:8px; }
+  .recording-welcome-copy { flex:1 1 auto; min-width:0; }
+  .recording-welcome-copy h1, .recording-welcome-copy p { text-align:left; }
+  .recording-search-submit { min-width:58px; padding:9px 10px; font-size:13px; }
 }
 
-@media (max-width: 620px) and (orientation: portrait) {
-    @supports not (height: 100dvh) {
-        body:has(.calendar-scroll) .page {
-            height: calc(100vh - 152px - env(safe-area-inset-bottom, 0px));
-            max-height: calc(100vh - 152px - env(safe-area-inset-bottom, 0px));
-        }
-    }
+/* ボイスメモ風プレイヤー */
+.recording-player { display:flex; align-items:center; gap:13px; width:100%; min-width:0; box-sizing:border-box; padding:12px; margin-top:8px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
+.recording-audio-source { display:none !important; }
+.recording-play-button { display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; padding:0; border:0; border-radius:50%; color:#fff; background:var(--purple); cursor:pointer; box-shadow:0 3px 9px rgba(0,0,0,.15); }
+.recording-play-button svg { width:22px; height:22px; }
+.recording-pause-icon { display:none; }
+.recording-player.is-playing .recording-play-icon { display:none; }
+.recording-player.is-playing .recording-pause-icon { display:block; }
+.recording-player-main { flex:1 1 auto; min-width:0; }
+.recording-waveform { display:flex; align-items:center; justify-content:space-between; gap:2px; height:24px; overflow:hidden; }
+.recording-waveform i { display:block; flex:1 1 2px; max-width:4px; min-width:1px; border-radius:4px; height:var(--wave-height,45%); background:var(--purple); opacity:.55; }
+.recording-waveform i:nth-child(5n) { height:88%; }
+.recording-waveform i:nth-child(3n) { height:65%; }
+.recording-waveform i:nth-child(4n) { height:32%; }
+.recording-waveform i:nth-child(7n) { height:100%; }
+.recording-progress { display:block; width:100%; height:5px; margin:7px 0 4px; border-radius:99px; appearance:none; -webkit-appearance:none; background:linear-gradient(to right,var(--purple) 0 var(--progress,0%),var(--border) var(--progress,0%) 100%); cursor:pointer; }
+.recording-progress::-webkit-slider-thumb { appearance:none; -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--purple); border:2px solid var(--surface); box-shadow:0 0 0 1px var(--purple); }
+.recording-progress::-moz-range-thumb { width:10px; height:10px; border-radius:50%; background:var(--purple); border:2px solid var(--surface); box-shadow:0 0 0 1px var(--purple); }
+.recording-player-times { display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:11px; font-variant-numeric:tabular-nums; }
+@media (max-width:600px) { .recording-player { gap:10px; padding:10px; } .recording-play-button { flex-basis:40px; width:40px; height:40px; } }
+
+/* 最終調整：スマホの見出しを一覧カードの左端に揃える */
+.recording-welcome {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  justify-content: space-between;
+  text-align: left;
+}
+.recording-welcome-copy {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  text-align: left;
+}
+.recording-welcome-copy h1,
+.recording-welcome-copy p {
+  width: 100%;
+  text-align: left !important;
+}
+@media (max-width: 600px) {
+  .recording-welcome {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
-
-/* 修正：スマホ版カレンダーの各マスを広く保ち、表の横スクロールで確認できるようにする */
-@media (max-width: 620px) {
-    .calendar-grid-scroll {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-    }
-    .calendar-grid-scroll .calendar-grid {
-        width: 1120px !important;
-        min-width: 1120px !important;
-        max-width: none !important;
-        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
-    }
+/* 再生ボタン：A案の丸いボタンを確実に表示 */
+.recording-player .recording-play-button {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 46px;
+  width: 46px;
+  min-width: 46px;
+  max-width: 46px;
+  height: 46px;
+  min-height: 46px;
+  margin: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--purple) !important;
+  color: #fff !important;
+  line-height: 1;
+  box-shadow: 0 3px 9px rgba(0,0,0,.15);
 }
-
-
-/* 最終調整：calendar.html の実際のクラス名 .calendar-scroll に統一 */
-@media (max-width: 620px) {
-    /* 表の外側だけをスクロール領域にし、7列それぞれに十分な幅を確保 */
-    body:has(.calendar-scroll) .calendar-scroll {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        overflow-x: auto !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-        scrollbar-width: thin;
-        box-sizing: border-box;
-    }
-
-    body:has(.calendar-scroll) .calendar-scroll > .calendar-grid {
-        display: grid !important;
-        grid-template-columns: repeat(7, minmax(160px, 1fr)) !important;
-        width: 1120px !important;
-        min-width: 1120px !important;
-        max-width: none !important;
-        box-sizing: border-box;
-    }
-
-    body:has(.calendar-scroll) .calendar-scroll .calendar-weekday,
-    body:has(.calendar-scroll) .calendar-scroll .calendar-day {
-        min-width: 0 !important;
-        box-sizing: border-box;
-    }
-
-    /* 日付入力欄はモーダル内の幅からはみ出さない */
-    .calendar-modal {
-        width: 100% !important;
-        max-width: 520px !important;
-        min-width: 0 !important;
-        box-sizing: border-box !important;
-    }
-    .calendar-modal form,
-    .calendar-edit-form,
-    .calendar-add-form,
-    .calendar-edit-form label,
-    .calendar-add-form label {
-        width: 100%;
-        min-width: 0 !important;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-    .calendar-modal input[type="date"],
-    .calendar-edit-form input[type="date"],
-    .calendar-add-form input[type="date"] {
-        display: block;
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        font-size: 16px;
-    }
+.recording-player .recording-play-button svg {
+  display: none;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  color: #fff;
 }
+.recording-player .recording-play-button .recording-play-icon { display: block; }
+.recording-player.is-playing .recording-play-button .recording-play-icon { display: none; }
+.recording-player.is-playing .recording-play-button .recording-pause-icon { display: block; }
 
-/* iPhone/iOSアプリ：下部メニューの位置が一時的に跳ね上がる現象を抑える */
-.bottom-nav {
-    position: fixed !important;
-    top: auto !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
-    will-change: transform;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+/* 再生時間は横並び・改行なしで表示崩れを防ぐ */
+.recording-player .recording-player-times {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-
-/* タッチ操作時の hover/focus 状態でメニュー全体が動かないようにする */
-.bottom-nav:hover,
-.bottom-nav:focus,
-.bottom-nav:focus-within {
-    top: auto !important;
-    bottom: 0 !important;
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
+.recording-player .recording-player-times span {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  white-space: nowrap;
+}
+.recording-player .recording-progress {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  .recording-player .recording-play-button {
+    flex-basis: 42px;
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    height: 42px;
+    min-height: 42px;
+  }
 }
