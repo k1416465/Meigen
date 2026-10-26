@@ -605,7 +605,8 @@
             </div>
           </article>
         {% else %}
-          <article class="card event-card event-card-{{ event.kind|default('school') }}" style="flex: 0 0 auto;">
+          <article class="card event-card event-card-{{ event.kind|default('school') }}"
+            data-event-date="{{ event.date }}" style="flex: 0 0 auto;">
             <div class="event-date" style="background-color: {% if event.kind|default('school') == 'holiday' %}#FDECEC{% else %}#E8F2FC{% endif %}; color: {{ event.text_color|default('#0563B5') }};">
               <span class="event-month">{{ event.date[5:7] }}月</span>
               <strong>{{ event.date[8:10] }}</strong>
@@ -1046,6 +1047,19 @@
         }
       });
     });
+
+  // サーバー側の予定と端末内の自分の予定を、一覧全体で日付順に並べ直す。
+  // 日付がないカードは末尾に置き、同じ日付の予定は元の順序を保つ。
+  Array.from(list.querySelectorAll(':scope > .event-card'))
+    .map((card, index) => ({ card, index }))
+    .sort((a, b) => {
+      const dateA = a.card.dataset.eventDate || '';
+      const dateB = b.card.dataset.eventDate || '';
+      if (!dateA && dateB) return 1;
+      if (dateA && !dateB) return -1;
+      return dateA.localeCompare(dateB) || a.index - b.index;
+    })
+    .forEach(({ card }) => list.appendChild(card));
 
   // 共有予定からカレンダーへ移動する処理
   document

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}迷言｜録音{% endblock %}
+
+{% block content %}
+<section class="welcome-row recording-welcome">
+  <div class="recording-welcome-copy">
+    <h1>録音</h1>
+    <p>迷言の録音を再生・検索できます。</p>
+  </div>
+  <button class="recording-search-toggle" type="button" id="recording-search-toggle"
+          aria-expanded="{{ 'true' if query else 'false' }}" aria-controls="recording-search-panel"
+          aria-label="検索欄を開く／閉じる" title="検索">
+    <img class="recording-search-icon recording-search-light" src="{{ url_for('static', filename='icons/light/search.png') }}" alt="">
+    <img class="recording-search-icon recording-search-dark" src="{{ url_for('static', filename='icons/dark/search.png') }}" alt="">
+  </button>
+</section>
+
+<section class="recording-search-section" aria-label="録音を検索">
+
+  <div class="recording-search-panel" id="recording-search-panel" {% if not query %}hidden{% endif %}>
+    <form class="recording-search-form" method="get" action="{{ url_for('recording_page') }}">
+      <input type="search" name="q" value="{{ query }}" placeholder="検索したい言葉を入力" aria-label="録音を検索" id="recording-search-input">
+      <input type="hidden" name="scope" value="all">
+      <button type="submit" class="recording-search-submit">検索</button>
+    </form>
+
+    {% if tag_options %}
+      <div class="recording-tag-choices" aria-label="タグから検索">
+        <span class="recording-tag-choices-label">タグから検索</span>
+        <div class="recording-tag-choice-list">
+          {% for tag in tag_options %}
+            <a class="recording-tag-choice{% if query == tag and search_scope == 'tags' %} is-active{% endif %}"
+               href="{{ url_for('recording_page', q=tag, scope='tags') }}">{{ tag }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="recording-tag-choices-empty">録音情報にタグを登録すると、ここに検索候補が表示されます。</p>
+    {% endif %}
+    <p class="recording-hint">MP3は <code>static/recording/</code> に置いてください。</p>
+  </div>
+</section>
+
+<section class="recording-list-section">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">LIBRARY</p>
+      <h2>{% if query %}検索結果{% else %}録音一覧{% endif %} <span class="recording-count">{{ recordings|length }}件</span></h2>
+    </div>
+  </div>
+
+  {% if recordings %}
+    <div class="recording-list">
+      {% for item in recordings %}
+        <article class="card recording-card">
+          <div class="recording-card-heading">
+            <div class="recording-title-wrap">
+              <h3>{{ item['title'] or item['filename'] }}</h3>
+              <p class="recording-meta">
+                {% if item['people'] %}<span>{{ item['people'] }}</span>{% endif %}
+                {% if item['recorded_at'] %}<span>{{ item['recorded_at'] }}</span>{% endif %}
+              </p>
+            </div>
+          </div>
+          <audio controls preload="none" src="{{ url_for('static', filename='recording/' ~ item['filename']) }}">
+            お使いのブラウザは音声再生に対応していません。
+          </audio>
+          {% if item['tags'] %}
+            <div class="recording-tags">
+              {% for tag in item['tags'].replace('、', ',').split(',') %}
+                {% if tag.strip() %}<a class="recording-tag" href="{{ url_for('recording_page', q=tag.strip(), scope='tags') }}">{{ tag.strip() }}</a>{% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card recording-empty">
+      <h3>{% if query %}該当する録音がありません{% else %}録音ファイルはまだありません{% endif %}</h3>
+      {% if query %}
+        <p>別の人物名・日時・タグで検索してみてね。</p>
+        <a class="text-link" href="{{ url_for('recording_page') }}">検索をクリア</a>
+      {% else %}
+        <p><code>static/recording/</code> にMP3ファイルを入れると、ここに表示されます。</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+<script>
+  (function () {
+    var toggle = document.getElementById('recording-search-toggle');
+    var panel = document.getElementById('recording-search-panel');
+    var input = document.getElementById('recording-search-input');
+    function updateSearchIcon() {
+      var dark = document.body.classList.contains('dark');
+      document.querySelectorAll('.recording-search-light').forEach(function (img) { img.style.display = dark ? 'none' : 'block'; });
+      document.querySelectorAll('.recording-search-dark').forEach(function (img) { img.style.display = dark ? 'block' : 'none'; });
+    }
+    toggle.addEventListener('click', function () {
+      var opening = panel.hidden;
+      panel.hidden = !opening;
+      toggle.setAttribute('aria-expanded', String(opening));
+      if (opening && input) input.focus();
+    });
+    updateSearchIcon();
+    var observer = new MutationObserver(updateSearchIcon);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  })();
+</script>
+{% endblock %}
