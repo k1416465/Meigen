@@ -634,6 +634,7 @@ def _find_status(text):
 # 運行情報の詳細文を抽出
 # ==================================================
 
+
 def _extract_detail(text, status, status_index):
     """運行情報の詳細文を抽出する。"""
 
@@ -667,10 +668,10 @@ def _extract_detail(text, status, status_index):
     if marker_index >= 0:
         text = text[marker_index + len(marker):]
 
-    # 迂回ルート検索や登録案内以降を除去
+    # 案内・投稿エリア以降を除去
     stop_markers = (
         "迂回ルート検索",
-        "路線を登録すると",
+        "路線を登録",
         "この路線に関するつぶやき",
         "みんなの運行情報",
         "運行情報を投稿",
@@ -709,10 +710,22 @@ def _extract_detail(text, status, status_index):
 
     text = _normalise_text(text)
 
+    # 先頭に状態ラベルが残っている場合は除去
+    text = re.sub(
+        r"^(?:(?:列車遅延|遅延|運転見合わせ|運休|一部運休|"
+        r"運転再開|運転中止|運転計画|その他)"
+        r"[\s：:、。]*)+",
+        "",
+        text,
+    )
+
+    text = _normalise_text(text)
+
     if not text:
         return "詳細は情報元のページをご確認ください。"
 
     return text[:4000]
+
 
 # ==================================================
 # Yahoo!運行情報ページの解析
@@ -962,6 +975,18 @@ def fetch_operation_alerts():
             "source_url": source_url,
             "icon": icon,
         })
+
+    # 表示順：× 運転見合わせ・運休 → △ 遅延 → その他
+    def alert_priority(alert):
+        icon = alert.get("icon", "")
+
+        if icon == "stop.png":
+            return 0
+        if icon == "delay.png":
+            return 1
+        return 2
+
+    alerts.sort(key=alert_priority)
 
     with OPERATION_LOCK:
         OPERATION_ALERT_CACHE["cached_at"] = time.time()
