@@ -4029,26 +4029,78 @@ a.recording-tag:hover { opacity: .8; }
 }
 
 
-/* iPhoneのホーム画面からアプリとして開いた場合のみ、下部メニューを押しやすくする */
-@media (max-width: 600px) {
-    body.app-standalone .bottom-nav {
-        padding-top: 12px !important;
-        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+/* スマホ版カレンダー：ページ全体は固定し、カレンダー表だけスクロール */
+@media (max-width: 620px) {
+    body:has(.calendar-scroll) {
+        overflow: hidden !important;
+        height: 100%;
+        overscroll-behavior: none;
     }
 
-    body.app-standalone .bottom-nav > .nav-item {
-        min-height: 58px;
-        padding-top: 7px !important;
-        padding-bottom: 7px !important;
-        gap: 5px;
+    body:has(.calendar-scroll) .page {
+        height: calc(100dvh - 62px - 90px - env(safe-area-inset-bottom, 0px));
+        min-height: 0 !important;
+        max-height: calc(100dvh - 62px - 90px - env(safe-area-inset-bottom, 0px));
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
     }
 
-    body.app-standalone .bottom-nav > .nav-item > .nav-icon,
-    body.app-standalone .bottom-nav > .nav-item > img.nav-icon {
-        width: 26px !important;
-        height: 26px !important;
-        min-width: 26px !important;
-        max-width: 26px !important;
-        flex-basis: 26px !important;
+    body:has(.calendar-scroll) .page > .calendar-card {
+        flex: 0 0 auto;
+        min-height: 0;
+    }
+
+    body:has(.calendar-scroll) .page > .calendar-card:has(.calendar-scroll) {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    body:has(.calendar-scroll) .calendar-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none !important;
+        overflow: auto !important;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    body:has(.calendar-scroll) .calendar-grid {
+        min-width: 560px;
+        width: 560px;
+    }
+
+    /* 予定の追加・編集画面の日付入力が横にはみ出さないようにする */
+    .calendar-modal,
+    .calendar-modal form,
+    .calendar-edit-form,
+    .calendar-add-form {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .calendar-modal input[type="date"],
+    .calendar-edit-form input[type="date"],
+    .calendar-add-form input[type="date"] {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+        font: inherit;
+    }
+}
+
+@media (max-width: 620px) and (orientation: portrait) {
+    @supports not (height: 100dvh) {
+        body:has(.calendar-scroll) .page {
+            height: calc(100vh - 152px - env(safe-area-inset-bottom, 0px));
+            max-height: calc(100vh - 152px - env(safe-area-inset-bottom, 0px));
+        }
     }
 }
