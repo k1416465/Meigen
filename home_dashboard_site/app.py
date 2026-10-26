@@ -539,8 +539,43 @@ def _find_status(text):
         if index >= 0:
             return "平常運転", index
 
+    # 運転再開後も遅れ・運休が残る場合は、過去の「運転見合わせ」より優先する。
+    # 例：「運転を見合わせていましたが、20:16頃、運転を再開しました。
+    # なお、一部列車に遅れや運休が出ています。」
+    has_restart = any(
+        phrase in text
+        for phrase in (
+            "運転を再開",
+            "運転再開",
+            "運転を再開しました",
+        )
+    )
+
+    has_remaining_disruption = any(
+        phrase in text
+        for phrase in (
+            "遅れが出ています",
+            "遅延が出ています",
+            "一部列車に遅れ",
+            "一部の列車に遅れ",
+            "一部列車に運休",
+            "一部の列車に運休",
+            "一部列車に遅れや運休",
+            "一部運休",
+            "遅れや運休",
+            "遅延や運休",
+        )
+    )
+
+    if has_restart and has_remaining_disruption:
+        index = text.find("一部列車に遅れ")
+        if index < 0:
+            index = text.find("遅れ")
+        return "遅延", index if index >= 0 else 0
+
     # ------------------------------------------
-    # 2. 運転見合わせ・運転中止
+    # 運転見合わせ・運転中止
+    # （運転再開後の残存遅延は上で判定済み）
     # ------------------------------------------
     suspension_options = (
         "運転見合わせ",
@@ -561,37 +596,6 @@ def _find_status(text):
         suspension_matches.sort(key=lambda item: item[0])
         index, phrase = suspension_matches[0]
         return phrase, index
-
-    # ------------------------------------------
-    # 3. 運転再開後も遅れ・運休が残る場合
-    # ------------------------------------------
-    has_restart = any(
-        phrase in text
-        for phrase in (
-            "運転を再開",
-            "運転再開",
-            "運転を再開しました",
-        )
-    )
-
-    has_remaining_disruption = any(
-        phrase in text
-        for phrase in (
-            "遅れが出ています",
-            "遅延が出ています",
-            "一部列車に遅れ",
-            "一部の列車に遅れ",
-            "一部列車に運休",
-            "一部の列車に運休",
-            "一部運休",
-            "遅れや運休",
-            "遅延や運休",
-        )
-    )
-
-    if has_restart and has_remaining_disruption:
-        index = text.find("運転")
-        return "遅延", index if index >= 0 else 0
 
     # ------------------------------------------
     # 4. 運休・遅延
@@ -689,6 +693,16 @@ def _extract_detail(text, status, status_index):
 
     text = _normalise_text(text)
 
+
+    # 路線の運行区間表示を削除
+    text = re.sub(
+        r"\[(?:南栗橋[～〜~\-－−]東武日光|東京[～〜~\-－−]宇都宮|宇都宮[～〜~\-－−]黒磯|久喜[～〜~\-－−]伊勢崎)\]",
+        "",
+        text,
+    )
+    text = _normalise_text(text)
+
+
     # 先頭に路線名が残っている場合は除去
     route_names = (
         "東武宇都宮線",
@@ -702,6 +716,16 @@ def _extract_detail(text, status, status_index):
         "宇都宮線",
         "両毛線",
     )
+
+
+    # 「路線を登録 運転見合わせ」などの操作リンク・状態見出しを除去
+    text = re.sub(
+        r"路線を登録\s*(?:運転見合わせ|運転取りやめ|運転中止|一部運休|運休|列車遅延|遅延|運転再開)?",
+        "",
+        text,
+    )
+    text = _normalise_text(text)
+
 
     for route_name in route_names:
         if text.startswith(route_name):
@@ -742,7 +766,21 @@ def _parse_operation_page(soup, route_key):
         for name in candidates
     }
 
-    if heading_text not in candidate_names:
+    # Yahoo!側で路線名の括弧内区間などの表記が変わっても、
+    # 対象路線そのものが一致していれば解析を続ける。
+    heading_matches = heading_text in candidate_names
+    if not heading_matches:
+        if route_key == "tobu_nikko":
+            heading_matches = "東武日光線" in heading_text
+        elif route_key == "tobu_isesaki":
+            heading_matches = (
+                "東武伊勢崎線" in heading_text
+                or "東武スカイツリーライン" in heading_text
+            )
+        elif route_key == "utsunomiya":
+            heading_matches = "宇都宮線" in heading_text
+        
+    if not heading_matches:
         raise ValueError(f"路線名が一致しません: {heading_text}")
 
     # HTML全体から見出し以降のテキストを取得する
