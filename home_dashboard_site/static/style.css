@@ -4203,3 +4203,56 @@ a.recording-tag:hover { opacity: .8; }
     text-align: left !important;
   }
 }
+
+
+/* 根本修正：録音ページのタイトルを一覧カードと同じコンテンツ左端に固定 */
+.page > section.recording-welcome {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 28px 0 !important;
+    padding: 0 !important;
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    text-align: left !important;
+}
+.page > section.recording-welcome > .recording-welcome-copy {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: static !important;
+    transform: none !important;
+    text-align: left !important;
+}
+.page > section.recording-welcome > .recording-welcome-copy > h1,
+.page > section.recording-welcome > .recording-welcome-copy > p {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    text-align: left !important;
+}
+@media (max-width: 620px) {
+    .page > section.recording-welcome {
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        margin-bottom: 28px !important;
+    }
+    .page > section.recording-welcome > .recording-search-toggle {
+        flex: 0 0 44px !important;
+        width: 44px !important;
+        height: 44px !important;
+        margin-left: 8px !important;
+    }
+}
