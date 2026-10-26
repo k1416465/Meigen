@@ -107,11 +107,12 @@
       inline-size:100%; max-width:100% !important; min-width:0 !important;
       min-inline-size:0; max-inline-size:100%;
     }
-    /* iOS Safariのdate入力だけ右へはみ出す場合に備え、予定名欄の見た目幅に合わせる */
+    /* 日付欄も予定名欄と同じ幅にする（余分な縮小はしない） */
     #calendarAddForm input[type="date"] {
-      width:calc(100% - 36px) !important;
-      inline-size:calc(100% - 36px) !important;
-      max-width:calc(100% - 36px) !important;
+      width:100% !important;
+      inline-size:100% !important;
+      max-width:100% !important;
+      align-self:stretch;
     }
     #calendarAddForm input[type="date"], .calendar-edit-form input[type="date"] {
       padding-inline:8px; font-size:16px;
@@ -130,6 +131,17 @@
     }
     .calendar-add-form .calendar-color-swatch, .calendar-edit-form .calendar-color-swatch {
       width:16px; height:16px; flex:0 0 16px;
+    }
+    /* スマホでは色名を隠し、色の丸だけを表示 */
+    .calendar-add-form .calendar-color-option > span:not(.calendar-color-swatch),
+    .calendar-edit-form .calendar-color-option > span:not(.calendar-color-swatch) {
+      display:none !important;
+    }
+    .calendar-add-form .calendar-color-option,
+    .calendar-edit-form .calendar-color-option {
+      flex-direction:row !important;
+      gap:0 !important;
+      padding:5px 0;
     }
     .calendar-edit-form > label { display:flex; width:100%; min-width:0; }
     .calendar-edit-form input[type="date"], .calendar-edit-form input[type="text"] {
