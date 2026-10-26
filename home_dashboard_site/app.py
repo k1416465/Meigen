@@ -1335,7 +1335,10 @@ def recording_admin_login():
     error = ""
     if request.method == "POST":
         submitted = request.form.get("password", "")
-        if secrets.compare_digest(submitted, configured_password):
+        if secrets.compare_digest(
+            submitted.encode("utf-8"),
+            configured_password.encode("utf-8")
+        ):
             session["recording_admin_authenticated"] = True
             return redirect(url_for("recording_admin"))
         error = "パスワードが違います。"
