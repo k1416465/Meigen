@@ -11,7 +11,6 @@
 
 <style>
   .calendar-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
-  .calendar-add-card:has(.calendar-add-form[hidden]) { display:none; }
   .calendar-add-toggle, .calendar-primary-button {
     display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
     border:0; border-radius:10px; padding:10px 16px; background:#077AE3;
@@ -19,6 +18,8 @@
   }
   .calendar-add-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:16px; }
   .calendar-add-form[hidden] { display:none; }
+  .calendar-add-modal .calendar-add-form { margin-top:0; }
+  .calendar-add-modal .calendar-add-form button[type="submit"] { margin-top:2px; }
   .calendar-add-form label, .calendar-edit-form label { display:flex; flex-direction:column; gap:6px; font-size:.9rem; }
   .calendar-add-form input[type="date"], .calendar-add-form input[type="text"],
   .calendar-add-form textarea, .calendar-edit-form input[type="date"],
@@ -28,11 +29,8 @@
     background:var(--card-bg,transparent); color:inherit; font:inherit;
   }
   .calendar-add-form > label, .calendar-edit-form > label { min-width:0; }
-  .calendar-scroll { width:100%; min-width:0; max-height:75vh; overflow-x:auto; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
-  .calendar-scroll .calendar-grid { min-width:1050px; }
-  .calendar-day { min-height:150px; }
-  .calendar-add-form label, .calendar-edit-form label { min-width:0; }
-  .calendar-add-form input[type="date"], .calendar-edit-form input[type="date"] { min-inline-size:0; max-inline-size:100%; }
+  .calendar-scroll { width:100%; min-width:0; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .calendar-scroll .calendar-grid { min-width:0; }
   .calendar-add-form .wide, .calendar-edit-form .wide { grid-column:1 / -1; }
   .calendar-add-form button[type="submit"], .calendar-edit-form button[type="submit"] {
     justify-self:start; border:0; border-radius:9px; padding:10px 14px; background:#077AE3; color:white; cursor:pointer; font:inherit;
@@ -80,13 +78,12 @@
   .calendar-danger-button { background:#c62828; color:#fff; }
   .calendar-edit-form { display:grid; grid-template-columns:1fr; gap:12px; }
   .calendar-edit-form[hidden] { display:none; }
-  .calendar-edit-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
-  .calendar-edit-actions button[hidden] { display:none !important; }
   .calendar-modal-help { font-size:.88rem; opacity:.8; margin:0 0 12px; }
   @media (max-width:600px) {
     .calendar-heading { align-items:flex-start; }
     .calendar-add-toggle { padding:9px 11px; font-size:.9rem; }
     .calendar-add-form { grid-template-columns:minmax(0,1fr); }
+    .calendar-add-modal { width:min(520px,100%); max-height:calc(100dvh - 36px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow:auto; }
     .calendar-add-form .wide { grid-column:auto; min-width:0; }
     .calendar-add-form input[type="date"], .calendar-edit-form input[type="date"] {
       display:block; box-sizing:border-box; width:100%; max-width:100%; min-width:0;
@@ -96,15 +93,19 @@
     }
     .calendar-color-option { flex:0 0 auto; gap:3px !important; font-size:.75rem; white-space:nowrap; }
     .calendar-color-swatch { width:16px; height:16px; flex:0 0 16px; }
-    .calendar-scroll { max-width:100%; overflow-x:auto; overflow-y:auto; max-height:70vh; }
-    .calendar-scroll .calendar-grid { min-width:1050px; }
-    .calendar-add-form input[type="date"], .calendar-edit-form input[type="date"] { padding-inline:8px; font-size:16px; }
+    .calendar-scroll { max-width:100%; overflow-x:auto; }
+    .calendar-scroll .calendar-grid { min-width:700px; }
     .calendar-modal { padding:16px; }
   }
 </style>
 
-<section class="card calendar-card calendar-add-card">
-  <form class="calendar-add-form" id="calendarAddForm" method="post" action="{{ url_for('calendar_page') }}" hidden>
+<div class="calendar-modal-backdrop" id="calendarAddBackdrop" hidden>
+  <section class="calendar-modal calendar-add-modal" role="dialog" aria-modal="true" aria-labelledby="calendarAddTitle">
+    <div class="calendar-modal-header">
+      <h2 id="calendarAddTitle">予定の追加</h2>
+      <button type="button" class="calendar-modal-close" data-close-modal>閉じる</button>
+    </div>
+  <form class="calendar-add-form" id="calendarAddForm" method="post" action="{{ url_for('calendar_page') }}">
     <input type="hidden" name="action" value="add">
     <label>日付
       <input type="date" name="event_date" value="{{ today.isoformat() }}" required>
@@ -130,7 +131,8 @@
     <input type="hidden" name="return_date" value="{{ year }}-{{ '%02d'|format(month) }}-01">
     <button type="submit">予定を保存</button>
   </form>
-</section>
+  </section>
+</div>
 
 <section class="card calendar-card">
   <div class="calendar-navigation">
@@ -236,10 +238,7 @@
         <textarea name="detail" id="editEventDetail" rows="3" maxlength="300"></textarea>
       </label>
       <input type="hidden" name="return_date" id="editReturnDate" value="{{ year }}-{{ '%02d'|format(month) }}-01">
-      <div class="calendar-edit-actions">
-        <button type="submit">変更を保存</button>
-        <button type="button" class="calendar-danger-button" id="editDeleteButton" hidden>予定を削除</button>
-      </div>
+      <button type="submit">変更を保存</button>
     </form>
   </section>
 </div>
@@ -254,6 +253,7 @@
 (() => {
   const addToggle = document.getElementById('calendarAddToggle');
   const addForm = document.getElementById('calendarAddForm');
+  const addBackdrop = document.getElementById('calendarAddBackdrop');
   const dayBackdrop = document.getElementById('calendarDayBackdrop');
   const actionBackdrop = document.getElementById('calendarActionBackdrop');
   const editBackdrop = document.getElementById('calendarEditBackdrop');
@@ -263,23 +263,26 @@
   let pressTimer = null;
   let longPressHandled = false;
 
-  if (addToggle && addForm) {
-    addToggle.addEventListener('click', () => {
-      const willOpen = addForm.hidden;
-      addForm.hidden = !willOpen;
-      addToggle.setAttribute('aria-expanded', String(willOpen));
-      addToggle.textContent = willOpen ? '－ 入力を閉じる' : '＋ 予定を追加';
-      if (willOpen) addForm.querySelector('input[name="title"]')?.focus();
-    });
+  if (addToggle && addForm && addBackdrop) {
+    addToggle.addEventListener('click', () => openAddForm());
   }
 
   const closeModals = () => {
-    [dayBackdrop, actionBackdrop, editBackdrop].forEach(el => { el.hidden = true; });
+    [addBackdrop, dayBackdrop, actionBackdrop, editBackdrop].forEach(el => { if (el) el.hidden = true; });
+    addToggle?.setAttribute('aria-expanded', 'false');
   };
+
+  function openAddForm(date) {
+    closeModals();
+    if (date) addForm.querySelector('input[name="event_date"]').value = date;
+    addBackdrop.hidden = false;
+    addToggle?.setAttribute('aria-expanded', 'true');
+    setTimeout(() => addForm.querySelector('input[name="title"]')?.focus(), 50);
+  }
   document.querySelectorAll('[data-close-modal]').forEach(button => {
     button.addEventListener('click', closeModals);
   });
-  [dayBackdrop, actionBackdrop, editBackdrop].forEach(backdrop => {
+  [addBackdrop, dayBackdrop, actionBackdrop, editBackdrop].forEach(backdrop => {
     backdrop.addEventListener('click', event => {
       if (event.target === backdrop) closeModals();
     });
@@ -342,14 +345,7 @@
   });
 
   document.getElementById('addEventForDay').addEventListener('click', () => {
-    closeModals();
-    addForm.querySelector('input[name="event_date"]').value = selectedDay;
-    if (addForm.hidden) {
-      addForm.hidden = false;
-      addToggle.setAttribute('aria-expanded', 'true');
-      addToggle.textContent = '－ 入力を閉じる';
-    }
-    addForm.querySelector('input[name="title"]')?.focus();
+    openAddForm(selectedDay);
   });
 
   function openActions() {
@@ -367,8 +363,6 @@
     document.getElementById('editEventTitle').value = selectedEvent.dataset.eventTitle || '';
     document.getElementById('editEventDetail').value = selectedEvent.dataset.eventDetail || '';
     document.getElementById('editReturnDate').value = selectedEvent.dataset.eventDate;
-    const editDeleteButton = document.getElementById('editDeleteButton');
-    if (editDeleteButton) editDeleteButton.hidden = !String(selectedEvent.dataset.eventId || '').startsWith('device-');
     const color = selectedEvent.dataset.eventColor || 'blue';
     const radio = document.querySelector(`#calendarEditForm input[name="color"][value="${color}"]`);
     if (radio) radio.checked = true;
@@ -440,7 +434,7 @@
     el.dataset.eventId=ev.id; el.dataset.eventDate=ev.date; el.dataset.eventTitle=ev.title; el.dataset.eventDetail=ev.detail||''; el.dataset.eventColor=ev.color||'blue';
     const title=document.createElement('div'); title.className='calendar-event-title'; title.textContent=ev.title; el.appendChild(title);
     if(ev.detail){const d=document.createElement('div');d.className='calendar-event-detail';d.textContent=ev.detail;el.appendChild(d);}
-    const openEdit=()=>{const form=document.getElementById('calendarEditForm');if(!form)return;document.getElementById('editEventId').value=ev.id;document.getElementById('editEventDate').value=ev.date;document.getElementById('editEventTitle').value=ev.title;document.getElementById('editEventDetail').value=ev.detail||'';document.getElementById('editReturnDate').value=ev.date;document.getElementById('deleteEventId').value=ev.id;document.getElementById('deleteReturnDate').value=ev.date;const del=document.getElementById('editDeleteButton');if(del)del.hidden=!String(ev.id).startsWith('device-');const radio=form.querySelector(`input[name="color"][value="${ev.color||'blue'}"]`);if(radio)radio.checked=true;document.getElementById('calendarEditBackdrop').hidden=false;};
+    const openEdit=()=>{const form=document.getElementById('calendarEditForm');if(!form)return;document.getElementById('editEventId').value=ev.id;document.getElementById('editEventDate').value=ev.date;document.getElementById('editEventTitle').value=ev.title;document.getElementById('editEventDetail').value=ev.detail||'';document.getElementById('editReturnDate').value=ev.date;document.getElementById('deleteEventId').value=ev.id;document.getElementById('deleteReturnDate').value=ev.date;const radio=form.querySelector(`input[name="color"][value="${ev.color||'blue'}"]`);if(radio)radio.checked=true;document.getElementById('calendarEditBackdrop').hidden=false;};
     el.addEventListener('click',openEdit);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openEdit();}});
     return el;
   };
@@ -466,19 +460,6 @@
   if(editForm) editForm.addEventListener('submit',e=>{
     e.preventDefault();const f=new FormData(editForm);const id=safe(f.get('event_id'));const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!id.startsWith('device-')||!validDate(date)||!title)return;
     const list=load();const ev=list.find(x=>x.id===id);if(!ev)return;Object.assign(ev,{date,title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
-  });
-  const editDeleteButton=document.getElementById('editDeleteButton');
-  if(editDeleteButton) editDeleteButton.addEventListener('click',()=>{
-    const id=safe(document.getElementById('editEventId')?.value);
-    if(!id.startsWith('device-')) return;
-    const title=safe(document.getElementById('editEventTitle')?.value);
-    if(!confirm(`「${title}」を削除しますか？`)) return;
-    const list=load();
-    const eventToDelete=list.find(x=>x.id===id);
-    save(list.filter(x=>x.id!==id));
-    const date=safe(eventToDelete?.date || document.getElementById('editEventDate')?.value);
-    const [y,m]=date.split('-').map(Number);
-    window.location.href=`/calendar?year=${y||new Date().getFullYear()}&month=${m||new Date().getMonth()+1}`;
   });
   const delForm=document.getElementById('calendarDeleteForm');
   const deleteButton=document.getElementById('deleteEventButton');
