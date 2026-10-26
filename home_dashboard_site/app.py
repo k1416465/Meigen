@@ -7,6 +7,7 @@ import re
 import traceback
 import json
 import uuid
+import sqlite3
 from pathlib import Path
 
 import jpholiday
@@ -1182,12 +1183,95 @@ def roster_page():
     )
 
 
-@app.route("/recording")
+# ==================================================
+# 録音（MP3は static/recording/ に手動で配置）
+# ==================================================
+
+BASE_DIR = Path(__file__).resolve().parent
+RECORDING_DIR = BASE_DIR / "static" / "recording"
+RECORDING_DB = BASE_DIR / "recordings.db"
+
+
+def get_recording_db():
+    conn = sqlite3.connect(RECORDING_DB)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_recording_db():
+    RECORDING_DIR.mkdir(parents=True, exist_ok=True)
+    with get_recording_db() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS recordings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT NOT NULL UNIQUE,
+                title TEXT NOT NULL DEFAULT '',
+                people TEXT NOT NULL DEFAULT '',
+                recorded_at TEXT NOT NULL DEFAULT '',
+                tags TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        # static/recording に手動で置かれたMP3を一覧に反映する。
+        # 既存のタイトルやタグなどのメタデータは上書きしない。
+        for path in RECORDING_DIR.iterdir():
+            if path.is_file() and path.suffix.lower() == ".mp3":
+                conn.execute(
+                    "INSERT OR IGNORE INTO recordings (filename, title) VALUES (?, ?)",
+                    (path.name, path.stem.replace('_', ' '))
+                )
+
+
+@app.route("/recording", methods=["GET"])
 def recording_page():
+    init_recording_db()
+
+    query = request.args.get("q", "").strip()
+    search_scope = request.args.get("scope", "all").strip().lower()
+    if search_scope not in {"all", "title", "people", "date", "tags"}:
+        search_scope = "all"
+
+    with get_recording_db() as conn:
+        # 検索欄の下に表示するタグ候補を、登録済みの録音情報から集める。
+        tag_rows = conn.execute("SELECT tags FROM recordings WHERE tags IS NOT NULL AND tags != ''").fetchall()
+        tag_options = []
+        seen_tags = set()
+        for row in tag_rows:
+            for raw_tag in (row["tags"] or "").replace("、", ",").split(","):
+                tag = raw_tag.strip()
+                if tag and tag.casefold() not in seen_tags:
+                    seen_tags.add(tag.casefold())
+                    tag_options.append(tag)
+        tag_options.sort(key=str.casefold)
+
+        if query:
+            like = f"%{query}%"
+            search_columns = {
+                "title": "title LIKE ? OR filename LIKE ?",
+                "people": "people LIKE ?",
+                "date": "recorded_at LIKE ?",
+                "tags": "tags LIKE ?",
+                "all": "title LIKE ? OR filename LIKE ? OR people LIKE ? OR recorded_at LIKE ? OR tags LIKE ?",
+            }
+            where_clause = search_columns[search_scope]
+            parameter_count = where_clause.count("?")
+            recordings = conn.execute(
+                f"SELECT * FROM recordings WHERE ({where_clause}) ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE",
+                tuple([like] * parameter_count)
+            ).fetchall()
+        else:
+            recordings = conn.execute(
+                "SELECT * FROM recordings ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE"
+            ).fetchall()
+
     return render_template(
-        "tool_page.html",
-        tool_name="録音",
-        description="録音のページです。"
+        "recording.html",
+        recordings=recordings,
+        query=query,
+        search_scope=search_scope,
+        tag_options=tag_options,
+        weather_place=selected_weather_place(),
+        railway_label=ROUTE_OPTIONS[selected_route()],
     )
 
 
