@@ -2,7 +2,6 @@
 {% block title %}迷言｜ホーム{% endblock %}
 {% block content %}
 
-
 <style>
 /* ホーム画面のスマートフォン表示 */
 @media (max-width: 600px) {
@@ -13,33 +12,117 @@
     gap: 8px !important;
     align-items: stretch;
   }
-  .hero-grid > *, .school-grid > *, .school-column { min-width: 0 !important; width: 100%; }
-  .clock-card, .weather-card, .schedule-card, #events .event-list { min-width: 0; }
-  .clock-card, .weather-card { padding: 10px !important; }
-  .card-heading { gap: 5px !important; font-size: .82rem !important; flex-wrap: wrap; }
-  .heading-icon-image { width: 18px !important; height: 18px !important; }
-  .clock { font-size: clamp(1.45rem, 6.2vw, 2rem) !important; line-height: 1.2; letter-spacing: -.045em; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .clock-bottom { font-size: .68rem !important; }
-  .weather-location { font-size: .68rem !important; }
-  .weather-main { gap: 9px !important; align-items: center; }
-  .weather-symbol, .weather-condition-icon { width: 36px !important; height: 36px !important; }
-  .weather-temp { font-size: 1.25rem !important; line-height: 1.3; letter-spacing: .025em; font-variant-numeric: tabular-nums; margin-bottom: 3px; }
-  .weather-desc { font-size: .68rem !important; overflow-wrap: anywhere; }
-  .weather-card { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  .weather-card:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
-  .weather-details { display: none !important; gap: 4px !important; }
-  .weather-card.show-details .weather-details { display: grid !important; }
-  .weather-card.show-details .weather-main { display: none !important; }
+
+  .hero-grid > *,
+  .school-grid > *,
+  .school-column {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .clock-card,
+  .weather-card,
+  .schedule-card,
+  #events .event-list {
+    min-width: 0;
+  }
+
+  .clock-card,
+  .weather-card {
+    padding: 10px !important;
+  }
+
+  .card-heading {
+    gap: 5px !important;
+    font-size: .82rem !important;
+    flex-wrap: wrap;
+  }
+
+  .heading-icon-image {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .clock {
+    font-size: clamp(1.45rem, 6.2vw, 2rem) !important;
+    line-height: 1.2;
+    letter-spacing: -.045em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .clock-bottom {
+    font-size: .68rem !important;
+  }
+
+  .weather-location {
+    font-size: .68rem !important;
+  }
+
+  .weather-main {
+    gap: 9px !important;
+    align-items: center;
+  }
+
+  .weather-symbol,
+  .weather-condition-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .weather-temp {
+    font-size: 1.25rem !important;
+    line-height: 1.3;
+    letter-spacing: .025em;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 3px;
+  }
+
+  .weather-desc {
+    font-size: .68rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  .weather-card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .weather-card:focus-visible {
+    outline: 2px solid var(--purple);
+    outline-offset: 2px;
+  }
+
+  .weather-details {
+    display: none !important;
+    gap: 4px !important;
+  }
+
+  .weather-card.show-details .weather-details {
+    display: grid !important;
+  }
+
+  .weather-card.show-details .weather-main {
+    display: none !important;
+  }
+
   /* 詳細表示でも市区町村名は見出しの横に残す */
-  .weather-card.show-details #weatherLocation { display: inline !important; }
+  .weather-card.show-details #weatherLocation {
+    display: inline !important;
+  }
+
   /* 見出しの位置は保ち、区切り線と詳細項目を少し下げる */
-  .weather-card.show-details .card-heading { margin-bottom: 5px !important; }
+  .weather-card.show-details .card-heading {
+    margin-bottom: 5px !important;
+  }
+
   .weather-card.show-details .weather-details {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     align-items: stretch;
     padding-top: 12px !important;
     gap: 0 !important;
   }
+
   .weather-details > div {
     min-width: 0;
     width: 100%;
@@ -51,59 +134,182 @@
     text-align: center;
     padding: 0 3px !important;
   }
-  .weather-details > div + div { padding-left: 3px !important; }
-  .weather-details span { display: block; font-size: .58rem !important; }
-  .weather-details strong { font-size: .75rem !important; letter-spacing: .015em; font-variant-numeric: tabular-nums; }
-  .section-heading { margin-bottom: 6px !important; }
-  .section-heading h2 { font-size: .95rem !important; line-height: 1.25; }
-  .class-caption { font-size: .68rem !important; margin:0 !important; white-space:nowrap; }
-  #today-schedule .section-heading > div { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; min-width:0; }
-  #today-schedule .section-heading h2 { margin:0 !important; }
-  .schedule-card { padding: 8px !important; }
-  .table-top { padding: 5px !important; }
-  #today-schedule .schedule-date-label { font-size: 1.05rem !important; font-weight: 800; }
-  .lesson-row { gap: 5px !important; padding: 6px 4px !important; }
-  .lesson-number { min-width: 18px !important; }
-  .lesson-name { font-size: .75rem !important; overflow-wrap: anywhere; }
-  .class-not-selected { font-size: .72rem !important; overflow-wrap: anywhere; }
-  #events .event-list { gap: 6px; }
-  #events .event-card { padding: 7px !important; gap: 6px !important; }
-  #events .event-date { min-width: 32px !important; padding: 4px !important; }
-  #events .event-month { font-size: .58rem !important; }
-  #events .event-date strong { font-size: 1rem !important; }
-  #events .event-copy strong { font-size: .72rem !important; overflow-wrap: anywhere; }
-  #events .empty-state { padding: 8px !important; font-size: .72rem !important; }
+
+  .weather-details > div + div {
+    padding-left: 3px !important;
+  }
+
+  .weather-details span {
+    display: block;
+    font-size: .58rem !important;
+  }
+
+  .weather-details strong {
+    font-size: .75rem !important;
+    letter-spacing: .015em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .section-heading {
+    margin-bottom: 6px !important;
+  }
+
+  .section-heading h2 {
+    font-size: .95rem !important;
+    line-height: 1.25;
+  }
+
+  .class-caption {
+    font-size: .68rem !important;
+    margin: 0 !important;
+    white-space: nowrap;
+  }
+
+  #today-schedule .section-heading > div {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  #today-schedule .section-heading h2 {
+    margin: 0 !important;
+  }
+
+  .schedule-card {
+    padding: 8px !important;
+  }
+
+  .table-top {
+    padding: 5px !important;
+  }
+
+  #today-schedule .schedule-date-label {
+    font-size: 1.05rem !important;
+    font-weight: 800;
+  }
+
+  .lesson-row {
+    gap: 5px !important;
+    padding: 6px 4px !important;
+  }
+
+  .lesson-number {
+    min-width: 18px !important;
+  }
+
+  .lesson-name {
+    font-size: .75rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  .class-not-selected {
+    font-size: .72rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  #events .event-list {
+    gap: 6px;
+  }
+
+  #events .event-card {
+    padding: 7px !important;
+    gap: 6px !important;
+  }
+
+  #events .event-date {
+    min-width: 32px !important;
+    padding: 4px !important;
+  }
+
+  #events .event-month {
+    font-size: .58rem !important;
+  }
+
+  #events .event-date strong {
+    font-size: 1rem !important;
+  }
+
+  #events .event-copy strong {
+    font-size: .72rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  #events .empty-state {
+    padding: 8px !important;
+    font-size: .72rem !important;
+  }
 }
 
 /* スマホのホームは画面内に固定し、「今週の予定」一覧だけをスクロール */
 @media (max-width: 600px) {
   body:has(.hero-grid) {
-    height:100vh; height:100dvh; overflow:hidden !important;
-    display:flex; flex-direction:column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
   }
+
   body:has(.hero-grid) > .topbar,
-  body:has(.hero-grid) > .bottom-nav { flex:0 0 auto; }
+  body:has(.hero-grid) > .bottom-nav {
+    flex: 0 0 auto;
+  }
+
   body:has(.hero-grid) > .page {
-    flex:1 1 auto; min-height:0; overflow:hidden !important;
-    display:flex; flex-direction:column; gap:8px;
-    box-sizing:border-box;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
   }
-  body:has(.hero-grid) .hero-grid { flex:0 0 auto; min-height:0; }
+
+  body:has(.hero-grid) .hero-grid {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
   body:has(.hero-grid) .school-grid {
-    flex:1 1 0; min-height:0; overflow:hidden;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    align-items:stretch;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch;
   }
+
   body:has(.hero-grid) .school-column,
   body:has(.hero-grid) #today-schedule,
-  body:has(.hero-grid) #events { min-height:0; overflow:hidden; }
-  body:has(.hero-grid) #today-schedule .schedule-card { min-height:0; overflow:hidden; }
-  body:has(.hero-grid) #events { display:flex; flex-direction:column; }
-  body:has(.hero-grid) #events .section-heading { flex:0 0 auto; }
+  body:has(.hero-grid) #events {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body:has(.hero-grid) #today-schedule .schedule-card {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body:has(.hero-grid) #events {
+    display: flex;
+    flex-direction: column;
+  }
+
+  body:has(.hero-grid) #events .section-heading {
+    flex: 0 0 auto;
+  }
+
   body:has(.hero-grid) #events .event-list {
-    flex:1 1 0; min-height:0; height:auto !important; max-height:none !important;
-    overflow-y:auto !important; overflow-x:hidden; -webkit-overflow-scrolling:touch;
-    overscroll-behavior:contain;
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
 
@@ -114,19 +320,22 @@
     flex-direction: column !important;
     min-height: 0 !important;
   }
+
   body:has(.hero-grid) #today-schedule .section-heading {
     flex: 0 0 auto !important;
     margin: 0 0 4px !important;
     min-height: 0 !important;
   }
+
   body:has(.hero-grid) #today-schedule .section-heading h2 {
-    /* 「今週の予定」と同じ文字サイズ */
     font-size: .95rem !important;
     line-height: 1.25 !important;
   }
+
   body:has(.hero-grid) #today-schedule .class-caption {
     font-size: .58rem !important;
   }
+
   body:has(.hero-grid) #today-schedule .schedule-card {
     flex: 1 1 auto !important;
     height: auto !important;
@@ -134,13 +343,19 @@
     padding: 4px !important;
     overflow: hidden !important;
   }
+
   body:has(.hero-grid) #today-schedule .table-top {
     flex: 0 0 auto !important;
     padding: 3px 5px !important;
     min-height: 22px !important;
     font-size: .65rem !important;
   }
-  body:has(.hero-grid) #today-schedule .schedule-date-label { font-size: .95rem !important; font-weight: 800; }
+
+  body:has(.hero-grid) #today-schedule .schedule-date-label {
+    font-size: .95rem !important;
+    font-weight: 800;
+  }
+
   body:has(.hero-grid) #today-schedule .lesson-list {
     flex: 1 1 auto !important;
     display: flex !important;
@@ -151,6 +366,7 @@
     padding: 0 3px !important;
     overflow: hidden !important;
   }
+
   body:has(.hero-grid) #today-schedule .lesson-row {
     flex: 1 1 0 !important;
     min-height: 0 !important;
@@ -159,9 +375,11 @@
     padding: 0 !important;
     border-bottom: 1px solid var(--border) !important;
   }
+
   body:has(.hero-grid) #today-schedule .lesson-row:last-child {
     border-bottom: 0 !important;
   }
+
   body:has(.hero-grid) #today-schedule .lesson-number {
     flex: 0 0 21px !important;
     width: 21px !important;
@@ -170,12 +388,14 @@
     font-size: .62rem !important;
     border-radius: 6px !important;
   }
+
   body:has(.hero-grid) #today-schedule .lesson-name {
     min-width: 0 !important;
     font-size: .65rem !important;
     line-height: 1.1 !important;
     overflow-wrap: anywhere !important;
   }
+
   body:has(.hero-grid) #today-schedule .no-lessons-today,
   body:has(.hero-grid) #today-schedule .class-not-selected {
     padding: 8px 5px !important;
@@ -183,11 +403,16 @@
     line-height: 1.25 !important;
   }
 }
-  #events details.event-card > summary::-webkit-details-marker { display:none; }
-  #events details.event-card > summary::marker { content:""; }
 
-/* インストール済みアプリとして開いた場合だけ時間割の縦方向を調整。
-   文字サイズは通常のスマートフォン表示と同じ */
+#events details.event-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+#events details.event-card > summary::marker {
+  content: "";
+}
+
+/* インストール済みアプリ版：時間割カードの高さを固定 */
 @media (max-width: 600px) {
   body.app-standalone:has(.hero-grid) #today-schedule .schedule-card {
     flex: 0 0 350px !important;
@@ -198,11 +423,13 @@
     padding-top: 6px !important;
     padding-bottom: 6px !important;
   }
+
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-list {
     flex: 0 0 auto !important;
     justify-content: flex-start !important;
     gap: 0 !important;
   }
+
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-row {
     flex: 0 0 43px !important;
     height: 43px !important;
@@ -211,12 +438,38 @@
     padding: 0 !important;
     box-sizing: border-box !important;
   }
+
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-number {
     font-size: .62rem !important;
   }
+
   body.app-standalone:has(.hero-grid) #today-schedule .lesson-name {
     font-size: .65rem !important;
     line-height: 1.1 !important;
+  }
+
+  /* インストール済みアプリ版：予定一覧も時間割カードと同じ高さ */
+  body.app-standalone:has(.hero-grid) #events {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body.app-standalone:has(.hero-grid) #events .section-heading {
+    flex: 0 0 auto !important;
+  }
+
+  body.app-standalone:has(.hero-grid) #events .event-list {
+    flex: 0 0 350px !important;
+    height: 350px !important;
+    min-height: 0 !important;
+    max-height: 350px !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
 </style>
@@ -303,11 +556,7 @@
       </div>
 
       {% if not class_name %}
-        <a
-          class="class-not-selected"
-          href="{{ url_for('settings') }}"
-        >設定から時間割のクラス選択ができます</a>
-
+        <a class="class-not-selected" href="{{ url_for('settings') }}">設定から時間割のクラス選択ができます</a>
       {% else %}
         {% if today_lessons %}
           <div class="lesson-list">
@@ -383,6 +632,7 @@
       <h2 id="homeEventModalTitle">予定を編集</h2>
       <button type="button" id="homeEventModalClose" class="home-event-modal-close">閉じる</button>
     </div>
+
     <form method="post" action="{{ url_for('calendar_page') }}" class="home-event-edit-form">
       <input type="hidden" name="action" value="edit">
       <input type="hidden" name="event_id" id="homeEditEventId">
@@ -392,11 +642,17 @@
       <label>予定名 <input type="text" name="title" id="homeEditEventTitle" maxlength="80" required></label>
       <label>詳細 <textarea name="detail" id="homeEditEventDetail" rows="3" maxlength="300"></textarea></label>
       <label>色 <select name="color" id="homeEditEventColor">
-        <option value="blue">青</option><option value="red">赤</option><option value="orange">橙</option>
-        <option value="yellow">黄</option><option value="green">緑</option><option value="purple">紫</option><option value="pink">桃</option>
+        <option value="blue">青</option>
+        <option value="red">赤</option>
+        <option value="orange">橙</option>
+        <option value="yellow">黄</option>
+        <option value="green">緑</option>
+        <option value="purple">紫</option>
+        <option value="pink">桃</option>
       </select></label>
       <button type="submit">変更を保存</button>
     </form>
+
     <form method="post" action="{{ url_for('calendar_page') }}" id="homeEventDeleteForm" class="home-event-delete-form">
       <input type="hidden" name="action" value="delete">
       <input type="hidden" name="event_id" id="homeDeleteEventId">
@@ -406,45 +662,136 @@
     </form>
   </section>
 </div>
+
 <style>
-  .home-event-modal-backdrop { position:fixed; inset:0; z-index:2000; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.48); }
-  .home-event-modal-backdrop[hidden] { display:none; }
-  .home-event-modal { width:min(520px,100%); max-height:85vh; overflow:auto; padding:20px; border-radius:14px; background:var(--surface,#fff); color:var(--text,inherit); box-shadow:0 12px 40px rgba(0,0,0,.25); }
-  .home-event-modal-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
-  .home-event-modal-header h2 { margin:0; font-size:1.2rem; }
-  .home-event-modal-close { border:0; border-radius:8px; padding:6px 10px; font:inherit; cursor:pointer; }
-  .home-event-edit-form { display:grid; gap:10px; }
-  .home-event-edit-form label { display:grid; gap:4px; font-size:.9rem; }
-  .home-event-edit-form input, .home-event-edit-form textarea, .home-event-edit-form select { width:100%; box-sizing:border-box; font:inherit; padding:8px; }
-  .home-event-edit-form button, .home-event-delete-form button { padding:8px 12px; font:inherit; cursor:pointer; }
-  .home-event-delete-form { margin-top:10px; }
-  @media(max-width:600px) { .home-event-modal { padding:16px; } }
+.home-event-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0,0,0,.48);
+}
+
+.home-event-modal-backdrop[hidden] {
+  display: none;
+}
+
+.home-event-modal {
+  width: min(520px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--surface,#fff);
+  color: var(--text,inherit);
+  box-shadow: 0 12px 40px rgba(0,0,0,.25);
+}
+
+.home-event-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.home-event-modal-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.home-event-modal-close {
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.home-event-edit-form {
+  display: grid;
+  gap: 10px;
+}
+
+.home-event-edit-form label {
+  display: grid;
+  gap: 4px;
+  font-size: .9rem;
+}
+
+.home-event-edit-form input,
+.home-event-edit-form textarea,
+.home-event-edit-form select {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  padding: 8px;
+}
+
+.home-event-edit-form button,
+.home-event-delete-form button {
+  padding: 8px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.home-event-delete-form {
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .home-event-modal {
+    padding: 16px;
+  }
+}
 </style>
+
 <script>
 // 前回見ていた日付をブラウザーの再読み込み・履歴復元で引き継がず、ホームを開き直したら当日に戻す。
 (function () {
   const params = new URLSearchParams(window.location.search);
-  const navigation = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-  if (params.has('day_offset') && navigation && (navigation.type === 'reload' || navigation.type === 'back_forward')) {
+  const navigation = performance.getEntriesByType &&
+    performance.getEntriesByType('navigation')[0];
+
+  if (
+    params.has('day_offset') &&
+    navigation &&
+    (navigation.type === 'reload' || navigation.type === 'back_forward')
+  ) {
     window.location.replace('/');
   }
 })();
 
+/* インストール済みアプリとして開いているかを判定 */
 (function () {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
     window.matchMedia('(display-mode: fullscreen)').matches ||
     window.navigator.standalone === true;
-  if (isStandalone) document.body.classList.add('app-standalone');
+
+  if (isStandalone) {
+    document.body.classList.add('app-standalone');
+  }
 })();
 
+/* ホーム画面から予定を操作 */
 (function () {
   const backdrop = document.getElementById('homeEventModalBackdrop');
   if (!backdrop) return;
+
   const closeButton = document.getElementById('homeEventModalClose');
   const deleteForm = document.getElementById('homeEventDeleteForm');
-  function closeModal() { backdrop.hidden = true; }
+
+  function closeModal() {
+    backdrop.hidden = true;
+  }
+
   function openFor(card) {
     const d = card.dataset;
+
     document.getElementById('homeEditEventId').value = d.eventId || '';
     document.getElementById('homeEditEventDate').value = d.eventDate || '';
     document.getElementById('homeEditReturnDate').value = d.eventDate || '';
@@ -454,55 +801,85 @@
     document.getElementById('homeDeleteEventId').value = d.eventId || '';
     document.getElementById('homeDeleteReturnDate').value = d.eventDate || '';
     deleteForm.dataset.title = d.eventTitle || 'この予定';
+
     backdrop.hidden = false;
     document.getElementById('homeEditEventTitle').focus();
   }
+
   function goToCalendarFor(card) {
     const eventDate = card.dataset.eventDate || '';
     const eventId = card.dataset.eventId || '';
     if (!eventDate || !eventId) return;
+
     const [year, month] = eventDate.split('-');
-    const params = new URLSearchParams({ year, month: String(Number(month)), open_event: eventId });
+    const params = new URLSearchParams({
+      year,
+      month: String(Number(month)),
+      open_event: eventId
+    });
+
     window.location.href = '{{ url_for("calendar_page") }}?' + params.toString();
   }
+
   document.querySelectorAll('.home-personal-event').forEach(card => {
     card.addEventListener('click', () => goToCalendarFor(card));
+
     card.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToCalendarFor(card); }
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        goToCalendarFor(card);
+      }
     });
   });
+
   closeButton.addEventListener('click', closeModal);
-  backdrop.addEventListener('click', event => { if (event.target === backdrop) closeModal(); });
-  document.addEventListener('keydown', event => { if (event.key === 'Escape' && !backdrop.hidden) closeModal(); });
+
+  backdrop.addEventListener('click', event => {
+    if (event.target === backdrop) closeModal();
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !backdrop.hidden) closeModal();
+  });
+
   deleteForm.addEventListener('submit', event => {
-    if (!confirm('「' + (deleteForm.dataset.title || 'この予定') + '」を削除しますか？')) event.preventDefault();
+    if (!confirm('「' + (deleteForm.dataset.title || 'この予定') + '」を削除しますか？')) {
+      event.preventDefault();
+    }
   });
 })();
 
+/*
+ * 時間割カードの実際の高さに予定一覧を合わせる。
+ * インストール済みアプリ版では時間割カードが350pxなので、
+ * 予定一覧も350pxになり、一覧の中だけでスクロールする。
+ */
 (function () {
   const scheduleCard = document.querySelector('.schedule-card');
-  const eventList = document.querySelector('.event-list');
+  const eventList = document.querySelector('#events .event-list');
 
   if (!scheduleCard || !eventList) return;
 
   function syncEventListHeight() {
-    // 今週の予定欄だけを、時間割カードと同じ高さに制限する。
-    // 予定が収まらない場合は、この一覧の中だけでスクロールさせる。
-    const height = Math.round(scheduleCard.getBoundingClientRect().height);
+    const height = Math.round(
+      scheduleCard.getBoundingClientRect().height
+    );
+
     if (!height) return;
 
+    eventList.style.height = height + 'px';
     eventList.style.maxHeight = height + 'px';
     eventList.style.minHeight = '0';
     eventList.style.boxSizing = 'border-box';
+    eventList.style.overflowY = 'auto';
+    eventList.style.overflowX = 'hidden';
+    eventList.style.webkitOverflowScrolling = 'touch';
     eventList.style.overscrollBehavior = 'contain';
-    eventList.style.overflowY =
-      eventList.scrollHeight > height ? 'auto' : 'visible';
   }
 
   window.addEventListener('load', syncEventListHeight);
   window.addEventListener('resize', syncEventListHeight);
 
-  // 時間割カードの高さが変わった場合（画面幅・文字サイズ変更など）も追従する。
   if ('ResizeObserver' in window) {
     const observer = new ResizeObserver(syncEventListHeight);
     observer.observe(scheduleCard);
@@ -515,14 +892,16 @@
   syncEventListHeight();
 })();
 
-// スマートフォンでは「今日の天気」をタップして表示を切り替える。
+/* スマートフォンでは「今日の天気」をタップして表示を切り替える */
 (function () {
   const weatherCard = document.getElementById('weather');
   if (!weatherCard) return;
 
   function toggleWeatherDetails() {
     if (!window.matchMedia('(max-width: 600px)').matches) return;
+
     const showingDetails = weatherCard.classList.toggle('show-details');
+
     weatherCard.setAttribute('aria-expanded', String(showingDetails));
     weatherCard.setAttribute(
       'aria-label',
@@ -533,8 +912,10 @@
   }
 
   weatherCard.addEventListener('click', toggleWeatherDetails);
+
   weatherCard.addEventListener('keydown', function (event) {
     if (event.target !== weatherCard) return;
+
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       toggleWeatherDetails();
@@ -550,23 +931,131 @@
 })();
 </script>
 
-
 <script>
+/* 端末内に保存された個人予定をホーム画面に追加 */
 (() => {
- const KEY='meigen.devicePersonalEvents.v1'; let events=[]; try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');events=Array.isArray(v)?v:[]}catch{}
- const list=document.querySelector('#events .event-list');if(!list)return;
- const colors={blue:'#E8F2FC',red:'#FDECEC',orange:'#FFF0E2',yellow:'#FFF8D6',green:'#E8F5EA',purple:'#F2E8FA',pink:'#FCE8F1'};
- const text={blue:'#0563B5',red:'#C62828',orange:'#B45309',yellow:'#8A6D00',green:'#1B5E20',purple:'#6A1B9A',pink:'#AD1457'};
- const now=new Date();now.setHours(0,0,0,0);const end=new Date(now);end.setDate(end.getDate()+7);
- events.filter(e=>{const d=new Date(e.date+'T00:00:00');return d>=now&&d<=end;}).sort((a,b)=>a.date.localeCompare(b.date)).forEach(ev=>{
-  const card=document.createElement('article');card.className='card event-card event-card-personal home-personal-event';card.setAttribute('role','button');card.tabIndex=0;card.style.cssText='flex:0 0 auto;cursor:pointer;';
-  Object.assign(card.dataset,{eventId:ev.id,eventDate:ev.date,eventTitle:ev.title,eventDetail:ev.detail||'',eventColor:ev.color||'blue',deviceEvent:'1'});
-  const date=document.createElement('div');date.className='event-date';date.style.cssText=`background-color:${colors[ev.color]||colors.blue};color:${text[ev.color]||text.blue};`;date.innerHTML=`<span class="event-month">${ev.date.slice(5,7)}月</span><strong>${ev.date.slice(8,10)}</strong>`;
-  const copy=document.createElement('div');copy.className='event-copy';copy.style.cssText='min-width:0;flex:1;';const title=document.createElement('strong');title.textContent=ev.title;copy.appendChild(title);if(ev.detail){const d=document.createElement('div');d.style.cssText='font-size:.8rem;margin-top:3px;';d.textContent=ev.detail;copy.appendChild(d);}card.append(date,copy);list.appendChild(card);
-  const go=()=>{const [y,m]=ev.date.split('-');location.href=`/calendar?year=${y}&month=${Number(m)}&open_event=${encodeURIComponent(ev.id)}`;};card.addEventListener('click',go);card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
- });
- // Shared legacy events must not offer editing; local events are edited from the calendar.
- document.querySelectorAll('.home-personal-event:not([data-device-event])').forEach(card=>{card.addEventListener('click',e=>{e.stopImmediatePropagation();location.href='/calendar';},true);});
+  const KEY = 'meigen.devicePersonalEvents.v1';
+  let events = [];
+
+  try {
+    const value = JSON.parse(localStorage.getItem(KEY) || '[]');
+    events = Array.isArray(value) ? value : [];
+  } catch {
+    events = [];
+  }
+
+  const list = document.querySelector('#events .event-list');
+  if (!list) return;
+
+  const colors = {
+    blue: '#E8F2FC',
+    red: '#FDECEC',
+    orange: '#FFF0E2',
+    yellow: '#FFF8D6',
+    green: '#E8F5EA',
+    purple: '#F2E8FA',
+    pink: '#FCE8F1'
+  };
+
+  const text = {
+    blue: '#0563B5',
+    red: '#C62828',
+    orange: '#B45309',
+    yellow: '#8A6D00',
+    green: '#1B5E20',
+    purple: '#6A1B9A',
+    pink: '#AD1457'
+  };
+
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  const end = new Date(now);
+  end.setDate(end.getDate() + 7);
+
+  events
+    .filter(event => {
+      const date = new Date(event.date + 'T00:00:00');
+      return date >= now && date <= end;
+    })
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .forEach(event => {
+      const card = document.createElement('article');
+
+      card.className = 'card event-card event-card-personal home-personal-event';
+      card.setAttribute('role', 'button');
+      card.tabIndex = 0;
+      card.style.cssText = 'flex:0 0 auto;cursor:pointer;';
+
+      Object.assign(card.dataset, {
+        eventId: event.id,
+        eventDate: event.date,
+        eventTitle: event.title,
+        eventDetail: event.detail || '',
+        eventColor: event.color || 'blue',
+        deviceEvent: '1'
+      });
+
+      const date = document.createElement('div');
+      date.className = 'event-date';
+      date.style.cssText =
+        `background-color:${colors[event.color] || colors.blue};` +
+        `color:${text[event.color] || text.blue};`;
+
+      const month = document.createElement('span');
+      month.className = 'event-month';
+      month.textContent = event.date.slice(5, 7) + '月';
+
+      const day = document.createElement('strong');
+      day.textContent = event.date.slice(8, 10);
+
+      date.append(month, day);
+
+      const copy = document.createElement('div');
+      copy.className = 'event-copy';
+      copy.style.cssText = 'min-width:0;flex:1;';
+
+      const title = document.createElement('strong');
+      title.textContent = event.title;
+      copy.appendChild(title);
+
+      if (event.detail) {
+        const detail = document.createElement('div');
+        detail.style.cssText = 'font-size:.8rem;margin-top:3px;';
+        detail.textContent = event.detail;
+        copy.appendChild(detail);
+      }
+
+      card.append(date, copy);
+      list.appendChild(card);
+
+      const go = () => {
+        const [year, monthNumber] = event.date.split('-');
+
+        location.href =
+          `/calendar?year=${year}&month=${Number(monthNumber)}` +
+          `&open_event=${encodeURIComponent(event.id)}`;
+      };
+
+      card.addEventListener('click', go);
+
+      card.addEventListener('keydown', eventKey => {
+        if (eventKey.key === 'Enter' || eventKey.key === ' ') {
+          eventKey.preventDefault();
+          go();
+        }
+      });
+    });
+
+  // 共有予定からカレンダーへ移動する処理
+  document
+    .querySelectorAll('.home-personal-event:not([data-device-event])')
+    .forEach(card => {
+      card.addEventListener('click', event => {
+        event.stopImmediatePropagation();
+        location.href = '/calendar';
+      }, true);
+    });
 })();
 </script>
 
