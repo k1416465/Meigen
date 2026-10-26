@@ -37,6 +37,9 @@
   .calendar-add-form button[type="submit"], .calendar-edit-form button[type="submit"] {
     justify-self:start; border:0; border-radius:9px; padding:10px 14px; background:#077AE3; color:white; cursor:pointer; font:inherit;
   }
+  .calendar-edit-actions { display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+  .calendar-edit-actions button { justify-self:auto; }
+  .calendar-edit-actions .calendar-danger-button { border:0; border-radius:9px; padding:10px 14px; background:#c62828; color:#fff; cursor:pointer; font:inherit; }
   .calendar-color-options { display:flex; flex-wrap:wrap; gap:9px; margin-top:4px; }
   .calendar-color-option { position:relative; display:inline-flex !important; flex-direction:row !important; align-items:center; gap:6px !important; cursor:pointer; }
   .calendar-color-option input { position:absolute; opacity:0; width:1px; height:1px; }
@@ -96,20 +99,26 @@
       min-inline-size:0; padding-inline:8px; font-size:16px;
     }
     /* 色の選択肢をスマホでも横一列に7個並べる */
-    .calendar-add-form .calendar-color-options {
+    .calendar-add-form .calendar-color-options, .calendar-edit-form .calendar-color-options {
       display:flex; flex-wrap:nowrap; justify-content:space-between; align-items:stretch;
       gap:0; width:100%; min-width:0;
     }
-    .calendar-add-form .calendar-color-option {
+    .calendar-add-form .calendar-color-option, .calendar-edit-form .calendar-color-option {
       box-sizing:border-box; flex:1 1 0; min-width:0;
       display:flex !important; flex-direction:column !important;
       align-items:center; justify-content:center; gap:3px !important;
       padding:3px 0; font-size:clamp(9px, 2.7vw, 11px);
       line-height:1.2; white-space:nowrap;
     }
-    .calendar-add-form .calendar-color-swatch {
+    .calendar-add-form .calendar-color-swatch, .calendar-edit-form .calendar-color-swatch {
       width:16px; height:16px; flex:0 0 16px;
     }
+    .calendar-edit-form > label { display:flex; width:100%; min-width:0; }
+    .calendar-edit-form input[type="date"], .calendar-edit-form input[type="text"] {
+      display:block; box-sizing:border-box; width:100%; max-width:100%; min-width:0;
+    }
+    .calendar-edit-actions { flex-direction:row; align-items:center; gap:8px; }
+    .calendar-edit-actions button { padding:10px 11px; }
     .calendar-scroll { max-width:100%; overflow-x:auto; }
     .calendar-scroll .calendar-grid { min-width:700px; }
     .calendar-modal { padding:16px; }
@@ -255,7 +264,10 @@
         <textarea name="detail" id="editEventDetail" rows="3" maxlength="300"></textarea>
       </label>
       <input type="hidden" name="return_date" id="editReturnDate" value="{{ year }}-{{ '%02d'|format(month) }}-01">
-      <button type="submit">変更を保存</button>
+      <div class="calendar-edit-actions">
+        <button type="submit">変更を保存</button>
+        <button type="button" class="calendar-danger-button" id="editDeleteButton">予定を削除</button>
+      </div>
     </form>
   </section>
 </div>
@@ -389,14 +401,16 @@
   }
 
   document.getElementById('editEventButton').addEventListener('click', openEdit);
-  document.getElementById('deleteEventButton').addEventListener('click', () => {
+  const deleteSelectedEvent = () => {
     if (!selectedEvent) return;
     if (window.confirm(`「${selectedEvent.dataset.eventTitle}」を削除しますか？`)) {
       document.getElementById('deleteEventId').value = selectedEvent.dataset.eventId;
       document.getElementById('deleteReturnDate').value = selectedEvent.dataset.eventDate;
       document.getElementById('calendarDeleteForm').submit();
     }
-  });
+  };
+  document.getElementById('deleteEventButton').addEventListener('click', deleteSelectedEvent);
+  document.getElementById('editDeleteButton').addEventListener('click', deleteSelectedEvent);
 
   document.querySelectorAll('[data-personal-event]').forEach(eventEl => {
     const beginPress = () => {
