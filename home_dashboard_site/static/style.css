@@ -4176,12 +4176,12 @@ a.recording-tag:hover { opacity: .8; }
   }
 }
 
-/* タイトル位置の最終修正：スマホではカードと同じ左右位置に固定 */
+/* タイトル位置の修正：中央寄せの親要素から独立させ、画面端から31pxに揃える */
 @media (max-width: 600px) {
-  .recording-welcome {
+  .page > .recording-welcome {
     position: relative !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    left: calc(50% - 50vw + 31px) !important;
+    transform: none !important;
     width: calc(100vw - 62px) !important;
     max-width: none !important;
     margin: 0 0 28px !important;
