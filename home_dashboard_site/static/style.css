@@ -1111,6 +1111,12 @@ body.dark .operation-status-text[data-state="alert"] {
     bottom: 0 !important;
 }
 
+body.app-standalone .bottom-nav {
+    height: auto !important;
+    margin: 0 !important;
+    padding: 8px 4px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
 .bottom-nav > .nav-item {
     position: static !important;
     width: 100% !important;
