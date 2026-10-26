@@ -23,8 +23,8 @@ app = Flask(__name__)
 # 録音管理画面の設定
 # 下の2つの値を、運用前に自分だけが知る値へ変更してください。
 # ==================================================
-RECORDING_ADMIN_PASSWORD = "ここを自分の管理用パスワードに変更"
-FLASK_SESSION_SECRET = "ここを長くランダムな秘密文字列に変更してください"
+RECORDING_ADMIN_PASSWORD = "Meigen123"
+FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
 
 app.secret_key = FLASK_SESSION_SECRET
 
