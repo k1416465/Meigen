@@ -1111,12 +1111,6 @@ body.dark .operation-status-text[data-state="alert"] {
     bottom: 0 !important;
 }
 
-body.app-standalone .bottom-nav {
-    height: auto !important;
-    margin: 0 !important;
-    padding: 8px 4px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
 .bottom-nav > .nav-item {
     position: static !important;
     width: 100% !important;
@@ -4173,5 +4167,33 @@ a.recording-tag:hover { opacity: .8; }
     max-width: 42px;
     height: 42px;
     min-height: 42px;
+  }
+}
+
+/* タイトル位置の最終修正：スマホではカードと同じ左右位置に固定 */
+@media (max-width: 600px) {
+  .recording-welcome {
+    position: relative !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: calc(100vw - 62px) !important;
+    max-width: none !important;
+    margin: 0 0 28px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+  }
+  .recording-welcome-copy {
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    text-align: left !important;
+  }
+  .recording-welcome-copy h1,
+  .recording-welcome-copy p {
+    margin-left: 0 !important;
+    text-align: left !important;
   }
 }
