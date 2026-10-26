@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}録音管理ログイン｜迷言{% endblock %}
+{% block content %}
+<section class="recording-admin-page">
+  <h1>録音管理ログイン</h1>
+  {% if error %}<p class="recording-admin-error">{{ error }}</p>{% endif %}
+  <form method="post" class="recording-admin-login">
+    <label>管理用パスワード
+      <input type="password" name="password" required autocomplete="current-password">
+    </label>
+    <button type="submit">ログイン</button>
+  </form>
+  <p class="recording-admin-note">管理用パスワードはサーバーの環境変数 RECORDING_ADMIN_PASSWORD に設定してください。</p>
+</section>
+{% endblock %}
