@@ -90,13 +90,25 @@
     .calendar-add-form { grid-template-columns:minmax(0,1fr); }
     .calendar-add-modal { width:min(520px,100%); max-height:calc(100dvh - 36px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow:auto; }
     .calendar-add-form .wide { grid-column:auto; min-width:0; }
-    /* 日付欄を予定名欄と同じ幅にそろえる */
-    .calendar-add-form > label { display:flex; width:100%; min-width:0; }
-    .calendar-add-form input[type="date"], .calendar-add-form input[type="text"] {
-      display:block; box-sizing:border-box; width:100%; max-width:100%; min-width:0;
+    /* iPhone Safariでも日付欄を予定名欄と同じ内側幅に固定 */
+    .calendar-add-modal { box-sizing:border-box; }
+    #calendarAddForm {
+      display:grid; grid-template-columns:minmax(0,1fr); width:100%; min-width:0;
+      box-sizing:border-box;
     }
-    .calendar-add-form input[type="date"], .calendar-edit-form input[type="date"] {
-      min-inline-size:0; padding-inline:8px; font-size:16px;
+    #calendarAddForm > label {
+      display:flex; flex-direction:column; width:auto !important;
+      max-width:100%; min-width:0; box-sizing:border-box;
+    }
+    #calendarAddForm input[type="date"],
+    #calendarAddForm input[type="text"],
+    #calendarAddForm textarea {
+      display:block; box-sizing:border-box; width:100% !important;
+      inline-size:100%; max-width:100% !important; min-width:0 !important;
+      min-inline-size:0; max-inline-size:100%;
+    }
+    #calendarAddForm input[type="date"], .calendar-edit-form input[type="date"] {
+      padding-inline:8px; font-size:16px;
     }
     /* 色の選択肢をスマホでも横一列に7個並べる */
     .calendar-add-form .calendar-color-options, .calendar-edit-form .calendar-color-options {
