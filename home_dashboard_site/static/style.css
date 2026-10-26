@@ -4104,3 +4104,18 @@ a.recording-tag:hover { opacity: .8; }
         }
     }
 }
+
+
+/* 修正：スマホ版カレンダーの各マスを広く保ち、表の横スクロールで確認できるようにする */
+@media (max-width: 620px) {
+    .calendar-grid-scroll {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    .calendar-grid-scroll .calendar-grid {
+        width: 1120px !important;
+        min-width: 1120px !important;
+        max-width: none !important;
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    }
+}
