@@ -4180,3 +4180,29 @@ a.recording-tag:hover { opacity: .8; }
         font-size: 16px;
     }
 }
+
+/* iPhone/iOSアプリ：下部メニューの位置が一時的に跳ね上がる現象を抑える */
+.bottom-nav {
+    position: fixed !important;
+    top: auto !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* タッチ操作時の hover/focus 状態でメニュー全体が動かないようにする */
+.bottom-nav:hover,
+.bottom-nav:focus,
+.bottom-nav:focus-within {
+    top: auto !important;
+    bottom: 0 !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+}
