@@ -4119,3 +4119,64 @@ a.recording-tag:hover { opacity: .8; }
         grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
     }
 }
+
+
+/* 最終調整：calendar.html の実際のクラス名 .calendar-scroll に統一 */
+@media (max-width: 620px) {
+    /* 表の外側だけをスクロール領域にし、7列それぞれに十分な幅を確保 */
+    body:has(.calendar-scroll) .calendar-scroll {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        box-sizing: border-box;
+    }
+
+    body:has(.calendar-scroll) .calendar-scroll > .calendar-grid {
+        display: grid !important;
+        grid-template-columns: repeat(7, minmax(160px, 1fr)) !important;
+        width: 1120px !important;
+        min-width: 1120px !important;
+        max-width: none !important;
+        box-sizing: border-box;
+    }
+
+    body:has(.calendar-scroll) .calendar-scroll .calendar-weekday,
+    body:has(.calendar-scroll) .calendar-scroll .calendar-day {
+        min-width: 0 !important;
+        box-sizing: border-box;
+    }
+
+    /* 日付入力欄はモーダル内の幅からはみ出さない */
+    .calendar-modal {
+        width: 100% !important;
+        max-width: 520px !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+    .calendar-modal form,
+    .calendar-edit-form,
+    .calendar-add-form,
+    .calendar-edit-form label,
+    .calendar-add-form label {
+        width: 100%;
+        min-width: 0 !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    .calendar-modal input[type="date"],
+    .calendar-edit-form input[type="date"],
+    .calendar-add-form input[type="date"] {
+        display: block;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 16px;
+    }
+}
