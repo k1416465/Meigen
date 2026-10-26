@@ -107,6 +107,12 @@
       inline-size:100%; max-width:100% !important; min-width:0 !important;
       min-inline-size:0; max-inline-size:100%;
     }
+    /* iOS Safariのdate入力だけ右へはみ出す場合に備え、予定名欄の見た目幅に合わせる */
+    #calendarAddForm input[type="date"] {
+      width:calc(100% - 36px) !important;
+      inline-size:calc(100% - 36px) !important;
+      max-width:calc(100% - 36px) !important;
+    }
     #calendarAddForm input[type="date"], .calendar-edit-form input[type="date"] {
       padding-inline:8px; font-size:16px;
     }
