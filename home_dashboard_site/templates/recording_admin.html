@@ -3,29 +3,52 @@
 {% block content %}
 <section class="recording-admin-page">
   <div class="recording-admin-heading">
-    <div><h1>録音管理</h1><p>タイトル・人物名・録音日・タグを編集できます。</p></div>
+    <div><h1>録音管理</h1><p>複数の録音を編集し、ページ下部の「すべて保存」でまとめて保存できます。</p></div>
     <form method="post" action="{{ url_for('recording_admin_logout') }}"><button type="submit" class="recording-admin-secondary">ログアウト</button></form>
   </div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}<div class="recording-admin-messages">{% for category, message in messages %}<p class="recording-admin-message {{ category }}">{{ message }}</p>{% endfor %}</div>{% endif %}
+  {% endwith %}
   <form method="get" class="recording-admin-search">
     <input type="search" name="q" value="{{ query }}" placeholder="タイトル・ファイル名・タグで検索">
     <button type="submit">検索</button>
   </form>
-  {% for rec in recordings %}
-  <article class="recording-admin-card">
-    <div class="recording-admin-file"><strong>{{ rec['title'] or rec['filename'] }}</strong><small>ID: {{ rec['id'] }} ・ {{ rec['filename'] }}</small></div>
-    <form method="post" class="recording-admin-edit">
-      <input type="hidden" name="id" value="{{ rec['id'] }}">
-      <input type="hidden" name="q" value="{{ query }}">
-      <label>タイトル<input name="title" value="{{ rec['title'] }}" required maxlength="200"></label>
-      <label>人物名<input name="people" value="{{ rec['people'] }}" maxlength="200" placeholder="例：先生、友人"></label>
-      <label>録音日<input name="recorded_at" value="{{ rec['recorded_at'] }}" placeholder="例：2026-10-27"></label>
-      <label>タグ（カンマ区切り）<input name="tags" value="{{ rec['tags'] }}" placeholder="学校, 爆笑, 先生"></label>
-      <button type="submit">この録音を保存</button>
-    </form>
-  </article>
-  {% else %}
-  <p>該当する録音がありません。</p>
-  {% endfor %}
-  <p class="recording-admin-note">タグはカンマ（,）で区切って入力してください。保存すると録音ページの検索・タグ候補にも反映されます。</p>
+
+  <form method="post" id="recordingAdminBulkForm" class="recording-admin-bulk-form">
+    <input type="hidden" name="action" value="save_all">
+    <input type="hidden" name="q" value="{{ query }}">
+    {% for rec in recordings %}
+    <article class="recording-admin-card">
+      <div class="recording-admin-file"><strong>{{ rec['title'] or rec['filename'] }}</strong><small>ID: {{ rec['id'] }} ・ {{ rec['filename'] }}</small></div>
+      <input type="hidden" name="recording_ids" value="{{ rec['id'] }}">
+      <div class="recording-admin-edit">
+        <label>タイトル<input name="title_{{ rec['id'] }}" value="{{ rec['title'] }}" required maxlength="200"></label>
+        <label>人物名<input name="people_{{ rec['id'] }}" value="{{ rec['people'] }}" maxlength="200" placeholder="例：先生、友人"></label>
+        <label>録音日<input name="recorded_at_{{ rec['id'] }}" value="{{ rec['recorded_at'] }}" placeholder="例：2026-10-27"></label>
+        <label>タグ（カンマ区切り）<input name="tags_{{ rec['id'] }}" value="{{ rec['tags'] }}" placeholder="学校, 爆笑, 先生"></label>
+      </div>
+      <div class="recording-admin-card-actions">
+        <button type="button" class="recording-admin-delete" onclick="deleteRecording({{ rec['id'] }}, {{ (rec['title'] or rec['filename'])|tojson }})">この録音を削除</button>
+      </div>
+    </article>
+    {% else %}
+    <p>該当する録音がありません。</p>
+    {% endfor %}
+    {% if recordings %}<div class="recording-admin-savebar"><span>入力内容を確認してから保存してください。</span><button type="submit" class="recording-admin-save-all">すべて保存</button></div>{% endif %}
+  </form>
+
+  <form method="post" id="recordingAdminDeleteForm" class="recording-admin-hidden-form" hidden>
+    <input type="hidden" name="action" value="delete">
+    <input type="hidden" name="q" value="{{ query }}">
+    <input type="hidden" name="id" id="recordingAdminDeleteId" value="">
+  </form>
+  <p class="recording-admin-note">タグはカンマ（,）で区切って入力してください。削除すると録音情報と音声ファイルが削除されます。必要な音声は事前にバックアップしてください。</p>
 </section>
+<script>
+function deleteRecording(id, title) {
+  if (!window.confirm('「' + title + '」を削除しますか？\n録音情報と音声ファイルの両方が削除され、この操作は元に戻せません。')) return;
+  document.getElementById('recordingAdminDeleteId').value = id;
+  document.getElementById('recordingAdminDeleteForm').submit();
+}
+</script>
 {% endblock %}
