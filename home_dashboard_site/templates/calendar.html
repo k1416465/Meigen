@@ -152,6 +152,40 @@
     .calendar-scroll { max-width:100%; overflow-x:auto; }
     .calendar-scroll .calendar-grid { min-width:700px; }
     .calendar-modal { padding:16px; }
+
+    /* iPhone Safari：日付欄と予定名欄を同じ親幅・同じ寸法ルールに統一 */
+    #calendarAddForm > label,
+    #calendarEditForm > label {
+      display:flex !important;
+      flex-direction:column !important;
+      width:100% !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      box-sizing:border-box !important;
+    }
+
+    #calendarAddForm > label > input[type="date"],
+    #calendarAddForm > label > input[type="text"],
+    #calendarEditForm > label > input[type="date"],
+    #calendarEditForm > label > input[type="text"] {
+      display:block !important;
+      width:100% !important;
+      inline-size:100% !important;
+      min-width:0 !important;
+      min-inline-size:0 !important;
+      max-width:100% !important;
+      max-inline-size:100% !important;
+      box-sizing:border-box !important;
+      margin:0 !important;
+    }
+
+    /* iOSの日付入力固有の余分な外観幅を抑え、予定名欄と揃える */
+    #calendarAddForm > label > input[type="date"],
+    #calendarEditForm > label > input[type="date"] {
+      -webkit-appearance:none;
+      appearance:none;
+      border-radius:8px;
+    }
   }
 </style>
 
