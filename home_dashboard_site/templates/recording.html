@@ -62,9 +62,20 @@
               </p>
             </div>
           </div>
-          <audio controls preload="none" src="{{ url_for('static', filename='recording/' ~ item['filename']) }}">
-            お使いのブラウザは音声再生に対応していません。
-          </audio>
+          <div class="recording-player" data-recording-player>
+            <audio class="recording-audio-source" preload="metadata" src="{{ url_for('static', filename='recording/' ~ item['filename']) }}">
+              お使いのブラウザは音声再生に対応していません。
+            </audio>
+            <button class="recording-play-button" type="button" data-play aria-label="再生" aria-pressed="false">
+              <svg class="recording-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" fill="currentColor"/></svg>
+              <svg class="recording-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor"/></svg>
+            </button>
+            <div class="recording-player-main">
+              <div class="recording-waveform" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <input class="recording-progress" data-progress type="range" min="0" max="1000" value="0" step="1" aria-label="再生位置">
+              <div class="recording-player-times"><span data-current-time>0:00</span><span data-duration>--:--</span></div>
+            </div>
+          </div>
           {% if item['tags'] %}
             <div class="recording-tags">
               {% for tag in item['tags'].replace('、', ',').split(',') %}
@@ -90,6 +101,49 @@
 </section>
 <script>
   (function () {
+    // ボイスメモ風のカスタム再生コントロール
+    function formatTime(seconds) {
+      if (!Number.isFinite(seconds) || seconds < 0) return '--:--';
+      var mins = Math.floor(seconds / 60);
+      var secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return mins + ':' + secs;
+    }
+    document.querySelectorAll('[data-recording-player]').forEach(function (player) {
+      var audio = player.querySelector('.recording-audio-source');
+      var play = player.querySelector('[data-play]');
+      var progress = player.querySelector('[data-progress]');
+      var current = player.querySelector('[data-current-time]');
+      var duration = player.querySelector('[data-duration]');
+      if (!audio || !play || !progress) return;
+      function sync() {
+        var ratio = audio.duration ? audio.currentTime / audio.duration : 0;
+        progress.value = String(Math.round(ratio * 1000));
+        progress.style.setProperty('--progress', (ratio * 100) + '%');
+        current.textContent = formatTime(audio.currentTime);
+        duration.textContent = formatTime(audio.duration);
+        player.classList.toggle('is-playing', !audio.paused && !audio.ended);
+        play.setAttribute('aria-label', audio.paused ? '再生' : '一時停止');
+        play.setAttribute('aria-pressed', String(!audio.paused));
+      }
+      play.addEventListener('click', function () {
+        if (audio.paused) {
+          document.querySelectorAll('.recording-audio-source').forEach(function (other) {
+            if (other !== audio) other.pause();
+          });
+          var result = audio.play();
+          if (result && result.catch) result.catch(function () {});
+        } else audio.pause();
+      });
+      progress.addEventListener('input', function () {
+        if (audio.duration) audio.currentTime = (Number(progress.value) / 1000) * audio.duration;
+        sync();
+      });
+      ['loadedmetadata', 'timeupdate', 'play', 'pause', 'ended', 'durationchange'].forEach(function (eventName) {
+        audio.addEventListener(eventName, sync);
+      });
+      sync();
+    });
+
     var toggle = document.getElementById('recording-search-toggle');
     var panel = document.getElementById('recording-search-panel');
     var input = document.getElementById('recording-search-input');
