@@ -4514,13 +4514,13 @@ a.recording-tag:hover { opacity: .8; }
   .recording-tag-order-item { padding: 8px; }
 }
 
-/* スマートフォン：一括ダウンロードと並び替えを同じ行に配置 */
+/* スマートフォン：一括ダウンロードと並び替えを同じ行の右側に配置 */
 @media (max-width: 700px) {
   .recording-list-actions {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
     gap: 8px;
     width: 100%;
   }
