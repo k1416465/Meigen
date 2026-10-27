@@ -1290,9 +1290,10 @@ def recording_page():
     search_scope = request.args.get("scope", "all").strip().lower()
     if search_scope not in {"all", "title", "people", "date", "tags"}:
         search_scope = "all"
-    sort_by = request.args.get("sort", "tags").strip().lower()
+    # 初期表示は管理画面で設定した人物順にします。
+    sort_by = request.args.get("sort", "people").strip().lower()
     if sort_by not in {"date", "people", "tags"}:
-        sort_by = "date"
+        sort_by = "people"
 
     with get_recording_db() as conn:
         rows = conn.execute("SELECT * FROM recordings").fetchall()
@@ -1332,7 +1333,23 @@ def recording_page():
 
     def sort_key(item):
         if sort_by == 'people':
-            return ((item['people'] or '').casefold(), (item['title'] or '').casefold())
+            # 管理画面で保存した人物順を録音一覧の「人名順」にも反映します。
+            # 複数人物が登録されている場合は、設定順で最も先の人物を基準にします。
+            item_people = [
+                person.strip()
+                for person in (item['people'] or '').replace('、', ',').split(',')
+                if person.strip()
+            ]
+            if item_people:
+                person_key = min(
+                    (0, people_rank[person.casefold()], person.casefold())
+                    if person.casefold() in people_rank
+                    else (1, len(people_rank), person.casefold())
+                    for person in item_people
+                )
+            else:
+                person_key = (2, len(people_rank), '')
+            return (person_key, (item['title'] or '').casefold())
         if sort_by == 'tags':
             # 管理画面で保存したタグ順を使い、録音に付いているタグのうち
             # 最も優先順位が高いタグを基準に並べます。未登録タグは末尾側です。
