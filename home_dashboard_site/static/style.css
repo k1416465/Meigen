@@ -4296,3 +4296,220 @@ a.recording-tag:hover { opacity: .8; }
   .recording-admin-save-all { width:100%; }
   .recording-admin-card-actions .recording-admin-delete { width:100%; }
 }
+
+
+/* 録音ページ：一括ダウンロード・並び替え・検索ボタンの見た目調整 */
+.recording-list-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.recording-download-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 10px 15px;
+  border: 1px solid var(--purple);
+  border-radius: 10px;
+  background: var(--purple);
+  color: #fff !important;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: opacity .15s ease, transform .15s ease;
+}
+.recording-download-all:hover { opacity: .88; }
+.recording-download-all:active { transform: translateY(1px); }
+.recording-sort-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.recording-sort-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text, inherit);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.recording-sort-form select {
+  min-height: 42px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 9px 30px 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.recording-search-form .recording-search-submit,
+.recording-search-form .recording-search-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.recording-search-form .recording-search-submit {
+  border: 1px solid #087bea;
+  background: #087bea;
+  color: #fff;
+}
+.recording-search-form .recording-search-submit:hover { background: #066bd0; border-color: #066bd0; }
+.recording-search-form .recording-search-reset {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: inherit;
+}
+.recording-search-form .recording-search-reset:hover { background: var(--purple-soft); }
+@media (max-width: 700px) {
+  .recording-list-actions { justify-content: flex-start; }
+  .recording-download-all { flex: 1 1 100%; }
+  .recording-sort-form { flex: 1 1 100%; }
+  .recording-sort-form select { flex: 1 1 auto; min-width: 0; }
+  .recording-search-form .recording-search-submit,
+  .recording-search-form .recording-search-reset { min-height: 42px; padding: 10px 12px; }
+}
+
+
+/* 録音ページ：並び替えボタンを押すと選択肢をまとめて表示 */
+.recording-sort-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.recording-sort-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text, inherit);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.recording-sort-button:hover { border-color: #077AE3; }
+.recording-sort-options:not([hidden]) {
+  position: absolute;
+  z-index: 100;
+  top: calc(100% + 6px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 190px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .18);
+}
+.recording-sort-options a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text, inherit);
+  font-size: 13px;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.recording-sort-options a:hover,
+.recording-sort-options a[aria-current="true"] {
+  background: rgba(7, 122, 227, .12);
+  color: #077AE3;
+}
+@media (max-width: 600px) {
+  .recording-sort-options:not([hidden]) { right: 0; left: auto; }
+}
+
+
+
+/* 録音管理：タグ表示順の編集 */
+.recording-tag-order-admin {
+  margin: 24px 0 30px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.recording-tag-order-heading h2 { margin: 0 0 6px; font-size: 18px; }
+.recording-tag-order-heading p { margin: 0 0 16px; color: var(--muted, #777); font-size: 13px; }
+.recording-tag-order-list {
+  list-style: decimal;
+  padding-left: 28px;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.recording-tag-order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--background, transparent);
+}
+.recording-tag-order-name { overflow-wrap: anywhere; }
+.recording-tag-order-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.recording-tag-move {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
+.recording-tag-move:hover:not(:disabled) { border-color: #077AE3; color: #077AE3; }
+.recording-tag-move:disabled { opacity: .35; cursor: not-allowed; }
+@media (max-width: 600px) {
+  .recording-tag-order-admin { padding: 14px; }
+  .recording-tag-order-item { padding: 8px; }
+}
