@@ -1,5 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response, session, flash
-import os
+from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response, send_file, abort, session, flash
 import secrets
 from datetime import datetime, timezone, timedelta
 import time
@@ -10,6 +9,8 @@ import traceback
 import json
 import uuid
 import sqlite3
+import io
+import zipfile
 from pathlib import Path
 
 import jpholiday
@@ -19,13 +20,9 @@ from bs4 import BeautifulSoup
 
 
 app = Flask(__name__)
-# ==================================================
-# 録音管理画面の設定
-# 下の2つの値を、運用前に自分だけが知る値へ変更してください。
-# ==================================================
+# 録音管理画面の設定：運用前に必ず自分だけが知る値へ変更してください。
 RECORDING_ADMIN_PASSWORD = "Meigen123"
 FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
-
 app.secret_key = FLASK_SESSION_SECRET
 
 JST = timezone(timedelta(hours=9))
@@ -549,43 +546,8 @@ def _find_status(text):
         if index >= 0:
             return "平常運転", index
 
-    # 運転再開後も遅れ・運休が残る場合は、過去の「運転見合わせ」より優先する。
-    # 例：「運転を見合わせていましたが、20:16頃、運転を再開しました。
-    # なお、一部列車に遅れや運休が出ています。」
-    has_restart = any(
-        phrase in text
-        for phrase in (
-            "運転を再開",
-            "運転再開",
-            "運転を再開しました",
-        )
-    )
-
-    has_remaining_disruption = any(
-        phrase in text
-        for phrase in (
-            "遅れが出ています",
-            "遅延が出ています",
-            "一部列車に遅れ",
-            "一部の列車に遅れ",
-            "一部列車に運休",
-            "一部の列車に運休",
-            "一部列車に遅れや運休",
-            "一部運休",
-            "遅れや運休",
-            "遅延や運休",
-        )
-    )
-
-    if has_restart and has_remaining_disruption:
-        index = text.find("一部列車に遅れ")
-        if index < 0:
-            index = text.find("遅れ")
-        return "遅延", index if index >= 0 else 0
-
     # ------------------------------------------
-    # 運転見合わせ・運転中止
-    # （運転再開後の残存遅延は上で判定済み）
+    # 2. 運転見合わせ・運転中止
     # ------------------------------------------
     suspension_options = (
         "運転見合わせ",
@@ -606,6 +568,37 @@ def _find_status(text):
         suspension_matches.sort(key=lambda item: item[0])
         index, phrase = suspension_matches[0]
         return phrase, index
+
+    # ------------------------------------------
+    # 3. 運転再開後も遅れ・運休が残る場合
+    # ------------------------------------------
+    has_restart = any(
+        phrase in text
+        for phrase in (
+            "運転を再開",
+            "運転再開",
+            "運転を再開しました",
+        )
+    )
+
+    has_remaining_disruption = any(
+        phrase in text
+        for phrase in (
+            "遅れが出ています",
+            "遅延が出ています",
+            "一部列車に遅れ",
+            "一部の列車に遅れ",
+            "一部列車に運休",
+            "一部の列車に運休",
+            "一部運休",
+            "遅れや運休",
+            "遅延や運休",
+        )
+    )
+
+    if has_restart and has_remaining_disruption:
+        index = text.find("運転")
+        return "遅延", index if index >= 0 else 0
 
     # ------------------------------------------
     # 4. 運休・遅延
@@ -703,16 +696,6 @@ def _extract_detail(text, status, status_index):
 
     text = _normalise_text(text)
 
-
-    # 路線の運行区間表示を削除
-    text = re.sub(
-        r"\[(?:南栗橋[～〜~\-－−]東武日光|東京[～〜~\-－−]宇都宮|宇都宮[～〜~\-－−]黒磯|久喜[～〜~\-－−]伊勢崎)\]",
-        "",
-        text,
-    )
-    text = _normalise_text(text)
-
-
     # 先頭に路線名が残っている場合は除去
     route_names = (
         "東武宇都宮線",
@@ -726,16 +709,6 @@ def _extract_detail(text, status, status_index):
         "宇都宮線",
         "両毛線",
     )
-
-
-    # 「路線を登録 運転見合わせ」などの操作リンク・状態見出しを除去
-    text = re.sub(
-        r"路線を登録\s*(?:運転見合わせ|運転取りやめ|運転中止|一部運休|運休|列車遅延|遅延|運転再開)?",
-        "",
-        text,
-    )
-    text = _normalise_text(text)
-
 
     for route_name in route_names:
         if text.startswith(route_name):
@@ -776,21 +749,7 @@ def _parse_operation_page(soup, route_key):
         for name in candidates
     }
 
-    # Yahoo!側で路線名の括弧内区間などの表記が変わっても、
-    # 対象路線そのものが一致していれば解析を続ける。
-    heading_matches = heading_text in candidate_names
-    if not heading_matches:
-        if route_key == "tobu_nikko":
-            heading_matches = "東武日光線" in heading_text
-        elif route_key == "tobu_isesaki":
-            heading_matches = (
-                "東武伊勢崎線" in heading_text
-                or "東武スカイツリーライン" in heading_text
-            )
-        elif route_key == "utsunomiya":
-            heading_matches = "宇都宮線" in heading_text
-        
-    if not heading_matches:
+    if heading_text not in candidate_names:
         raise ValueError(f"路線名が一致しません: {heading_text}")
 
     # HTML全体から見出し以降のテキストを取得する
@@ -1239,6 +1198,20 @@ BASE_DIR = Path(__file__).resolve().parent
 RECORDING_DIR = BASE_DIR / "static" / "recording"
 RECORDING_DB = BASE_DIR / "recordings.db"
 
+# タグの表示順は、ログイン後の録音管理画面から編集し、SQLiteに保存します。
+TAG_ORDER_SETTING_KEY = "recording_tag_order"
+
+
+def get_saved_tag_order(conn):
+    row = conn.execute("SELECT value FROM app_settings WHERE key = ?", (TAG_ORDER_SETTING_KEY,)).fetchone()
+    if not row:
+        return []
+    try:
+        value = json.loads(row["value"])
+        return [str(item) for item in value if isinstance(item, str) and item.strip()]
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return []
+
 
 def get_recording_db():
     conn = sqlite3.connect(RECORDING_DB)
@@ -1250,6 +1223,12 @@ def init_recording_db():
     RECORDING_DIR.mkdir(parents=True, exist_ok=True)
     with get_recording_db() as conn:
         conn.execute("""
+            CREATE TABLE IF NOT EXISTS app_settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS recordings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 filename TEXT NOT NULL UNIQUE,
@@ -1260,8 +1239,6 @@ def init_recording_db():
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        # static/recording に手動で置かれたMP3を一覧に反映する。
-        # 既存のタイトルやタグなどのメタデータは上書きしない。
         for path in RECORDING_DIR.iterdir():
             if path.is_file() and path.suffix.lower() == ".mp3":
                 conn.execute(
@@ -1270,27 +1247,56 @@ def init_recording_db():
                 )
 
 
-@app.route("/recording", methods=["GET"])
+def split_tags(value):
+    return [part.strip() for part in (value or '').replace('、', ',').split(',') if part.strip()]
+
+
+@app.route("/recording", methods=["GET", "POST"])
 def recording_page():
     init_recording_db()
+    if request.method == "POST":
+        filename = Path(request.form.get("filename", "").strip()).name
+        title = request.form.get("title", "").strip()
+        people = request.form.get("people", "").strip()
+        recorded_at = request.form.get("recorded_at", "").strip()
+        tags = request.form.get("tags", "").strip()
+        audio_path = RECORDING_DIR / filename
+        if filename.lower().endswith(".mp3") and audio_path.is_file() and title:
+            with get_recording_db() as conn:
+                conn.execute(
+                    """INSERT INTO recordings (filename, title, people, recorded_at, tags)
+                       VALUES (?, ?, ?, ?, ?)
+                       ON CONFLICT(filename) DO UPDATE SET
+                         title=excluded.title, people=excluded.people,
+                         recorded_at=excluded.recorded_at, tags=excluded.tags""",
+                    (filename, title, people, recorded_at, tags)
+                )
+        return redirect(url_for("recording_page"))
 
     query = request.args.get("q", "").strip()
     search_scope = request.args.get("scope", "all").strip().lower()
     if search_scope not in {"all", "title", "people", "date", "tags"}:
         search_scope = "all"
+    sort_by = request.args.get("sort", "date").strip().lower()
+    if sort_by not in {"date", "people", "tags"}:
+        sort_by = "date"
 
     with get_recording_db() as conn:
-        # 検索欄の下に表示するタグ候補を、登録済みの録音情報から集める。
-        tag_rows = conn.execute("SELECT tags FROM recordings WHERE tags IS NOT NULL AND tags != ''").fetchall()
-        tag_options = []
-        seen_tags = set()
-        for row in tag_rows:
-            for raw_tag in (row["tags"] or "").replace("、", ",").split(","):
-                tag = raw_tag.strip()
-                if tag and tag.casefold() not in seen_tags:
-                    seen_tags.add(tag.casefold())
-                    tag_options.append(tag)
-        tag_options.sort(key=str.casefold)
+        rows = conn.execute("SELECT * FROM recordings").fetchall()
+        tag_options, person_options = [], []
+        seen_tags, seen_people = set(), set()
+        for row in rows:
+            for tag in split_tags(row['tags']):
+                if tag.casefold() not in seen_tags:
+                    seen_tags.add(tag.casefold()); tag_options.append(tag)
+            for person in (row['people'] or '').replace('、', ',').split(','):
+                person = person.strip()
+                if person and person.casefold() not in seen_people:
+                    seen_people.add(person.casefold()); person_options.append(person)
+        saved_order = get_saved_tag_order(conn)
+        rank = {tag.casefold(): i for i, tag in enumerate(saved_order)}
+        tag_options.sort(key=lambda tag: (0, rank[tag.casefold()]) if tag.casefold() in rank else (1, tag.casefold()))
+        person_options.sort(key=str.casefold)
 
         if query:
             like = f"%{query}%"
@@ -1302,46 +1308,90 @@ def recording_page():
                 "all": "title LIKE ? OR filename LIKE ? OR people LIKE ? OR recorded_at LIKE ? OR tags LIKE ?",
             }
             where_clause = search_columns[search_scope]
-            parameter_count = where_clause.count("?")
             recordings = conn.execute(
-                f"SELECT * FROM recordings WHERE ({where_clause}) ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE",
-                tuple([like] * parameter_count)
+                f"SELECT * FROM recordings WHERE ({where_clause})",
+                tuple([like] * where_clause.count('?'))
             ).fetchall()
         else:
-            recordings = conn.execute(
-                "SELECT * FROM recordings ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE"
-            ).fetchall()
+            recordings = rows
+
+    def sort_key(item):
+        if sort_by == 'people':
+            return ((item['people'] or '').casefold(), (item['title'] or '').casefold())
+        if sort_by == 'tags':
+            # 管理画面で保存したタグ順を使い、録音に付いているタグのうち
+            # 最も優先順位が高いタグを基準に並べます。未登録タグは末尾側です。
+            item_tags = split_tags(item['tags'])
+            if not item_tags:
+                tag_key = (2, '', '')
+            else:
+                tag_key = min(
+                    (0, tag_rank[tag.casefold()], tag.casefold())
+                    if tag.casefold() in tag_rank
+                    else (1, 0, tag.casefold())
+                    for tag in item_tags
+                )
+            return (tag_key, (item['title'] or '').casefold())
+        return (item['recorded_at'] or '', (item['title'] or '').casefold())
+
+    # 保存済みの表示順を録音一覧の「タグ順」ソートにも共通利用します。
+    tag_rank = {tag.casefold(): i for i, tag in enumerate(saved_order)}
+    recordings = sorted(recordings, key=sort_key, reverse=(sort_by == 'date'))
 
     return render_template(
-        "recording.html",
-        recordings=recordings,
-        query=query,
-        search_scope=search_scope,
-        tag_options=tag_options,
-        weather_place=selected_weather_place(),
-        railway_label=ROUTE_OPTIONS[selected_route()],
+        "recording.html", recordings=recordings, query=query,
+        search_scope=search_scope, tag_options=tag_options,
+        person_options=person_options, sort_by=sort_by,
+        weather_place=selected_weather_place(), railway_label=ROUTE_OPTIONS[selected_route()],
     )
+
+
+@app.route("/recording/download/<path:filename>")
+def download_recording(filename):
+    safe_name = Path(filename).name
+    if safe_name != filename or not safe_name.lower().endswith('.mp3'):
+        abort(404)
+    path = RECORDING_DIR / safe_name
+    if not path.is_file():
+        abort(404)
+    return send_file(path, as_attachment=True, download_name=safe_name, mimetype='audio/mpeg')
+
+
+@app.route("/recording/download-all")
+def download_all_recordings():
+    init_recording_db()
+    memory_file = io.BytesIO()
+    with get_recording_db() as conn, zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as archive:
+        rows = conn.execute("SELECT filename, title FROM recordings ORDER BY title COLLATE NOCASE").fetchall()
+        added = 0
+        for row in rows:
+            filename = Path(row['filename']).name
+            path = RECORDING_DIR / filename
+            if filename.lower().endswith('.mp3') and path.is_file():
+                archive.write(path, arcname=filename)
+                added += 1
+    if added == 0:
+        return "ダウンロードできる録音ファイルがありません。", 404
+    memory_file.seek(0)
+    return send_file(memory_file, mimetype='application/zip', as_attachment=True, download_name='recordings.zip')
 
 
 # ==================================================
 # 録音管理（タイトル・人物名・日付・タグの編集）
-# 管理用パスワードは環境変数 RECORDING_ADMIN_PASSWORD に設定する。
 # ==================================================
 
 @app.route("/recording/admin/login", methods=["GET", "POST"])
 def recording_admin_login():
     configured_password = RECORDING_ADMIN_PASSWORD
-
     error = ""
     if request.method == "POST":
         submitted = request.form.get("password", "")
-        if secrets.compare_digest(
-            submitted.encode("utf-8"),
-            configured_password.encode("utf-8")
+        if configured_password and secrets.compare_digest(
+            submitted.encode("utf-8"), configured_password.encode("utf-8")
         ):
             session["recording_admin_authenticated"] = True
             return redirect(url_for("recording_admin"))
-        error = "パスワードが違います。"
+        error = "管理用パスワードが未設定か、パスワードが違います。"
     return render_template("recording_admin_login.html", error=error)
 
 
@@ -1355,45 +1405,64 @@ def recording_admin_logout():
 def recording_admin():
     if not session.get("recording_admin_authenticated"):
         return redirect(url_for("recording_admin_login"))
-
     init_recording_db()
     if request.method == "POST":
         action = request.form.get("action", "save_all")
         query = request.form.get("q", "")
-
+        if action == "save_tag_order":
+            submitted_order = []
+            seen = set()
+            for raw_tag in request.form.getlist("tag_order"):
+                tag = raw_tag.strip()
+                if tag and tag.casefold() not in seen:
+                    submitted_order.append(tag)
+                    seen.add(tag.casefold())
+            with get_recording_db() as conn:
+                all_rows = conn.execute("SELECT tags FROM recordings").fetchall()
+                existing_tags = []
+                existing_seen = set()
+                for row in all_rows:
+                    for tag in split_tags(row["tags"]):
+                        if tag.casefold() not in existing_seen:
+                            existing_seen.add(tag.casefold())
+                            existing_tags.append(tag)
+                # 画面送信後に追加されたタグも失わず、最後に追加する
+                for tag in existing_tags:
+                    if tag.casefold() not in seen:
+                        submitted_order.append(tag)
+                        seen.add(tag.casefold())
+                conn.execute(
+                    "INSERT INTO app_settings (key, value) VALUES (?, ?) "
+                    "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                    (TAG_ORDER_SETTING_KEY, json.dumps(submitted_order, ensure_ascii=False))
+                )
+                conn.commit()
+            flash("タグの並び順を保存しました。検索画面にも反映されます。", "success")
+            return redirect(url_for("recording_admin", q=query))
         if action == "delete":
             rec_id = request.form.get("id", type=int)
             with get_recording_db() as conn:
-                row = conn.execute(
-                    "SELECT filename FROM recordings WHERE id = ?", (rec_id,)
-                ).fetchone()
+                row = conn.execute("SELECT filename FROM recordings WHERE id = ?", (rec_id,)).fetchone()
                 if row is None:
                     flash("削除対象の録音が見つかりませんでした。", "error")
                 else:
-                    filename = row["filename"]
-                    # DBの記録と音声ファイルを一緒に削除する。誤削除防止の確認は画面側で行う。
+                    filename = Path(row["filename"]).name
                     conn.execute("DELETE FROM recordings WHERE id = ?", (rec_id,))
                     conn.commit()
-                    audio_path = (RECORDING_DIR / filename).resolve()
-                    recording_dir = RECORDING_DIR.resolve()
-                    if audio_path.parent == recording_dir and audio_path.is_file():
+                    audio_path = RECORDING_DIR / filename
+                    if audio_path.is_file() and audio_path.resolve().parent == RECORDING_DIR.resolve():
                         try:
                             audio_path.unlink()
+                            flash("録音情報と音声ファイルを削除しました。", "success")
                         except OSError:
                             flash("録音情報は削除しましたが、音声ファイルを削除できませんでした。", "error")
-                        else:
-                            flash("録音情報と音声ファイルを削除しました。", "success")
                     else:
-                        flash("録音情報を削除しました。", "success")
+                        flash("録音情報を削除しました。音声ファイルは見つかりませんでした。", "success")
             return redirect(url_for("recording_admin", q=query))
-
         if action == "save_all":
-            # 画面に表示されている録音をまとめて保存する。
-            saved = 0
-            errors = 0
+            saved = errors = 0
             with get_recording_db() as conn:
-                ids = request.form.getlist("recording_ids")
-                for raw_id in ids:
+                for raw_id in request.form.getlist("recording_ids"):
                     try:
                         rec_id = int(raw_id)
                     except (TypeError, ValueError):
@@ -1403,41 +1472,36 @@ def recording_admin():
                     people = request.form.get(f"people_{rec_id}", "").strip()
                     recorded_at = request.form.get(f"recorded_at_{rec_id}", "").strip()
                     raw_tags = request.form.get(f"tags_{rec_id}", "")
-                    tags = ",".join(dict.fromkeys(
-                        tag.strip() for tag in raw_tags.replace("、", ",").split(",")
-                        if tag.strip()
-                    ))
+                    tags = ",".join(dict.fromkeys(tag.strip() for tag in raw_tags.replace("、", ",").split(",") if tag.strip()))
                     if not title:
                         errors += 1
                         continue
-                    result = conn.execute(
-                        "UPDATE recordings SET title = ?, people = ?, recorded_at = ?, tags = ? WHERE id = ?",
-                        (title, people, recorded_at, tags, rec_id),
-                    )
+                    result = conn.execute("UPDATE recordings SET title=?, people=?, recorded_at=?, tags=? WHERE id=?", (title, people, recorded_at, tags, rec_id))
                     if result.rowcount:
                         saved += 1
                 conn.commit()
-            if errors:
-                flash(f"{saved}件を保存しました。{errors}件はタイトル未入力などのため保存できませんでした。", "error")
-            else:
-                flash(f"{saved}件の録音情報をまとめて保存しました。", "success")
+            flash(f"{saved}件を保存しました。" + (f" {errors}件は未保存です。" if errors else ""), "error" if errors else "success")
         return redirect(url_for("recording_admin", q=query))
-
     query = request.args.get("q", "").strip()
     with get_recording_db() as conn:
         if query:
             like = f"%{query}%"
-            rows = conn.execute(
-                """SELECT * FROM recordings
-                   WHERE title LIKE ? OR filename LIKE ? OR people LIKE ? OR tags LIKE ?
-                   ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE""",
-                (like, like, like, like),
-            ).fetchall()
+            rows = conn.execute("SELECT * FROM recordings WHERE title LIKE ? OR filename LIKE ? OR people LIKE ? OR tags LIKE ? ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE", (like, like, like, like)).fetchall()
         else:
-            rows = conn.execute(
-                "SELECT * FROM recordings ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE"
-            ).fetchall()
-    return render_template("recording_admin.html", recordings=rows, query=query)
+            rows = conn.execute("SELECT * FROM recordings ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE").fetchall()
+    with get_recording_db() as conn:
+        all_tag_rows = conn.execute("SELECT tags FROM recordings").fetchall()
+        all_tags = []
+        seen_tags = set()
+        for row in all_tag_rows:
+            for tag in split_tags(row["tags"]):
+                if tag.casefold() not in seen_tags:
+                    seen_tags.add(tag.casefold())
+                    all_tags.append(tag)
+        saved_order = get_saved_tag_order(conn)
+    order_rank = {tag.casefold(): i for i, tag in enumerate(saved_order)}
+    all_tags.sort(key=lambda tag: (0, order_rank[tag.casefold()]) if tag.casefold() in order_rank else (1, tag.casefold()))
+    return render_template("recording_admin.html", recordings=rows, query=query, tag_order=all_tags)
 
 
 @app.route("/stamp")
