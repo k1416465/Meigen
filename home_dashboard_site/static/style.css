@@ -4513,3 +4513,47 @@ a.recording-tag:hover { opacity: .8; }
   .recording-tag-order-admin { padding: 14px; }
   .recording-tag-order-item { padding: 8px; }
 }
+
+/* スマートフォン：一括ダウンロードと並び替えを同じ行に配置 */
+@media (max-width: 700px) {
+  .recording-list-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .recording-list-actions > .recording-download-all {
+    flex: 0 1 auto;
+    min-width: 0;
+    min-height: 38px;
+    padding: 8px 9px;
+    font-size: 11px;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .recording-list-actions > .recording-sort-wrap {
+    flex: 0 0 auto;
+  }
+
+  .recording-list-actions > .recording-sort-wrap .recording-sort-button {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  .recording-list-actions > .recording-download-all {
+    padding: 7px 6px;
+    font-size: 10px;
+  }
+  .recording-list-actions > .recording-sort-wrap .recording-sort-button {
+    padding: 7px 8px;
+    font-size: 11px;
+  }
+}
