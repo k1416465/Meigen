@@ -11,47 +11,47 @@
     <!-- 駅選択：PC・スマホ共通の順番とボタンサイズ -->
     <section class="station-selector">
         <div class="station-grid station-grid-large">
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/oyama/timetable">
+            <a class="station-button" href="/timetable?station=小山">
                 <span class="station-name">小山</span>
                 <span class="station-name-en">Oyama</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/omoigawa/timetable">
+            <a class="station-button" href="/timetable?station=思川">
                 <span class="station-name">思川</span>
                 <span class="station-name-en">Omoigawa</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/tochigi/timetable">
+            <a class="station-button" href="/timetable?station=栃木">
                 <span class="station-name">栃木</span>
                 <span class="station-name-en">Tochigi</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/ohirashita/timetable">
+            <a class="station-button" href="/timetable?station=大平下">
                 <span class="station-name">大平下</span>
                 <span class="station-name-en">Ohirashita</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/iwafune/timetable">
+            <a class="station-button" href="/timetable?station=岩舟">
                 <span class="station-name">岩舟</span>
                 <span class="station-name-en">Iwafune</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/sano/timetable">
+            <a class="station-button" href="/timetable?station=佐野">
                 <span class="station-name">佐野</span>
                 <span class="station-name-en">Sano</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/tomita/timetable">
+            <a class="station-button" href="/timetable?station=富田">
                 <span class="station-name">富田</span>
                 <span class="station-name-en">Tomita</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable">
+            <a class="station-button" href="/timetable?station=あしかがフラワーパーク">
                 <span class="station-name">あしかがフラワーパーク</span>
                 <span class="station-name-en">Ashikaga Flower Park</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/ashikaga/timetable">
+            <a class="station-button" href="/timetable?station=足利">
                 <span class="station-name">足利</span>
                 <span class="station-name-en">Ashikaga</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/yamamae/timetable">
+            <a class="station-button" href="/timetable?station=山前">
                 <span class="station-name">山前</span>
                 <span class="station-name-en">Yamamae</span>
             </a>
-            <a class="station-button" href="https://ryomo-line-timetable.onrender.com/station/omata/timetable">
+            <a class="station-button" href="/timetable?station=小俣">
                 <span class="station-name">小俣</span>
                 <span class="station-name-en">Omata</span>
             </a>
@@ -312,7 +312,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 showCenteredNotice("My駅の設定を確認してください。");
                 return;
             }
-            window.location.href = `https://ryomo-line-timetable.onrender.com/station/${myStationId}/timetable`;
+            const myStationNames = {
+                oyama: "小山",
+                omoigawa: "思川",
+                tochigi: "栃木",
+                ohirashita: "大平下",
+                iwafune: "岩舟",
+                sano: "佐野",
+                tomita: "富田",
+                ashikaga_flower_park: "あしかがフラワーパーク",
+                ashikaga: "足利",
+                yamamae: "山前",
+                omata: "小俣"
+            };
+            const myStationName = myStationNames[myStationId];
+            if (!myStationName) {
+                showCenteredNotice("My駅の設定を確認してください。");
+                return;
+            }
+            window.location.href = `/timetable?station=${encodeURIComponent(myStationName)}`;
         });
     }
 
@@ -383,7 +401,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 hideNotice();
-                window.location.href = `https://ryomo-line-timetable.onrender.com/station/${nearest.id}/timetable`;
+                window.location.href = `/timetable?station=${encodeURIComponent(nearest.name.replace(/駅$/, ""))}`;
             },
             error => {
                 const messages = {

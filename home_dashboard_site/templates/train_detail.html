@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ train.train_number }} 列車時刻表｜迷言{% endblock %}
+{% block content %}
+<section class="td-page">
+  <header class="td-header">
+    <p class="td-eyebrow">{{ line_name }}・列車時刻表</p>
+    <h1>{{ train.train_number }} <span>{{ train.type }}</span></h1>
+    <p class="td-route">{{ train.origin }} <span aria-hidden="true">→</span> {{ train.destination }}</p>
+    <div class="td-meta">
+      <span>{{ train.direction }}列車</span>
+      {% if train.cars %}<span>{{ train.cars }}両</span>{% endif %}
+    </div>
+    {% if train.note %}<p class="td-note">{{ train.note }}</p>{% endif %}
+  </header>
+
+  <section class="td-card" aria-label="停車駅と時刻">
+    <div class="td-card-heading"><h2>停車駅・到着／発車時刻</h2><p>各駅の到着時刻と発車時刻</p></div>
+    <ol class="td-stops">
+      {% for stop in stops %}
+      <li class="td-stop">
+        <span class="td-stop-dot" aria-hidden="true"></span>
+        <div class="td-stop-name">
+          {% if stop.station in ['桐生', '岩宿', '国定', '伊勢崎', '駒形', '前橋大島', '前橋', '新前橋', '井野', '高崎問屋町', '高崎'] %}
+            <span>{{ stop.station }}</span>
+          {% else %}
+            <a href="{{ url_for('timetable_page', station=stop.station) }}" aria-label="{{ stop.station }}駅の時刻表を見る">{{ stop.station }}</a>
+          {% endif %}
+        </div>
+        <div class="td-times">
+          <div><span>到着</span><strong>{{ stop.arrival if stop.arrival else '—' }}</strong></div>
+          <div><span>発車</span><strong>{{ stop.departure if stop.departure else '—' }}</strong></div>
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  <div class="td-actions">
+    {% if back_station %}<a class="td-button td-primary" href="{{ url_for('timetable_page', station=back_station) }}">駅の時刻表に戻る</a>{% endif %}
+    <a class="td-button" href="/operation">ほかの駅を選ぶ</a>
+  </div>
+</section>
+<style>
+.td-page{max-width:760px;margin:0 auto;padding:clamp(16px,3vw,30px);color:var(--text-color,#1f2937)}
+.td-header{margin-bottom:22px}.td-eyebrow{margin:0 0 7px;font-size:.82rem;font-weight:750;opacity:.65}.td-header h1{margin:0;font-size:clamp(1.5rem,4vw,2.1rem);line-height:1.25}.td-header h1 span{font-size:.72em;font-weight:650}.td-route{margin:9px 0;font-size:1.15rem;font-weight:800}.td-route span{padding:0 7px;color:#2563eb}.td-meta{display:flex;flex-wrap:wrap;gap:7px}.td-meta span{padding:4px 9px;border-radius:999px;background:rgba(100,116,139,.13);font-size:.8rem;font-weight:750}.td-note{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:rgba(100,116,139,.09);font-size:.9rem}
+.td-card{overflow:hidden;border:1px solid var(--border-color,#d7dce5);border-radius:18px;background:var(--card-bg,rgba(128,128,128,.035))}.td-card-heading{padding:16px;border-bottom:1px solid var(--border-color,#d7dce5);background:rgba(100,116,139,.08)}.td-card-heading h2{margin:0;font-size:1.05rem}.td-card-heading p{margin:5px 0 0;font-size:.82rem;opacity:.68}.td-stops{list-style:none;margin:0;padding:0 16px}.td-stop{display:grid;grid-template-columns:16px minmax(100px,1fr) minmax(150px,1.2fr);gap:12px;align-items:center;min-height:68px;padding:11px 0;border-bottom:1px solid var(--border-color,rgba(128,128,128,.18));position:relative}.td-stop:last-child{border-bottom:0}.td-stop-dot{width:10px;height:10px;border:3px solid #2563eb;background:var(--card-bg,#fff);border-radius:50%;z-index:1}.td-stop:not(:last-child)::before{content:"";position:absolute;left:4px;top:calc(50% + 6px);bottom:-15px;width:2px;background:rgba(37,99,235,.3)}.td-stop-name{font-weight:800}.td-stop-name a{color:inherit;text-decoration:none}.td-stop-name a:hover,.td-stop-name a:focus-visible{color:#2563eb;text-decoration:none}.td-times{display:grid;grid-template-columns:1fr 1fr;gap:8px}.td-times div{display:flex;flex-direction:column;gap:3px}.td-times span{font-size:.72rem;opacity:.65}.td-times strong{font-size:1.05rem;font-variant-numeric:tabular-nums}.td-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:22px 0 8px}.td-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border:1px solid var(--border-color,#d7dce5);border-radius:999px;color:inherit;text-decoration:none;font-weight:800}.td-primary{background:var(--button-bg,#2563eb);color:var(--button-text,#fff);border-color:transparent}.td-button:hover{filter:brightness(.97)}
+@media(max-width:520px){.td-stop{grid-template-columns:14px minmax(75px,.8fr) minmax(130px,1.2fr);gap:8px}.td-stops{padding:0 11px}.td-times{gap:5px}.td-times strong{font-size:.95rem}.td-card-heading{padding:13px}}
+/* ダークモード：文字を明るくし、停車駅カードとボタンを見やすく */
+html body.dark .td-page{color:#f8fafc}
+html body.dark .td-card{background:#171b22;border-color:#3b4350}
+html body.dark .td-card-heading{background:#252c37;border-color:#3b4350}
+html body.dark .td-card-heading p,
+html body.dark .td-eyebrow,
+html body.dark .td-times span{color:#d1d5db;opacity:1}
+html body.dark .td-stop{border-color:#3b4350}
+html body.dark .td-stop-dot{background:#171b22;border-color:#60a5fa}
+html body.dark .td-stop:not(:last-child)::before{background:rgba(96,165,250,.55)}
+html body.dark .td-stop-name a{color:#93c5fd;text-decoration:none}
+html body.dark .td-stop-name a:hover,
+html body.dark .td-stop-name a:focus-visible{color:#bfdbfe;text-decoration:none}
+html body.dark .td-route span{color:#93c5fd}
+html body.dark .td-meta span{background:#303846;color:#f3f4f6}
+html body.dark .td-note{background:#252c37;color:#f3f4f6}
+html body.dark .td-button{border-color:#596273;color:#f8fafc;background:#252c37}
+html body.dark .td-button.td-primary{background:#2563eb;border-color:#2563eb;color:#fff}
+</style>
+{% endblock %}
