@@ -71,18 +71,18 @@
 </section>
 
 <style>
-.tt-page{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,30px);color:var(--text-color,#1f2937);box-sizing:border-box}
+.tt-page{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,30px);color:var(--text-color,#1f2937)}
 .tt-header{display:flex;align-items:flex-start;margin-bottom:16px}
 .tt-header h1{margin:0;font-size:clamp(1.35rem,4vw,2rem);line-height:1.25}
 .tt-subtitle{margin:5px 0 0;font-size:.9rem;opacity:.68;letter-spacing:.01em}
-.tt-directions{display:grid;gap:18px;min-height:0}
+.tt-directions{display:grid;gap:18px}
 .tt-direction{border:1px solid var(--border-color,#d7dce5);border-radius:18px;overflow:hidden;background:var(--card-bg,rgba(128,128,128,.035))}
 .tt-direction-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;background:rgba(100,116,139,.09);border-bottom:1px solid var(--border-color,#d7dce5)}
 .tt-platform{margin:0 0 4px;font-size:.8rem;font-weight:800;opacity:.75}
 .tt-direction-heading h2{margin:0;font-size:1.05rem}
 .tt-direction-tag{border:1px solid currentColor;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;opacity:.75}
-.tt-train-list{display:flex;flex-direction:column;min-height:0;overflow:hidden;overscroll-behavior:contain}
-.tt-train-link{display:block;flex:1 1 0;min-height:0;color:inherit;text-decoration:none;outline-offset:-3px}.tt-train-link:focus-visible{outline:3px solid #2563eb}.tt-train-link:hover .tt-train{filter:brightness(.98)}
+.tt-train-list{display:grid;max-height:190px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tt-train-link{display:block;color:inherit;text-decoration:none;outline-offset:-3px}.tt-train-link:focus-visible{outline:3px solid #2563eb}.tt-train-link:hover .tt-train{filter:brightness(.98)}
 .tt-train{display:grid;grid-template-columns:85px minmax(0,1fr) auto;gap:13px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border-color,rgba(128,128,128,.2));position:relative}
 .tt-train:last-child{border-bottom:0}
 .tt-train.tt-next{background:rgba(37,99,235,.09);box-shadow:inset 4px 0 #2563eb}
@@ -106,38 +106,7 @@
 .tt-footer-action{display:flex;justify-content:center;margin:24px 0 8px}
 .tt-other-stations{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 22px;border-radius:999px;background:var(--button-bg,#2563eb);color:var(--button-text,#fff);text-decoration:none;font-weight:800;box-shadow:0 3px 10px rgba(0,0,0,.12)}
 .tt-other-stations:hover{filter:brightness(.96)}
-@media(max-width:540px){
-  html.tt-screen,html.tt-screen body{height:100%;overflow:hidden;overscroll-behavior:none}
-  html.tt-screen body{position:fixed;inset:0;width:100%;}
-  html.tt-screen body main,html.tt-screen body #content,html.tt-screen body .container,html.tt-screen body .main-content{min-height:0;overflow:hidden}
-  .tt-page{height:var(--tt-available-height,calc(100dvh - 12px));max-height:var(--tt-available-height,calc(100dvh - 12px));display:flex;flex-direction:column;gap:8px;padding:10px 12px;overflow:hidden}
-  .tt-header{flex:0 0 auto;margin:0 0 4px}
-  .tt-header h1{font-size:clamp(1.1rem,5vw,1.45rem)}
-  .tt-directions{flex:1 1 auto;grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;min-height:0;overflow:hidden}
-  .tt-direction{display:flex;flex-direction:column;min-height:0}
-  .tt-direction-heading{flex:0 0 auto;padding:8px 10px}
-  .tt-direction-heading h2{font-size:.9rem}
-  .tt-platform{font-size:.7rem}
-  .tt-train-list{flex:1 1 auto;min-height:0;overflow:hidden}
-  .tt-train-link{flex:1 1 0;min-height:0;display:flex}
-  .tt-train{width:100%;box-sizing:border-box;grid-template-columns:64px minmax(0,1fr);gap:8px;padding:8px 10px;align-content:center}
-  .tt-time{font-size:1.05rem}
-  .tt-train-title{gap:5px}
-  .tt-train-title>strong{font-size:.92rem}
-  .tt-type,.tt-cars,.tt-note,.tt-countdown{font-size:.72rem}
-  .tt-countdown{margin-top:3px}
-  .tt-past-label{grid-column:2;justify-self:start}
-  .tt-footer-action{flex:0 0 auto;margin:4px 0 0}
-  .tt-other-stations{min-height:38px;padding:8px 18px;font-size:.88rem}
-}
-@media(max-width:540px) and (max-height:650px){
-  .tt-page{padding-top:6px;padding-bottom:6px;gap:5px}
-  .tt-header{margin-bottom:0}
-  .tt-direction-heading{padding:6px 9px}
-  .tt-train{padding:5px 8px}
-  .tt-footer-action{margin-top:0}
-  .tt-other-stations{min-height:34px;padding:6px 14px}
-}
+@media(max-width:540px){.tt-train{grid-template-columns:70px minmax(0,1fr);gap:10px;padding:13px 12px}.tt-time{font-size:1.2rem}.tt-train-list{max-height:178px}.tt-past-label{grid-column:2;justify-self:start}.tt-direction-heading{padding:13px}.tt-direction-heading h2{font-size:.95rem}}
 /* ダークモード：文字・背景のコントラストを確保 */
 html body.dark .tt-page{color:#f8fafc}
 html body.dark .tt-direction{background:#171b22;border-color:#3b4350}
@@ -163,17 +132,6 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
 </style>
 <script>
 (function(){
-  const page = document.querySelector('.tt-page');
-  if (page && window.matchMedia('(max-width: 540px)').matches) {
-    document.documentElement.classList.add('tt-screen');
-    const fitPage = () => {
-      const top = Math.max(0, page.getBoundingClientRect().top);
-      page.style.setProperty('--tt-available-height', Math.max(250, window.innerHeight - top - 4) + 'px');
-    };
-    fitPage();
-    window.addEventListener('resize', fitPage, {passive:true});
-    window.addEventListener('orientationchange', fitPage, {passive:true});
-  }
   function updateCountdowns(){
     const now = new Date();
     document.querySelectorAll('.tt-train-list').forEach(list => {
@@ -237,18 +195,7 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
       });
 
       upcoming.sort((a, b) => a.eventTime - b.eventTime);
-      const stoppedRowForDisplay = rows.find(row => row.getAttribute('data-stopped') === 'true');
-      const visibleRows = [];
-      if (stoppedRowForDisplay) visibleRows.push(stoppedRowForDisplay);
-      upcoming.forEach(item => {
-        if (visibleRows.length < 2 && !visibleRows.includes(item.row)) visibleRows.push(item.row);
-      });
-      // 運行終了後など次の列車がない時間帯も、一覧が空にならないよう残りの先頭列車を補う。
-      rows.forEach(row => {
-        if (visibleRows.length < 2 && !visibleRows.includes(row)) visibleRows.push(row);
-      });
-      const nextTwo = new Set(visibleRows); 
-      rows.forEach(row => { row.style.display = nextTwo.has(row) ? '' : 'none'; });
+      const nextTwo = new Set(upcoming.slice(0, 2).map(item => item.row));
 
       rows.forEach(row => {
         row.classList.remove('tt-next', 'tt-second');
@@ -287,6 +234,7 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         const firstUpcoming = upcoming[0]?.row;
         const stoppedRow = rows.find(row => row.getAttribute('data-stopped') === 'true');
         const target = stoppedRow || firstUpcoming;
+        if (target) list.scrollTop = Math.max(0, target.offsetTop - list.offsetTop);
         list.dataset.initialPositioned = 'true';
       }
     });
