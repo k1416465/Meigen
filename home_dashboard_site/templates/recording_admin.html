@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% block title %}録音管理｜迷言{% endblock %}
 {% block content %}
+<style>
+  .recording-order-settings { margin: 16px 0; padding: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); overflow: hidden; }
+  .recording-order-settings > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; cursor: pointer; font-weight: 700; list-style: none; }
+  .recording-order-settings > summary::-webkit-details-marker { display: none; }
+  .recording-order-settings > summary::after { content: "+"; font-size: 20px; line-height: 1; }
+  .recording-order-settings[open] > summary::after { content: "−"; }
+  .recording-order-settings > p, .recording-order-settings > form, .recording-order-settings > .recording-admin-note { margin-left: 16px; margin-right: 16px; }
+  .recording-order-settings > p { color: var(--muted); font-size: 13px; }
+  .recording-order-settings > form { margin-top: 12px; margin-bottom: 16px; }
+</style>
 <section class="recording-admin-page">
   <div class="recording-admin-heading">
     <div><h1>録音管理</h1><p>複数の録音を編集し、ページ下部の「すべて保存」でまとめて保存できます。</p></div>
@@ -15,13 +25,9 @@
   </form>
 
 
-  <section class="recording-tag-order-admin" aria-labelledby="recording-tag-order-title">
-    <div class="recording-tag-order-heading">
-      <div>
-        <h2 id="recording-tag-order-title">タグの表示順</h2>
-        <p>検索画面に表示されるタグの順番を、ログイン後のこの画面で変更できます。</p>
-      </div>
-    </div>
+  <details class="recording-tag-order-admin recording-order-settings">
+    <summary id="recording-tag-order-title">タグの表示順</summary>
+    <p>検索画面に表示されるタグの順番を変更できます。</p>
     {% if tag_order %}
     <form method="post" class="recording-tag-order-form" id="recordingTagOrderForm">
       <input type="hidden" name="action" value="save_tag_order">
@@ -70,7 +76,60 @@
     {% else %}
     <p class="recording-admin-note">タグが登録されると、ここで並び順を編集できます。</p>
     {% endif %}
-  </section>
+  </details>
+
+  <details class="recording-people-order-admin recording-order-settings">
+    <summary id="recording-people-order-title">人物の表示順</summary>
+    <p>検索画面に表示される人物名の順番を変更できます。</p>
+    {% if people_order %}
+    <form method="post" class="recording-people-order-form" id="recordingPeopleOrderForm">
+      <input type="hidden" name="action" value="save_people_order">
+      <input type="hidden" name="q" value="{{ query }}">
+      <ol class="recording-tag-order-list" id="recordingPeopleOrderList">
+        {% for person in people_order %}
+        <li class="recording-tag-order-item">
+          <input type="hidden" name="people_order" value="{{ person }}">
+          <span class="recording-tag-order-name">{{ person }}</span>
+          <div class="recording-tag-order-actions">
+            <button type="button" class="recording-tag-move" data-move="up" aria-label="{{ person }}を上へ" {% if loop.first %}disabled{% endif %}>↑</button>
+            <button type="button" class="recording-tag-move" data-move="down" aria-label="{{ person }}を下へ" {% if loop.last %}disabled{% endif %}>↓</button>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+      <button type="submit" class="recording-admin-save-all">人物の並び順を保存</button>
+    </form>
+    <script>
+      (function () {
+        const list = document.getElementById('recordingPeopleOrderList');
+        if (!list) return;
+        function refreshButtons() {
+          const items = Array.from(list.children);
+          items.forEach((item, index) => {
+            const up = item.querySelector('[data-move="up"]');
+            const down = item.querySelector('[data-move="down"]');
+            up.disabled = index === 0;
+            down.disabled = index === items.length - 1;
+          });
+        }
+        list.addEventListener('click', function (event) {
+          const button = event.target.closest('button[data-move]');
+          if (!button) return;
+          const item = button.closest('li');
+          if (button.dataset.move === 'up' && item.previousElementSibling) {
+            list.insertBefore(item, item.previousElementSibling);
+          } else if (button.dataset.move === 'down' && item.nextElementSibling) {
+            list.insertBefore(item.nextElementSibling, item);
+          }
+          refreshButtons();
+        });
+        refreshButtons();
+      })();
+    </script>
+    {% else %}
+    <p class="recording-admin-note">人物名が登録されると、ここで並び順を編集できます。</p>
+    {% endif %}
+  </details>
 
     {% for rec in recordings %}
     <article class="recording-admin-card">
