@@ -14,6 +14,64 @@
     <button type="submit">検索</button>
   </form>
 
+
+  <section class="recording-tag-order-admin" aria-labelledby="recording-tag-order-title">
+    <div class="recording-tag-order-heading">
+      <div>
+        <h2 id="recording-tag-order-title">タグの表示順</h2>
+        <p>検索画面に表示されるタグの順番を、ログイン後のこの画面で変更できます。</p>
+      </div>
+    </div>
+    {% if tag_order %}
+    <form method="post" class="recording-tag-order-form" id="recordingTagOrderForm">
+      <input type="hidden" name="action" value="save_tag_order">
+      <input type="hidden" name="q" value="{{ query }}">
+      <ol class="recording-tag-order-list" id="recordingTagOrderList">
+        {% for tag in tag_order %}
+        <li class="recording-tag-order-item">
+          <input type="hidden" name="tag_order" value="{{ tag }}">
+          <span class="recording-tag-order-name">{{ tag }}</span>
+          <div class="recording-tag-order-actions">
+            <button type="button" class="recording-tag-move" data-move="up" aria-label="{{ tag }}を上へ" {% if loop.first %}disabled{% endif %}>↑</button>
+            <button type="button" class="recording-tag-move" data-move="down" aria-label="{{ tag }}を下へ" {% if loop.last %}disabled{% endif %}>↓</button>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+      <button type="submit" class="recording-admin-save-all">タグの並び順を保存</button>
+    </form>
+    <script>
+      (function () {
+        const list = document.getElementById('recordingTagOrderList');
+        if (!list) return;
+        function refreshButtons() {
+          const items = Array.from(list.children);
+          items.forEach((item, index) => {
+            const up = item.querySelector('[data-move="up"]');
+            const down = item.querySelector('[data-move="down"]');
+            up.disabled = index === 0;
+            down.disabled = index === items.length - 1;
+          });
+        }
+        list.addEventListener('click', function (event) {
+          const button = event.target.closest('button[data-move]');
+          if (!button) return;
+          const item = button.closest('li');
+          if (button.dataset.move === 'up' && item.previousElementSibling) {
+            list.insertBefore(item, item.previousElementSibling);
+          } else if (button.dataset.move === 'down' && item.nextElementSibling) {
+            list.insertBefore(item.nextElementSibling, item);
+          }
+          refreshButtons();
+        });
+        refreshButtons();
+      })();
+    </script>
+    {% else %}
+    <p class="recording-admin-note">タグが登録されると、ここで並び順を編集できます。</p>
+    {% endif %}
+  </section>
+
     {% for rec in recordings %}
     <article class="recording-admin-card">
       <div class="recording-admin-file"><strong>{{ rec['title'] or rec['filename'] }}</strong><small>ID: {{ rec['id'] }} ・ {{ rec['filename'] }}</small></div>

@@ -21,22 +21,20 @@
     <form class="recording-search-form" method="get" action="{{ url_for('recording_page') }}">
       <input type="search" name="q" value="{{ query }}" placeholder="検索したい言葉を入力" aria-label="録音を検索" id="recording-search-input">
       <input type="hidden" name="scope" value="all">
+      <input type="hidden" name="sort" value="{{ sort_by }}">
       <button type="submit" class="recording-search-submit">検索</button>
+      <a class="recording-search-reset" href="{{ url_for('recording_page', sort=sort_by) }}">リセット</a>
     </form>
-
-    {% if tag_options %}
-      <div class="recording-tag-choices" aria-label="タグから検索">
-        <span class="recording-tag-choices-label">タグから検索</span>
-        <div class="recording-tag-choice-list">
-          {% for tag in tag_options %}
-            <a class="recording-tag-choice{% if query == tag and search_scope == 'tags' %} is-active{% endif %}"
-               href="{{ url_for('recording_page', q=tag, scope='tags') }}">{{ tag }}</a>
-          {% endfor %}
-        </div>
-      </div>
-    {% else %}
-      <p class="recording-tag-choices-empty">録音情報にタグを登録すると、ここに検索候補が表示されます。</p>
+    {% if person_options %}
+      <div class="recording-tag-choices" aria-label="人名から検索"><span class="recording-tag-choices-label">人名から検索</span><div class="recording-tag-choice-list">
+      {% for person in person_options %}<a class="recording-tag-choice{% if query == person and search_scope == 'people' %} is-active{% endif %}" href="{{ url_for('recording_page', q=person, scope='people', sort=sort_by) }}">{{ person }}</a>{% endfor %}
+      </div></div>
     {% endif %}
+    {% if tag_options %}
+      <div class="recording-tag-choices" aria-label="タグから検索"><span class="recording-tag-choices-label">タグから検索</span><div class="recording-tag-choice-list">
+      {% for tag in tag_options %}<a class="recording-tag-choice{% if query == tag and search_scope == 'tags' %} is-active{% endif %}" href="{{ url_for('recording_page', q=tag, scope='tags', sort=sort_by) }}">{{ tag }}</a>{% endfor %}
+      </div></div>
+    {% else %}<p class="recording-tag-choices-empty">録音情報にタグを登録すると、ここに検索候補が表示されます。</p>{% endif %}
   </div>
 </section>
 
@@ -46,6 +44,43 @@
       <p class="eyebrow">LIBRARY</p>
       <h2>{% if query %}検索結果{% else %}録音一覧{% endif %} <span class="recording-count">{{ recordings|length }}件</span></h2>
     </div>
+    <div class="recording-list-actions">
+      <a class="recording-download-all" href="{{ url_for('download_all_recordings') }}">すべてダウンロード（ZIP）</a>
+      <div class="recording-sort-wrap">
+        <button type="button" class="recording-sort-button" id="recording-sort-toggle" aria-expanded="false" aria-controls="recording-sort-options" onclick="toggleRecordingSortOptions()">並び替え <span aria-hidden="true">▾</span></button>
+        <div class="recording-sort-options" id="recording-sort-options" hidden>
+          <a href="{{ url_for('recording_page', q=query, scope=search_scope, sort='date') }}"{% if sort_by == 'date' %} aria-current="true"{% endif %}>日付順（新しい順）{% if sort_by == 'date' %} ✓{% endif %}</a>
+          <a href="{{ url_for('recording_page', q=query, scope=search_scope, sort='people') }}"{% if sort_by == 'people' %} aria-current="true"{% endif %}>人名順{% if sort_by == 'people' %} ✓{% endif %}</a>
+          <a href="{{ url_for('recording_page', q=query, scope=search_scope, sort='tags') }}"{% if sort_by == 'tags' %} aria-current="true"{% endif %}>タグ順{% if sort_by == 'tags' %} ✓{% endif %}</a>
+        </div>
+      </div>
+      <script>
+        function toggleRecordingSortOptions() {
+          const button = document.getElementById('recording-sort-toggle');
+          const options = document.getElementById('recording-sort-options');
+          const isOpening = options.hidden;
+          options.hidden = !isOpening;
+          button.setAttribute('aria-expanded', String(isOpening));
+        }
+        document.addEventListener('click', function(event) {
+          const wrap = document.querySelector('.recording-sort-wrap');
+          if (wrap && !wrap.contains(event.target)) {
+            const options = document.getElementById('recording-sort-options');
+            const button = document.getElementById('recording-sort-toggle');
+            options.hidden = true;
+            button.setAttribute('aria-expanded', 'false');
+          }
+        });
+        document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape') {
+            const options = document.getElementById('recording-sort-options');
+            const button = document.getElementById('recording-sort-toggle');
+            options.hidden = true;
+            button.setAttribute('aria-expanded', 'false');
+          }
+        });
+      </script>
+    </div>
   </div>
 
   {% if recordings %}
@@ -54,7 +89,7 @@
         <article class="card recording-card">
           <div class="recording-card-heading">
             <div class="recording-title-wrap">
-              <h3>{{ item['title'] or item['filename'] }}</h3>
+              <h3><a class="recording-title-download" href="{{ url_for('download_recording', filename=item['filename']) }}">{{ item['title'] or item['filename'] }}</a></h3>
               <p class="recording-meta">
                 {% if item['people'] %}<span>{{ item['people'] }}</span>{% endif %}
                 {% if item['recorded_at'] %}<span>{{ item['recorded_at'] }}</span>{% endif %}
@@ -78,7 +113,7 @@
           {% if item['tags'] %}
             <div class="recording-tags">
               {% for tag in item['tags'].replace('、', ',').split(',') %}
-                {% if tag.strip() %}<a class="recording-tag" href="{{ url_for('recording_page', q=tag.strip(), scope='tags') }}">{{ tag.strip() }}</a>{% endif %}
+                {% if tag.strip() %}<a class="recording-tag" href="{{ url_for('recording_page', q=tag.strip(), scope='tags', sort=sort_by) }}">{{ tag.strip() }}</a>{% endif %}
               {% endfor %}
             </div>
           {% endif %}
