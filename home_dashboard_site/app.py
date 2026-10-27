@@ -1202,19 +1202,28 @@ BASE_DIR = Path(__file__).resolve().parent
 RECORDING_DIR = BASE_DIR / "static" / "recording"
 RECORDING_DB = BASE_DIR / "recordings.db"
 
-# タグの表示順は、ログイン後の録音管理画面から編集し、SQLiteに保存します。
+# タグ・人物の表示順は録音管理画面から編集し、SQLiteに保存します。
 TAG_ORDER_SETTING_KEY = "recording_tag_order"
+PEOPLE_ORDER_SETTING_KEY = "recording_people_order"
 
 
-def get_saved_tag_order(conn):
-    row = conn.execute("SELECT value FROM app_settings WHERE key = ?", (TAG_ORDER_SETTING_KEY,)).fetchone()
+def _get_saved_order(conn, setting_key):
+    row = conn.execute("SELECT value FROM app_settings WHERE key = ?", (setting_key,)).fetchone()
     if not row:
         return []
     try:
         value = json.loads(row["value"])
-        return [str(item) for item in value if isinstance(item, str) and item.strip()]
+        return [str(item).strip() for item in value if isinstance(item, str) and item.strip()]
     except (TypeError, ValueError, json.JSONDecodeError):
         return []
+
+
+def get_saved_tag_order(conn):
+    return _get_saved_order(conn, TAG_ORDER_SETTING_KEY)
+
+
+def get_saved_people_order(conn):
+    return _get_saved_order(conn, PEOPLE_ORDER_SETTING_KEY)
 
 
 def get_recording_db():
@@ -1281,7 +1290,7 @@ def recording_page():
     search_scope = request.args.get("scope", "all").strip().lower()
     if search_scope not in {"all", "title", "people", "date", "tags"}:
         search_scope = "all"
-    sort_by = request.args.get("sort", "date").strip().lower()
+    sort_by = request.args.get("sort", "tags").strip().lower()
     if sort_by not in {"date", "people", "tags"}:
         sort_by = "date"
 
@@ -1298,9 +1307,11 @@ def recording_page():
                 if person and person.casefold() not in seen_people:
                     seen_people.add(person.casefold()); person_options.append(person)
         saved_order = get_saved_tag_order(conn)
+        saved_people_order = get_saved_people_order(conn)
         rank = {tag.casefold(): i for i, tag in enumerate(saved_order)}
+        people_rank = {person.casefold(): i for i, person in enumerate(saved_people_order)}
         tag_options.sort(key=lambda tag: (0, rank[tag.casefold()]) if tag.casefold() in rank else (1, tag.casefold()))
-        person_options.sort(key=str.casefold)
+        person_options.sort(key=lambda person: (0, people_rank[person.casefold()]) if person.casefold() in people_rank else (1, person.casefold()))
 
         if query:
             like = f"%{query}%"
@@ -1443,6 +1454,37 @@ def recording_admin():
                 conn.commit()
             flash("タグの並び順を保存しました。検索画面にも反映されます。", "success")
             return redirect(url_for("recording_admin", q=query))
+        if action == "save_people_order":
+            submitted_order = []
+            seen = set()
+            for raw_person in request.form.getlist("people_order"):
+                person = raw_person.strip()
+                if person and person.casefold() not in seen:
+                    submitted_order.append(person)
+                    seen.add(person.casefold())
+            with get_recording_db() as conn:
+                all_rows = conn.execute("SELECT people FROM recordings").fetchall()
+                existing_people = []
+                existing_seen = set()
+                for row in all_rows:
+                    for person in (row["people"] or "").replace("、", ",").split(","):
+                        person = person.strip()
+                        if person and person.casefold() not in existing_seen:
+                            existing_seen.add(person.casefold())
+                            existing_people.append(person)
+                # 保存画面を開いた後に追加された人物名も順番から失わない
+                for person in existing_people:
+                    if person.casefold() not in seen:
+                        submitted_order.append(person)
+                        seen.add(person.casefold())
+                conn.execute(
+                    "INSERT INTO app_settings (key, value) VALUES (?, ?) "
+                    "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                    (PEOPLE_ORDER_SETTING_KEY, json.dumps(submitted_order, ensure_ascii=False))
+                )
+                conn.commit()
+            flash("人物の並び順を保存しました。検索画面にも反映されます。", "success")
+            return redirect(url_for("recording_admin", q=query))
         if action == "delete":
             rec_id = request.form.get("id", type=int)
             with get_recording_db() as conn:
@@ -1495,6 +1537,7 @@ def recording_admin():
             rows = conn.execute("SELECT * FROM recordings ORDER BY COALESCE(recorded_at, '') DESC, title COLLATE NOCASE").fetchall()
     with get_recording_db() as conn:
         all_tag_rows = conn.execute("SELECT tags FROM recordings").fetchall()
+        all_people_rows = conn.execute("SELECT people FROM recordings").fetchall()
         all_tags = []
         seen_tags = set()
         for row in all_tag_rows:
@@ -1502,10 +1545,21 @@ def recording_admin():
                 if tag.casefold() not in seen_tags:
                     seen_tags.add(tag.casefold())
                     all_tags.append(tag)
+        all_people = []
+        seen_people = set()
+        for row in all_people_rows:
+            for person in (row["people"] or "").replace("、", ",").split(","):
+                person = person.strip()
+                if person and person.casefold() not in seen_people:
+                    seen_people.add(person.casefold())
+                    all_people.append(person)
         saved_order = get_saved_tag_order(conn)
+        saved_people_order = get_saved_people_order(conn)
     order_rank = {tag.casefold(): i for i, tag in enumerate(saved_order)}
     all_tags.sort(key=lambda tag: (0, order_rank[tag.casefold()]) if tag.casefold() in order_rank else (1, tag.casefold()))
-    return render_template("recording_admin.html", recordings=rows, query=query, tag_order=all_tags)
+    people_order_rank = {person.casefold(): i for i, person in enumerate(saved_people_order)}
+    all_people.sort(key=lambda person: (0, people_order_rank[person.casefold()]) if person.casefold() in people_order_rank else (1, person.casefold()))
+    return render_template("recording_admin.html", recordings=rows, query=query, tag_order=all_tags, people_order=all_people)
 
 
 @app.route("/stamp")
