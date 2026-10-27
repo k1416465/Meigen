@@ -152,112 +152,6 @@ OPERATION_LOCK = threading.Lock()
 # ==================================================
 
 SCHOOL_EVENTS = [
-    {"date": "2026-4-27", "title": "内科検診", "detail": ""},
-    {"date": "2026-4-29", "title": "水①～⑤授業", "detail": ""},
-    {"date": "2026-4-29", "title": "⑤授業参観", "detail": ""},
-    {"date": "2026-4-29", "title": "PTA総会", "detail": ""},
-    {"date": "2026-4-30", "title": "新体力テスト･身体計測", "detail": ""},
-    {"date": "2026-4-30", "title": "交通安全教室", "detail": ""},
-    {"date": "2026-4-30", "title": "生徒総会", "detail": ""},
-    {"date": "2026-5-1", "title": "PTA総会代休", "detail": ""},
-    {"date": "2026-5-2", "title": "吹奏楽部第18回定期演奏会", "detail": ""},
-    {"date": "2026-5-2", "title": "吹奏楽部第18回定期演奏会", "detail": ""},
-    {"date": "2026-5-7", "title": "いじめ･教育相談アンケート", "detail": ""},
-    {"date": "2026-5-9", "title": "自習室空調工事", "detail": ""},
-    {"date": "2026-5-10", "title": "自習室空調工事", "detail": ""},
-    {"date": "2026-5-12", "title": "眼科検診", "detail": ""},
-    {"date": "2026-5-12", "title": "腎臓健診1次2次(該当者)", "detail": ""},
-    {"date": "2026-5-15", "title": "授業①②", "detail": ""},
-    {"date": "2026-5-15", "title": "創立記念式典", "detail": ""},
-    {"date": "2026-5-15", "title": "創立記念講演会⑤⑥", "detail": ""},
-    {"date": "2026-5-16", "title": "自習室空調工事", "detail": ""},
-    {"date": "2026-5-16", "title": "第2回PTA本部委員会", "detail": ""},
-    {"date": "2026-5-17", "title": "自習室空調工事(全停電)", "detail": ""},
-    {"date": "2026-5-19", "title": "1学期中間試験(1日目)", "detail": ""},
-    {"date": "2026-5-20", "title": "1学期中間試験(2日目)", "detail": ""},
-    {"date": "2026-5-21", "title": "1学期中間試験(3日目)", "detail": ""},
-    {"date": "2026-5-22", "title": "学校公開代休", "detail": ""},
-    {"date": "2026-5-24", "title": "学校公開", "detail": ""},
-    {"date": "2026-5-26", "title": "大学SG講座⑤⑥", "detail": ""},
-    {"date": "2026-5-26", "title": "職員会議", "detail": ""},
-    {"date": "2026-5-27", "title": "歯科検診❶(午前)", "detail": ""},
-    {"date": "2026-6-1", "title": "いじめ･教育相談アンケート", "detail": ""},
-    {"date": "2026-6-1", "title": "運動会準備⑦", "detail": ""},
-    {"date": "2026-6-2", "title": "旭城大運動会", "detail": ""},
-    {"date": "2026-6-3", "title": "臨時休校", "detail": ""},
-    {"date": "2026-6-4", "title": "歯科検診❷", "detail": ""},
-    {"date": "2026-6-5", "title": "腎臓健診2次(該当者)", "detail": ""},
-    {"date": "2026-6-10", "title": "40分授業", "detail": ""},
-    {"date": "2026-6-10", "title": "リーダーズシンポジウム", "detail": ""},
-    {"date": "2026-6-11", "title": "耳鼻科検診❶", "detail": ""},
-    {"date": "2026-6-18", "title": "耳鼻科検診❷", "detail": ""},
-    {"date": "2026-6-19", "title": "第2回教科主任会", "detail": ""},
-    {"date": "2026-6-24", "title": "職員会議", "detail": ""},
-    {"date": "2026-6-29", "title": "1学期期末試験(1日目)", "detail": ""},
-    {"date": "2026-6-30", "title": "1学期期末試験(2日目)", "detail": ""},
-    {"date": "2026-7-1", "title": "1学期期末試験(3日目)", "detail": ""},
-    {"date": "2026-7-2", "title": "1学期期末試験(4日目)", "detail": ""},
-    {"date": "2026-7-3", "title": "フィールドワーク", "detail": ""},
-    {"date": "2026-7-4", "title": "進研模試", "detail": ""},
-    {"date": "2026-7-7", "title": "第3回PTA本部役員会", "detail": ""},
-    {"date": "2026-7-9", "title": "学校運営協議会", "detail": ""},
-    {"date": "2026-7-10", "title": "第1回授業評価アンケート", "detail": ""},
-    {"date": "2026-7-11", "title": "土曜講座❷", "detail": ""},
-    {"date": "2026-7-13", "title": "生徒会立会演説会", "detail": ""},
-    {"date": "2026-7-13", "title": "成績個票", "detail": ""},
-    {"date": "2026-7-15", "title": "木曜日課", "detail": ""},
-    {"date": "2026-7-16", "title": "水曜日課", "detail": ""},
-    {"date": "2026-7-16", "title": "職員会議", "detail": ""},
-    {"date": "2026-7-21", "title": "1学期終業式", "detail": ""},
-    {"date": "2026-7-22", "title": "前期課外", "detail": ""},
-    {"date": "2026-7-23", "title": "前期課外", "detail": ""},
-    {"date": "2026-7-24", "title": "前期課外", "detail": ""},
-    {"date": "2026-7-27", "title": "前期課外", "detail": ""},
-    {"date": "2026-7-28", "title": "前期課外", "detail": ""},
-    {"date": "2026-7-29", "title": "東北大学オープンキャンパス", "detail": ""},
-    {"date": "2026-7-30", "title": "東北大学オープンキャンパス", "detail": ""},
-    {"date": "2026-7-31", "title": "前期課外", "detail": ""},
-    {"date": "2026-8-6", "title": "新潟大学オープンキャンパス", "detail": ""},
-    {"date": "2026-8-8", "title": "栃木県吹奏楽コンクール", "detail": ""},
-    {"date": "2026-8-12", "title": "学校閉庁日", "detail": ""},
-    {"date": "2026-8-13", "title": "学校閉庁日", "detail": ""},
-    {"date": "2026-8-14", "title": "学校閉庁日", "detail": ""},
-    {"date": "2026-8-18", "title": "後期課外(1日目)", "detail": ""},
-    {"date": "2026-8-18", "title": "卒業生との交流会", "detail": ""},
-    {"date": "2026-8-19", "title": "後期課外(2日目)", "detail": ""},
-    {"date": "2026-8-20", "title": "1日体験学習", "detail": ""},
-    {"date": "2026-8-21", "title": "後期課外(3日目)", "detail": ""},
-    {"date": "2026-8-22", "title": "全統記述模試", "detail": ""},
-    {"date": "2026-8-26", "title": "2学期始業式", "detail": ""},
-    {"date": "2026-8-26", "title": "いじめ･教育相談アンケート", "detail": ""},
-    {"date": "2026-8-26", "title": "旭城祭準備(午後)", "detail": ""},
-    {"date": "2026-8-26", "title": "職員会議", "detail": ""},
-    {"date": "2026-8-27", "title": "旭城祭準備 授業なし", "detail": ""},
-    {"date": "2026-8-28", "title": "旭城祭 開祭式", "detail": ""},
-    {"date": "2026-8-28", "title": "旭城祭 校内公開", "detail": ""},
-    {"date": "2026-8-29", "title": "旭城祭 一般公開", "detail": ""},
-    {"date": "2026-8-31", "title": "旭城祭 代休", "detail": ""},
-    {"date": "2026-9-1", "title": "定期試験日課", "detail": ""},
-    {"date": "2026-9-1", "title": "旭城祭 閉祭式", "detail": ""},
-    {"date": "2026-9-2", "title": "定期試験日課", "detail": ""},
-    {"date": "2026-9-3", "title": "定期試験日課", "detail": ""},
-    {"date": "2026-9-4", "title": "定期試験日課", "detail": ""},
-    {"date": "2026-9-4", "title": "性教育講話⑦", "detail": ""},
-    {"date": "2026-9-8", "title": "第4回教科主任会", "detail": ""},
-    {"date": "2026-9-10", "title": "実力テスト(1日目)", "detail": ""},
-    {"date": "2026-9-11", "title": "実力テスト(2日目)", "detail": ""},
-    {"date": "2026-9-12", "title": "土曜講座❸", "detail": ""},
-    {"date": "2026-9-16", "title": "職員会議", "detail": ""},
-    {"date": "2026-9-18", "title": "保護者会", "detail": ""},
-    {"date": "2026-10-7", "title": "2学期中間試験(1日目)", "detail": ""},
-    {"date": "2026-10-8", "title": "2学期中間試験(2日目)", "detail": ""},
-    {"date": "2026-10-9", "title": "2学期中間試験(3日目)", "detail": ""},
-    {"date": "2026-10-13", "title": "午前中授業", "detail": ""},
-    {"date": "2026-10-14", "title": "修学旅行(1日目)", "detail": ""},
-    {"date": "2026-10-15", "title": "修学旅行(2日目)", "detail": ""},
-    {"date": "2026-10-16", "title": "修学旅行(3日目)", "detail": ""},
-    {"date": "2026-10-17", "title": "修学旅行(4日目)", "detail": ""},
-    {"date": "2026-10-19", "title": "代休", "detail": ""},
     {"date": "2026-10-27", "title": "心肺蘇生講習会", "detail": ""},
     {"date": "2026-10-28", "title": "⑤⑥SG大学講座", "detail": ""},
     {"date": "2026-10-28", "title": "第4回教科主任会", "detail": ""},
@@ -492,6 +386,244 @@ def schedule():
         class_names=CLASS_NAMES,
     )
 
+
+
+
+# ==================================================
+# 両毛線時刻表
+# ==================================================
+
+TIMETABLE_STATIONS = {
+    "小山": {
+        "en": "Oyama",
+        "上り": {"direction_label": "栃木･佐野･高崎方面", "platform": "6･8番線"},
+    },
+    "思川": {
+        "en": "Omoigawa",
+        "上り": {"direction_label": "栃木･佐野･高崎方面", "platform": "1番線"},
+        "下り": {"direction_label": "小山方面", "platform": "2番線"},
+    },
+    "栃木": {
+        "en": "Tochigi",
+        "上り": {"direction_label": "佐野･足利･高崎方面", "platform": "2番線"},
+        "下り": {"direction_label": "小山方面", "platform": "1番線"},
+    },
+    "大平下": {
+        "en": "Ohirashita",
+        "上り": {"direction_label": "佐野･足利･高崎方面", "platform": ""},
+        "下り": {"direction_label": "栃木･小山方面", "platform": ""},
+    },
+    "岩舟": {
+        "en": "Iwafune",
+        "上り": {"direction_label": "佐野･足利･高崎方面", "platform": "2･3番線"},
+        "下り": {"direction_label": "栃木･小山方面", "platform": "1番線"},
+    },
+    "佐野": {
+        "en": "Sano",
+        "上り": {"direction_label": "足利･桐生･高崎方面", "platform": "1番線"},
+        "下り": {"direction_label": "栃木･小山方面", "platform": "2番線"},
+    },
+    "富田": {
+        "en": "Tomita",
+        "上り": {"direction_label": "足利･桐生･高崎方面", "platform": "1番線"},
+        "下り": {"direction_label": "佐野･栃木･小山方面", "platform": "2番線"},
+    },
+    "あしかがフラワーパーク": {
+        "en": "Ashikaga Flower Park",
+        "上り": {"direction_label": "足利･桐生･高崎方面", "platform": ""},
+        "下り": {"direction_label": "栃木･小山･東京方面", "platform": ""},
+    },
+    "足利": {
+        "en": "Ashikaga",
+        "上り": {"direction_label": "桐生･前橋･高崎方面", "platform": "2番線"},
+        "下り": {"direction_label": "佐野･栃木･小山方面", "platform": "1番線"},
+    },
+    "山前": {
+        "en": "Yamamae",
+        "上り": {"direction_label": "桐生･前橋･高崎方面", "platform": "1番線"},
+        "下り": {"direction_label": "足利･佐野･小山方面", "platform": "2･3番線"},
+    },
+    "小俣": {
+        "en": "Omata",
+        "上り": {"direction_label": "桐生･前橋･高崎方面", "platform": "1番線"},
+        "下り": {"direction_label": "足利･佐野･小山方面", "platform": "2番線"},
+    },
+    # 列車詳細ページから全停車駅の時刻表へ移動できるように追加
+    "桐生": {
+        "en": "Kiryu",
+        "上り": {"direction_label": "前橋･高崎方面", "platform": ""},
+        "下り": {"direction_label": "足利･佐野･小山方面", "platform": ""},
+    },
+    "岩宿": {
+        "en": "Iwajuku",
+        "上り": {"direction_label": "前橋･高崎方面", "platform": ""},
+        "下り": {"direction_label": "桐生･小山方面", "platform": ""},
+    },
+    "国定": {
+        "en": "Kunisada",
+        "上り": {"direction_label": "前橋･高崎方面", "platform": ""},
+        "下り": {"direction_label": "桐生･小山方面", "platform": ""},
+    },
+    "伊勢崎": {
+        "en": "Isesaki",
+        "上り": {"direction_label": "前橋･高崎方面", "platform": ""},
+        "下り": {"direction_label": "桐生･小山方面", "platform": ""},
+    },
+    "駒形": {
+        "en": "Komagata",
+        "上り": {"direction_label": "前橋･高崎方面", "platform": ""},
+        "下り": {"direction_label": "伊勢崎･桐生･小山方面", "platform": ""},
+    },
+    "前橋大島": {
+        "en": "Maebashi-Oshima",
+        "上り": {"direction_label": "前橋･高崎方面", "platform": ""},
+        "下り": {"direction_label": "伊勢崎･桐生･小山方面", "platform": ""},
+    },
+    "前橋": {
+        "en": "Maebashi",
+        "上り": {"direction_label": "新前橋･高崎方面", "platform": ""},
+        "下り": {"direction_label": "伊勢崎･桐生･小山方面", "platform": ""},
+    },
+    "新前橋": {
+        "en": "Shin-Maebashi",
+        "上り": {"direction_label": "高崎方面", "platform": ""},
+        "下り": {"direction_label": "前橋･伊勢崎･小山方面", "platform": ""},
+    },
+    "井野": {
+        "en": "Ino",
+        "上り": {"direction_label": "高崎方面", "platform": ""},
+        "下り": {"direction_label": "新前橋･小山方面", "platform": ""},
+    },
+    "高崎問屋町": {
+        "en": "Takasaki-Tonyamachi",
+        "上り": {"direction_label": "高崎方面", "platform": ""},
+        "下り": {"direction_label": "新前橋･小山方面", "platform": ""},
+    },
+    "高崎": {
+        "en": "Takasaki",
+        "上り": {"direction_label": "終点・高崎方面", "platform": ""},
+        "下り": {"direction_label": "新前橋･小山方面", "platform": ""},
+    },
+}
+
+@app.route("/timetable", methods=["GET"])
+def timetable_page():
+    station = request.args.get("station", "").strip()
+    if station not in TIMETABLE_STATIONS:
+        station = ""
+
+    now = datetime.now(JST)
+    departures_by_direction = {}
+    if station:
+        timetable_path = Path(__file__).resolve().parent / "timetable.json"
+        try:
+            with timetable_path.open("r", encoding="utf-8") as f:
+                timetable_data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            timetable_data = {"line": "両毛線", "trains": []}
+
+        def station_datetime(value):
+            if not value:
+                return None
+            try:
+                hour, minute = (int(part) for part in value.split(":"))
+                return now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+            except (TypeError, ValueError):
+                return None
+
+        for direction in ("上り", "下り"):
+            direction_info = TIMETABLE_STATIONS[station].get(direction)
+            if not direction_info:
+                continue
+            trains = []
+            for train in timetable_data.get("trains", []):
+                if train.get("direction") != direction:
+                    continue
+                stop = train.get("stops", {}).get(station, {})
+                arrival = stop.get("arrival")
+                departure = stop.get("departure")
+                # 到着時刻がある駅では到着を基準に表示。始発駅など到着時刻がない場合のみ発車時刻を使う。
+                event_time = arrival or departure
+                event_dt = station_datetime(event_time)
+                if not event_time or event_dt is None:
+                    continue
+                arrival_dt = station_datetime(arrival)
+                departure_dt = station_datetime(departure)
+                # 到着から発車までの間は「停車中」。到着のみで発車時刻がない終着駅は到着後「到着済」。
+                is_stopped = bool(arrival_dt and departure_dt and arrival_dt <= now < departure_dt)
+                is_past = bool((departure_dt and departure_dt <= now) or (arrival_dt and not departure_dt and arrival_dt <= now))
+                minutes_until = int((event_dt - now).total_seconds() // 60)
+                trains.append({
+                    "time": event_time,
+                    "time_minutes": event_dt.hour * 60 + event_dt.minute,
+                    "train_number": train.get("train_number", ""),
+                    "type": train.get("type", "普通"),
+                    "cars": train.get("cars", ""),
+                    "destination": train.get("destination", ""),
+                    "origin": train.get("origin", ""),
+                    "note": train.get("note", ""),
+                    "minutes_until": minutes_until,
+                    "is_past": is_past,
+                    "is_stopped": is_stopped,
+                    "sort_dt": event_dt,
+                    "arrival_iso": arrival_dt.isoformat() if arrival_dt else "",
+                    "departure_iso": departure_dt.isoformat() if departure_dt else "",
+                    "event_kind": "arrival" if arrival else "departure",
+                })
+            trains.sort(key=lambda item: item["sort_dt"])
+            future = [item for item in trains if not item["is_past"] and not item["is_stopped"] and item["sort_dt"] > now]
+            for index, item in enumerate(future[:2]):
+                item["upcoming_rank"] = index + 1
+            for item in trains:
+                item.setdefault("upcoming_rank", 0)
+                item["event_iso"] = item["sort_dt"].isoformat()
+                item.pop("sort_dt", None)
+            departures_by_direction[direction] = {
+                "info": direction_info,
+                "trains": trains,
+                "next_trains": future[:2],
+            }
+
+    return render_template(
+        "timetable.html",
+        station=station,
+        stations=TIMETABLE_STATIONS,
+        station_info=TIMETABLE_STATIONS.get(station, {}),
+        departures_by_direction=departures_by_direction,
+        line_name="両毛線",
+        now_label=now.strftime("%Y/%m/%d %H:%M"),
+    )
+
+@app.route("/train/<train_number>", methods=["GET"])
+def train_detail(train_number):
+    """列車ごとの全停車駅・到着時刻・発車時刻を表示する。"""
+    timetable_path = Path(__file__).resolve().parent / "timetable.json"
+    try:
+        with timetable_path.open("r", encoding="utf-8") as f:
+            timetable_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        abort(500, description="時刻表データを読み込めませんでした。")
+
+    train = next((item for item in timetable_data.get("trains", [])
+                  if str(item.get("train_number", "")) == str(train_number)), None)
+    if train is None:
+        abort(404)
+
+    stops = []
+    for station_name, times in train.get("stops", {}).items():
+        stops.append({
+            "station": station_name,
+            "arrival": times.get("arrival"),
+            "departure": times.get("departure"),
+        })
+
+    return render_template(
+        "train_detail.html",
+        train=train,
+        stops=stops,
+        line_name=timetable_data.get("line", "両毛線"),
+        back_station=request.args.get("station", "").strip(),
+    )
 
 # ==================================================
 # 設定
