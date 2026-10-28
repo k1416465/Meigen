@@ -644,28 +644,73 @@ document.addEventListener("DOMContentLoaded", () => {
         margin-bottom: 18px !important;
     }
 
+    /* 駅ボタン：1行3列、縦横6pxの隙間 */
     .operation-page .station-grid.station-grid-large {
+        display: grid !important;
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        grid-auto-rows: 62px !important; /* 56pxのボタン＋6pxの隙間 */
+        grid-auto-flow: row !important;
+        grid-auto-rows: 56px !important;
         column-gap: 6px !important;
-        row-gap: 0 !important;
+        row-gap: 6px !important;
+        gap: 6px !important;
         align-content: start !important;
-        align-items: start !important;
+        align-items: stretch !important;
+        justify-content: start !important;
+        height: auto !important;
     }
 
+    /* 駅ボタン本体 */
     .operation-page .station-grid.station-grid-large .station-button {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
         box-sizing: border-box !important;
-        background: #FFFDE7 !important;
+        width: 100% !important;
+        min-width: 0 !important;
         min-height: 56px !important;
         height: 56px !important;
-        padding: 4px 6px !important;
         margin: 0 !important;
+        padding: 4px 6px !important;
+        background: #FFFDE7 !important;
         border: 1px solid #FCD800 !important;
         gap: 0 !important;
+        text-align: center !important;
+        overflow: hidden !important;
     }
+
+    /* 日本語駅名 */
     .operation-page .station-grid.station-grid-large .station-name {
+        display: block !important;
+        max-width: 100% !important;
         font-size: 14px !important;
         line-height: 1.2 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* 英語駅名 */
+    .operation-page .station-grid.station-grid-large .station-name-en {
+        display: block !important;
+        max-width: 100% !important;
+        margin-top: 2px !important;
+        font-size: 9px !important;
+        line-height: 1.1 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* あしかがフラワーパークの駅名 */
+    .operation-page .station-grid.station-grid-large .station-name-flower-park {
+        font-size: 11px !important;
+        line-height: 1.1 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .operation-page .station-grid.station-grid-large
+    .station-button-flower-park .station-name-en {
+        font-size: 8px !important;
+        line-height: 1.1 !important;
     }
 }
 
