@@ -2205,7 +2205,7 @@
       "direction": "上り",
       "origin": "小山",
       "destination": "高崎",
-      "note": "高崎行最終列車です。",
+      "note": "高崎行最終列車。",
       "stops": {
         "小山": {
           "arrival": null,
@@ -2363,7 +2363,7 @@
       "direction": "上り",
       "origin": "小山",
       "destination": "桐生",
-      "note": "桐生行最終列車です。",
+      "note": "桐生行最終列車。",
       "stops": {
         "小山": {
           "arrival": null,
@@ -3589,7 +3589,7 @@
       "direction": "下り",
       "origin": "高崎",
       "destination": "小山",
-      "note": "小山駅９番線に到着します。",
+      "note": "小山駅９番線着。",
       "stops": {
         "高崎": {
           "arrival": null,
@@ -4678,7 +4678,7 @@
       "direction": "下り",
       "origin": "高崎",
       "destination": "小山",
-      "note": "栃木で南栗橋行最終電車にお乗り換えできます。",
+      "note": "",
       "stops": {
         "高崎": {
           "arrival": null,
@@ -4777,7 +4777,7 @@
       "direction": "下り",
       "origin": "高崎",
       "destination": "小山",
-      "note": "小山行最終列車です。小山駅６番線に到着します。",
+      "note": "小山行最終列車。小山駅６番線着。",
       "stops": {
         "高崎": {
           "arrival": null,
