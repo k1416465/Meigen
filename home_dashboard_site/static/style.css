@@ -4558,21 +4558,35 @@ a.recording-tag:hover { opacity: .8; }
   }
 }
 
-/* 時刻表ページ：駅選択ボタンを日本語のみ・2列の角丸黄色ボタンに */
-.operation-page .station-grid.station-grid-large {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 10px !important;
-    row-gap: 10px !important;
-    column-gap: 10px !important;
+
+/* 駅選択：日本語のみ・2列・選択して決定 */
+.operation-page .station-selector .station-grid.station-grid-large {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  grid-auto-rows: auto !important;
+  align-items: stretch !important;
 }
-.operation-page .station-grid.station-grid-large > .station-button {
-    box-sizing: border-box !important;
-    width: 100% !important;
-    min-height: 56px !important;
-    margin: 0 !important;
-    border-radius: 16px !important;
-    background: #FFD900 !important;
-    border: 0 !important;
-    color: #111 !important;
+.operation-page .station-selector .station-button {
+  display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important;
+  gap: 9px !important; width: 100% !important; min-width: 0 !important; min-height: 54px !important; height: auto !important;
+  margin: 0 !important; padding: 10px 12px !important; box-sizing: border-box !important;
+  border: 2px solid #FFD900 !important; border-radius: 12px !important; background: #FFD900 !important; color: #111 !important;
+  font: inherit; text-align: left !important; cursor: pointer; overflow: hidden !important;
+}
+.operation-page .station-selector .station-button.is-selected { border-color: #A88400 !important; box-shadow: inset 0 0 0 1px #A88400 !important; }
+.operation-page .station-selector .station-radio {
+  display: inline-block !important; flex: 0 0 20px !important; width: 20px !important; height: 20px !important;
+  box-sizing: border-box !important; border: 2px solid #A88400 !important; border-radius: 50% !important; background: #FFD900 !important;
+}
+.operation-page .station-selector .station-button.is-selected .station-radio { background: #A88400 !important; box-shadow: inset 0 0 0 4px #FFD900 !important; }
+.operation-page .station-selector .station-name { display: block !important; min-width: 0 !important; margin: 0 !important; color: #111 !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.35 !important; overflow-wrap: anywhere !important; }
+.operation-page .station-selector .station-name-en { display: none !important; }
+.operation-page .station-confirm { display: block !important; width: 100% !important; min-height: 54px !important; margin-top: 16px !important; padding: 12px 20px !important; border: 2px solid #FFD900 !important; border-radius: 12px !important; background: #FFD900 !important; color: #111 !important; font-size: 18px !important; font-weight: 700 !important; cursor: pointer; }
+.operation-page .station-confirm:disabled { opacity: .55 !important; cursor: not-allowed !important; }
+@media (max-width: 600px) {
+ .operation-page .station-selector .station-grid.station-grid-large { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+ .operation-page .station-selector .station-button { min-height: 52px !important; padding: 8px !important; gap: 7px !important; }
+ .operation-page .station-selector .station-radio { flex-basis: 18px !important; width: 18px !important; height: 18px !important; }
+ .operation-page .station-selector .station-name { font-size: 14px !important; }
 }
