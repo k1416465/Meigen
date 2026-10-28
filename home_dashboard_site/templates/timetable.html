@@ -71,6 +71,7 @@
   {% endif %}
 </section>
 
+
 <style>
 .tt-page {
     max-width: 900px;
@@ -181,6 +182,7 @@
     padding: 14px 16px;
     border-bottom: 1px solid var(--border-color, rgba(128,128,128,.2));
     position: relative;
+    box-sizing: border-box;
 }
 
 .tt-train:last-child {
@@ -313,60 +315,88 @@
 
 
 /* スマートフォン：文字を大きくして読みやすく */
-.tt-train {
-    width: 100%;
-    box-sizing: border-box;
-    grid-template-columns: 68px minmax(0, 1fr);
-    gap: 8px;
-    padding: 8px 9px;
-    align-content: center;
-}
+@media (max-width: 540px) {
+    .tt-page {
+        box-sizing: border-box;
+    }
 
-.tt-time {
-    font-size: 1.15rem;
-}
+    .tt-directions {
+        gap: 12px;
+    }
 
-.tt-time-column {
-    gap: 3px;
-}
+    /* 「2番線 ○○方面」の見出し：上下の余白を縮小 */
+    .tt-direction-heading {
+        padding: 4px 10px;
+        gap: 8px;
+    }
 
-.tt-train-title {
-    gap: 5px;
-}
+    .tt-platform {
+        font-size: .62rem;
+        margin-bottom: 2px;
+    }
 
-.tt-train-title > strong {
-    font-size: 0.95rem;
-}
+    .tt-direction-heading h2 {
+        font-size: .78rem;
+    }
 
-.tt-type {
-    font-size: 0.75rem;
-    padding: 3px 5px;
-}
+    .tt-direction-tag {
+        font-size: .62rem;
+        padding: 2px 6px;
+    }
 
-.tt-cars {
-    font-size: 0.75rem;
-}
+    .tt-train {
+        width: 100%;
+        grid-template-columns: 68px minmax(0, 1fr);
+        gap: 8px;
+        padding: 8px 9px;
+        align-content: center;
+    }
 
-.tt-note {
-    margin-top: 3px;
-    font-size: 0.75rem;
-}
+    .tt-time {
+        font-size: 1.15rem;
+    }
 
-.tt-countdown {
-    margin-top: 4px;
-    font-size: 0.78rem;
-    font-weight: 750;
-}
+    .tt-time-column {
+        gap: 3px;
+    }
 
-.tt-rank {
-    font-size: 0.68rem;
-}
+    .tt-train-title {
+        gap: 5px;
+    }
 
-.tt-past-label {
-    grid-column: 2;
-    justify-self: start;
-    font-size: 0.75rem;
-}
+    .tt-train-title > strong {
+        font-size: .95rem;
+    }
+
+    .tt-type {
+        font-size: .75rem;
+        padding: 3px 5px;
+    }
+
+    .tt-cars {
+        font-size: .75rem;
+    }
+
+    .tt-note {
+        margin-top: 3px;
+        font-size: .75rem;
+    }
+
+    .tt-countdown {
+        margin-top: 4px;
+        font-size: .78rem;
+        font-weight: 750;
+    }
+
+    .tt-rank {
+        font-size: .68rem;
+    }
+
+    .tt-past-label {
+        grid-column: 2;
+        justify-self: start;
+        font-size: .75rem;
+    }
 
     .tt-footer-action {
         flex: 0 0 auto;
@@ -380,7 +410,8 @@
     }
 }
 
-/* 画面の高さが低いスマートフォンでは余白を少し抑える */
+
+/* 画面の高さが低いスマートフォン */
 @media (max-width: 540px) and (max-height: 650px) {
     .tt-page {
         padding-top: 4px;
@@ -392,8 +423,9 @@
         margin-bottom: 0;
     }
 
+    /* 通常設定よりも、さらに上下の余白を縮小 */
     .tt-direction-heading {
-        padding: 4px 7px;
+        padding: 2px 7px;
     }
 
     .tt-train {
@@ -409,6 +441,7 @@
         padding: 4px 11px;
     }
 }
+
 
 /* ダークモード */
 html body.dark .tt-page {
@@ -494,6 +527,7 @@ html body.dark .tt-other-stations {
     color: #fff;
 }
 </style>
+
 
 <script>
 (function() {
