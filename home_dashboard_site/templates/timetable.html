@@ -113,8 +113,16 @@
 .tt-train:last-child{border-bottom:0}
 .tt-train.tt-next{background:rgba(37,99,235,.09);box-shadow:inset 4px 0 #2563eb}
 .tt-train.tt-second{background:rgba(37,99,235,.035);box-shadow:inset 4px 0 rgba(37,99,235,.4)}
-.tt-train.tt-stopped{background:rgba(16,185,129,.10);box-shadow:inset 4px 0 #10b981}
-.tt-train.tt-stopped .tt-countdown{color:#059669}
+
+/* 停車中：黄色 */
+.tt-train.tt-stopped{
+  background:rgba(250,204,21,.20);
+  box-shadow:inset 4px 0 #eab308;
+}
+.tt-train.tt-stopped .tt-countdown{
+  color:#a16207;
+}
+
 .tt-time-column{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
 .tt-time{font-size:1.35rem;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .tt-rank{font-size:.72rem;font-weight:800;color:#2563eb}
@@ -186,8 +194,16 @@ html body.dark .tt-train-link{color:#f8fafc;text-decoration:none}
 html body.dark .tt-train-link:hover .tt-train{filter:brightness(1.18)}
 html body.dark .tt-train.tt-next{background:#1e3558;box-shadow:inset 4px 0 #60a5fa}
 html body.dark .tt-train.tt-second{background:#202a3a;box-shadow:inset 4px 0 #527db8}
-html body.dark .tt-train.tt-stopped{background:#173b32;box-shadow:inset 4px 0 #34d399}
-html body.dark .tt-train.tt-stopped .tt-countdown{color:#6ee7b7}
+
+/* ダークモード：停車中も黄色 */
+html body.dark .tt-train.tt-stopped{
+  background:#493d16;
+  box-shadow:inset 4px 0 #facc15;
+}
+html body.dark .tt-train.tt-stopped .tt-countdown{
+  color:#fde047;
+}
+
 html body.dark .tt-countdown,
 html body.dark .tt-rank{color:#93c5fd}
 html body.dark .tt-past .tt-countdown{color:#e5e7eb}
