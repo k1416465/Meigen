@@ -1,5 +1,30 @@
 {% extends "base.html" %}
-{% block title %}迷言｜時刻表{% endblock %}
+{% block title %}迷言｜時刻表
+<script>
+(() => {
+  const selector = document.querySelector('.operation-page .station-selector');
+  if (!selector || selector.dataset.selectionReady === 'true') return;
+  selector.dataset.selectionReady = 'true';
+  const buttons = selector.querySelectorAll('.station-button[data-station]');
+  const confirmButton = selector.querySelector('#stationConfirm');
+  let selectedStation = '';
+  buttons.forEach(button => button.addEventListener('click', () => {
+    selectedStation = button.dataset.station;
+    buttons.forEach(item => {
+      const selected = item === button;
+      item.classList.toggle('is-selected', selected);
+      item.setAttribute('aria-pressed', String(selected));
+    });
+    confirmButton.disabled = !selectedStation;
+  }));
+  confirmButton.addEventListener('click', () => {
+    if (!selectedStation) return;
+    window.location.href = '/timetable?station=' + encodeURIComponent(selectedStation);
+  });
+})();
+</script>
+
+{% endblock %}
 
 {% block content %}
 <div class="page-container operation-page">
@@ -8,43 +33,22 @@
         <h1>時刻表</h1>
     </header>
 
-    <!-- 駅選択：PC・スマホ共通の順番とボタンサイズ -->
+    <!-- 駅選択 -->
     <section class="station-selector">
-        <div class="station-grid station-grid-large">
-            <a class="station-button" href="/timetable?station=小山">
-                <span class="station-name">小山</span>
-            </a>
-            <a class="station-button" href="/timetable?station=思川">
-                <span class="station-name">思川</span>
-            </a>
-            <a class="station-button" href="/timetable?station=栃木">
-                <span class="station-name">栃木</span>
-            </a>
-            <a class="station-button" href="/timetable?station=大平下">
-                <span class="station-name">大平下</span>
-            </a>
-            <a class="station-button" href="/timetable?station=岩舟">
-                <span class="station-name">岩舟</span>
-            </a>
-            <a class="station-button" href="/timetable?station=佐野">
-                <span class="station-name">佐野</span>
-            </a>
-            <a class="station-button" href="/timetable?station=富田">
-                <span class="station-name">富田</span>
-            </a>
-            <a class="station-button station-button-flower-park" href="/timetable?station=あしかがフラワーパーク">
-                <span class="station-name station-name-flower-park">あしかが<br>フラワーパーク</span>
-            </a>
-            <a class="station-button" href="/timetable?station=足利">
-                <span class="station-name">足利</span>
-            </a>
-            <a class="station-button" href="/timetable?station=山前">
-                <span class="station-name">山前</span>
-            </a>
-            <a class="station-button" href="/timetable?station=小俣">
-                <span class="station-name">小俣</span>
-            </a>
+        <div class="station-grid station-grid-large" role="group" aria-label="駅を選択">
+            <button type="button" class="station-button" data-station="小山" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">小山</span></button>
+            <button type="button" class="station-button" data-station="思川" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">思川</span></button>
+            <button type="button" class="station-button" data-station="栃木" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">栃木</span></button>
+            <button type="button" class="station-button" data-station="大平下" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">大平下</span></button>
+            <button type="button" class="station-button" data-station="岩舟" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">岩舟</span></button>
+            <button type="button" class="station-button" data-station="佐野" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">佐野</span></button>
+            <button type="button" class="station-button" data-station="富田" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">富田</span></button>
+            <button type="button" class="station-button" data-station="あしかがフラワーパーク" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">あしかがフラワーパーク</span></button>
+            <button type="button" class="station-button" data-station="足利" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">足利</span></button>
+            <button type="button" class="station-button" data-station="山前" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">山前</span></button>
+            <button type="button" class="station-button" data-station="小俣" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">小俣</span></button>
         </div>
+        <button type="button" id="stationConfirm" class="station-confirm" disabled>決定</button>
     </section>
 
     <!-- 運行情報 -->
@@ -430,60 +434,54 @@ document.addEventListener("DOMContentLoaded", () => {
     line-height: 1.3 !important;
 }
 
-/* 駅選択ボタン：日本語のみ・角丸の横長ボタンを2列で表示 */
+/* 駅ボタン：全駅を同じグリッド・同じサイズに */
 .operation-page .station-selector {
-    width: 100% !important;
+    width: 100%;
 }
 
 .operation-page .station-grid.station-grid-large {
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     grid-auto-rows: 56px !important;
-    gap: 10px !important;
-    row-gap: 10px !important;
-    column-gap: 10px !important;
+    gap: 6px 6px !important;
+    row-gap: 6px !important;
+    grid-row-gap: 6px !important;
     align-content: start !important;
     align-items: stretch !important;
 }
 
-.operation-page .station-grid.station-grid-large > .station-button {
-    display: flex !important;
+.operation-page .station-grid.station-grid-large .station-button {
     box-sizing: border-box !important;
-    width: 100% !important;
     height: 56px !important;
     min-height: 56px !important;
     margin: 0 !important;
-    padding: 8px 10px !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 16px !important;
-    background: #FFD900 !important;
-    border: 0 !important;
-    color: #111111 !important;
-    text-decoration: none !important;
-    overflow: hidden !important;
 }
 
 .operation-page .station-grid.station-grid-large .station-name {
-    display: block !important;
-    margin: 0 !important;
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    line-height: 1.25 !important;
-    text-align: center !important;
-    color: #111111 !important;
-    overflow-wrap: anywhere !important;
-    word-break: normal !important;
+    display: block;
+    line-height: 1.35;
 }
 
+/* 長い駅名は2行にして、駅ボタンのサイズを統一 */
 .operation-page .station-grid.station-grid-large .station-name-flower-park {
-    font-size: 14px !important;
-    line-height: 1.15 !important;
-    overflow-wrap: anywhere !important;
-    word-break: normal !important;
+    font-size: 13px;
+    line-height: 1.1;
+    overflow-wrap: normal;
+    word-break: keep-all;
 }
 
-/* 英語表記はHTMLから削除済み */
+.operation-page .station-grid.station-grid-large .station-button-flower-park .station-name-en {
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.operation-page .station-grid.station-grid-large .station-name-en {
+    display: block;
+    margin-top: 1px;
+    font-size: 12px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
 
 /* 運行情報：詳細文は省略せず左揃えで全文表示 */
 .operation-alert-card {
@@ -809,5 +807,30 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 </style>
+
+
+<script>
+(() => {
+  const selector = document.querySelector('.operation-page .station-selector');
+  if (!selector || selector.dataset.selectionReady === 'true') return;
+  selector.dataset.selectionReady = 'true';
+  const buttons = selector.querySelectorAll('.station-button[data-station]');
+  const confirmButton = selector.querySelector('#stationConfirm');
+  let selectedStation = '';
+  buttons.forEach(button => button.addEventListener('click', () => {
+    selectedStation = button.dataset.station;
+    buttons.forEach(item => {
+      const selected = item === button;
+      item.classList.toggle('is-selected', selected);
+      item.setAttribute('aria-pressed', String(selected));
+    });
+    confirmButton.disabled = !selectedStation;
+  }));
+  confirmButton.addEventListener('click', () => {
+    if (!selectedStation) return;
+    window.location.href = '/timetable?station=' + encodeURIComponent(selectedStation);
+  });
+})();
+</script>
 
 {% endblock %}
