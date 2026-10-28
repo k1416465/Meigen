@@ -311,156 +311,62 @@
     filter: brightness(.96);
 }
 
-/* スマートフォン */
-@media (max-width: 540px) {
-    html.tt-screen,
-    html.tt-screen body {
-        height: 100%;
-        overflow: hidden;
-        overscroll-behavior: none;
-    }
 
-    html.tt-screen body {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-    }
+/* スマートフォン：文字を大きくして読みやすく */
+.tt-train {
+    width: 100%;
+    box-sizing: border-box;
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px 9px;
+    align-content: center;
+}
 
-    html.tt-screen body main,
-    html.tt-screen body #content,
-    html.tt-screen body .container,
-    html.tt-screen body .main-content {
-        min-height: 0;
-        overflow: hidden;
-    }
+.tt-time {
+    font-size: 1.15rem;
+}
 
-    .tt-page {
-        height: var(--tt-available-height, calc(100dvh - 8px));
-        max-height: var(--tt-available-height, calc(100dvh - 8px));
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        padding: 10px 12px;
-        overflow: hidden;
-    }
+.tt-time-column {
+    gap: 3px;
+}
 
-    .tt-header {
-        flex: 0 0 auto;
-        margin: 0 0 4px;
-    }
+.tt-train-title {
+    gap: 5px;
+}
 
-    .tt-header h1 {
-        font-size: clamp(.95rem, 4.2vw, 1.2rem);
-        line-height: 1.15;
-    }
+.tt-train-title > strong {
+    font-size: 0.95rem;
+}
 
-    .tt-subtitle {
-        margin: 2px 0 0;
-        font-size: .68rem;
-    }
+.tt-type {
+    font-size: 0.75rem;
+    padding: 3px 5px;
+}
 
-    .tt-directions {
-        flex: 0 0 auto;
-        grid-template-rows: none;
-        gap: 12px;
-        min-height: 0;
-        overflow: visible;
-    }
+.tt-cars {
+    font-size: 0.75rem;
+}
 
-    .tt-direction {
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-        border-radius: 12px;
-    }
+.tt-note {
+    margin-top: 3px;
+    font-size: 0.75rem;
+}
 
-    .tt-direction-heading {
-        flex: 0 0 auto;
-        padding: 8px 10px;
-    }
+.tt-countdown {
+    margin-top: 4px;
+    font-size: 0.78rem;
+    font-weight: 750;
+}
 
-    .tt-direction-heading h2 {
-        font-size: .78rem;
-    }
+.tt-rank {
+    font-size: 0.68rem;
+}
 
-    .tt-platform {
-        font-size: .62rem;
-        margin-bottom: 2px;
-    }
-
-    .tt-direction-tag {
-        font-size: .62rem;
-        padding: 2px 6px;
-    }
-
-    .tt-train-list {
-        flex: 0 0 auto;
-        min-height: 0;
-        overflow-x: hidden;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .tt-train-link {
-        flex: 0 0 auto;
-        min-height: 0;
-        display: block;
-    }
-
-    .tt-train {
-        width: 100%;
-        box-sizing: border-box;
-        grid-template-columns: 54px minmax(0, 1fr);
-        gap: 6px;
-        padding: 5px 7px;
-        align-content: center;
-    }
-
-    .tt-time {
-        font-size: .9rem;
-    }
-
-    .tt-time-column {
-        gap: 2px;
-    }
-
-    .tt-train-title {
-        gap: 4px;
-    }
-
-    .tt-train-title > strong {
-        font-size: .78rem;
-    }
-
-    .tt-type,
-    .tt-cars,
-    .tt-note,
-    .tt-countdown {
-        font-size: .62rem;
-    }
-
-    .tt-type {
-        padding: 2px 4px;
-    }
-
-    .tt-countdown {
-        margin-top: 2px;
-    }
-
-    .tt-note {
-        margin-top: 2px;
-    }
-
-    .tt-rank {
-        font-size: .58rem;
-    }
-
-    .tt-past-label {
-        grid-column: 2;
-        justify-self: start;
-        font-size: .62rem;
-    }
+.tt-past-label {
+    grid-column: 2;
+    justify-self: start;
+    font-size: 0.75rem;
+}
 
     .tt-footer-action {
         flex: 0 0 auto;
