@@ -556,13 +556,23 @@
     e.preventDefault();const f=new FormData(editForm);const id=safe(f.get('event_id'));const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!id.startsWith('device-')||!validDate(date)||!title)return;
     const list=load();const ev=list.find(x=>x.id===id);if(!ev)return;Object.assign(ev,{date,title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
   });
-  const delForm=document.getElementById('calendarDeleteForm');
   const deleteButton=document.getElementById('deleteEventButton');
-  if(deleteButton) deleteButton.addEventListener('click',e=>{
-    const id=safe(document.getElementById('deleteEventId')?.value); if(!id.startsWith('device-')){e.stopImmediatePropagation();e.preventDefault();return;}
-    e.stopImmediatePropagation();e.preventDefault();if(!confirm('この端末で作成した予定を削除しますか？'))return;
-    save(load().filter(x=>x.id!==id));const d=safe(document.getElementById('deleteReturnDate')?.value);const [y,m]=d.split('-').map(Number);window.location.href=`/calendar?year=${y||new Date().getFullYear()}&month=${m||new Date().getMonth()+1}`;
-  },true);
+  const editDeleteButton=document.getElementById('editDeleteButton');
+  // Delete buttons must remove device-created events from localStorage.
+  // Capture phase prevents the older form-submit handler from submitting to Flask first.
+  const deleteDeviceEvent = (e, idInput, dateInput) => {
+    const id=safe(document.getElementById(idInput)?.value);
+    if(!id.startsWith('device-')){e.stopImmediatePropagation();e.preventDefault();return;}
+    e.stopImmediatePropagation();e.preventDefault();
+    const title=safe(document.getElementById('editEventTitle')?.value || document.getElementById('calendarActionSummary')?.textContent || 'この予定');
+    if(!confirm(`「${title}」を削除しますか？`))return;
+    save(load().filter(x=>x.id!==id));
+    const d=safe(document.getElementById(dateInput)?.value || document.getElementById('editEventDate')?.value || document.getElementById('deleteReturnDate')?.value);
+    const [y,m]=d.split('-').map(Number);
+    window.location.href=`/calendar?year=${y||new Date().getFullYear()}&month=${m||new Date().getMonth()+1}`;
+  };
+  if(deleteButton) deleteButton.addEventListener('click',e=>deleteDeviceEvent(e,'deleteEventId','deleteReturnDate'),true);
+  if(editDeleteButton) editDeleteButton.addEventListener('click',e=>deleteDeviceEvent(e,'editEventId','editEventDate'),true);
   // Disable actions for shared events; only device-prefixed entries can be edited.
   document.addEventListener('click',e=>{const el=e.target.closest('[data-personal-event]');if(el&&!el.dataset.deviceEvent){e.preventDefault();e.stopImmediatePropagation();}},true);
   document.addEventListener('keydown',e=>{const el=e.target.closest('[data-personal-event]');if(el&&!el.dataset.deviceEvent){e.preventDefault();e.stopImmediatePropagation();}},true);
