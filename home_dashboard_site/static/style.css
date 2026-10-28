@@ -4590,3 +4590,101 @@ a.recording-tag:hover { opacity: .8; }
  .operation-page .station-selector .station-radio { flex-basis: 18px !important; width: 18px !important; height: 18px !important; }
  .operation-page .station-selector .station-name { font-size: 14px !important; }
 }
+
+
+/* 駅選択：背景なし・黄色い丸・1行2駅 */
+.operation-page .station-selector .station-grid.station-grid-large {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: auto !important;
+    gap: 8px 10px !important;
+    align-items: center !important;
+}
+
+/* 駅の選択肢 */
+.operation-page .station-selector .station-grid.station-grid-large > .station-button {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 5px 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: inherit !important;
+    text-align: left !important;
+    cursor: pointer;
+}
+
+/* 選択中も背景は透明のまま */
+.operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 黄色い丸 */
+.operation-page .station-selector .station-radio {
+    display: inline-block !important;
+    flex: 0 0 19px !important;
+    width: 19px !important;
+    height: 19px !important;
+    box-sizing: border-box !important;
+    border: 2px solid #FFD900 !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+}
+
+/* 選択した駅の丸を黄色で塗る */
+.operation-page .station-selector .station-button.is-selected .station-radio {
+    background: #FFD900 !important;
+    box-shadow: none !important;
+}
+
+/* 駅名 */
+.operation-page .station-selector .station-name {
+    display: block !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    color: inherit !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* 英語の駅名を非表示 */
+.operation-page .station-selector .station-name-en {
+    display: none !important;
+}
+
+/* スマートフォン */
+@media (max-width: 600px) {
+    .operation-page .station-selector .station-grid.station-grid-large {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px 10px !important;
+    }
+
+    .operation-page .station-selector .station-grid.station-grid-large > .station-button {
+        min-height: 40px !important;
+        gap: 7px !important;
+        padding: 5px 0 !important;
+    }
+
+    .operation-page .station-selector .station-radio {
+        flex-basis: 17px !important;
+        width: 17px !important;
+        height: 17px !important;
+    }
+
+    .operation-page .station-selector .station-name {
+        font-size: 14px !important;
+    }
+}
