@@ -1111,12 +1111,6 @@ body.dark .operation-status-text[data-state="alert"] {
     bottom: 0 !important;
 }
 
-body.app-standalone .bottom-nav {
-    height: auto !important;
-    margin: 0 !important;
-    padding: 8px 4px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
 .bottom-nav > .nav-item {
     position: static !important;
     width: 100% !important;
@@ -4035,525 +4029,289 @@ a.recording-tag:hover { opacity: .8; }
 }
 
 
-/* 録音ページ改善：検索ボタンの文字はみ出し防止、スマホ見出し左寄せ */
-.recording-search-form { display:flex; align-items:stretch; gap:8px; min-width:0; }
-.recording-search-form input[type="search"] { flex:1 1 auto; width:0; min-width:0; box-sizing:border-box; }
-.recording-search-submit { flex:0 0 auto; min-width:64px; max-width:100%; padding:10px 12px; white-space:nowrap; text-align:center; box-sizing:border-box; line-height:1.2; }
-@media (max-width:600px) {
-  .recording-welcome { margin-left:-4px; margin-right:0; justify-content:flex-start; gap:8px; }
-  .recording-welcome-copy { flex:1 1 auto; min-width:0; }
-  .recording-welcome-copy h1, .recording-welcome-copy p { text-align:left; }
-  .recording-search-submit { min-width:58px; padding:9px 10px; font-size:13px; }
+/* スマホ版カレンダー：ページ全体は固定し、カレンダー表だけスクロール */
+@media (max-width: 620px) {
+    body:has(.calendar-scroll) {
+        overflow: hidden !important;
+        height: 100%;
+        overscroll-behavior: none;
+    }
+
+    body:has(.calendar-scroll) .page {
+        height: calc(100dvh - 62px - 90px - env(safe-area-inset-bottom, 0px));
+        min-height: 0 !important;
+        max-height: calc(100dvh - 62px - 90px - env(safe-area-inset-bottom, 0px));
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    body:has(.calendar-scroll) .page > .calendar-card {
+        flex: 0 0 auto;
+        min-height: 0;
+    }
+
+    body:has(.calendar-scroll) .page > .calendar-card:has(.calendar-scroll) {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    body:has(.calendar-scroll) .calendar-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none !important;
+        overflow: auto !important;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    body:has(.calendar-scroll) .calendar-grid {
+        min-width: 560px;
+        width: 560px;
+    }
+
+    /* 予定の追加・編集画面の日付入力が横にはみ出さないようにする */
+    .calendar-modal,
+    .calendar-modal form,
+    .calendar-edit-form,
+    .calendar-add-form {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .calendar-modal input[type="date"],
+    .calendar-edit-form input[type="date"],
+    .calendar-add-form input[type="date"] {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+        font: inherit;
+    }
 }
 
-/* ボイスメモ風プレイヤー */
-.recording-player { display:flex; align-items:center; gap:13px; width:100%; min-width:0; box-sizing:border-box; padding:12px; margin-top:8px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
-.recording-audio-source { display:none !important; }
-.recording-play-button { display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; padding:0; border:0; border-radius:50%; color:#fff; background:var(--purple); cursor:pointer; box-shadow:0 3px 9px rgba(0,0,0,.15); }
-.recording-play-button svg { width:22px; height:22px; }
-.recording-pause-icon { display:none; }
-.recording-player.is-playing .recording-play-icon { display:none; }
-.recording-player.is-playing .recording-pause-icon { display:block; }
-.recording-player-main { flex:1 1 auto; min-width:0; }
-.recording-waveform { display:flex; align-items:center; justify-content:space-between; gap:2px; height:24px; overflow:hidden; }
-.recording-waveform i { display:block; flex:1 1 2px; max-width:4px; min-width:1px; border-radius:4px; height:var(--wave-height,45%); background:var(--purple); opacity:.55; }
-.recording-waveform i:nth-child(5n) { height:88%; }
-.recording-waveform i:nth-child(3n) { height:65%; }
-.recording-waveform i:nth-child(4n) { height:32%; }
-.recording-waveform i:nth-child(7n) { height:100%; }
-.recording-progress { display:block; width:100%; height:5px; margin:7px 0 4px; border-radius:99px; appearance:none; -webkit-appearance:none; background:linear-gradient(to right,var(--purple) 0 var(--progress,0%),var(--border) var(--progress,0%) 100%); cursor:pointer; }
-.recording-progress::-webkit-slider-thumb { appearance:none; -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--purple); border:2px solid var(--surface); box-shadow:0 0 0 1px var(--purple); }
-.recording-progress::-moz-range-thumb { width:10px; height:10px; border-radius:50%; background:var(--purple); border:2px solid var(--surface); box-shadow:0 0 0 1px var(--purple); }
-.recording-player-times { display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:11px; font-variant-numeric:tabular-nums; }
-@media (max-width:600px) { .recording-player { gap:10px; padding:10px; } .recording-play-button { flex-basis:40px; width:40px; height:40px; } }
-
-/* 最終調整：スマホの見出しを一覧カードの左端に揃える */
-.recording-welcome {
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
-  justify-content: space-between;
-  text-align: left;
-}
-.recording-welcome-copy {
-  flex: 1 1 auto;
-  width: auto;
-  min-width: 0;
-  margin: 0;
-  text-align: left;
-}
-.recording-welcome-copy h1,
-.recording-welcome-copy p {
-  width: 100%;
-  text-align: left !important;
-}
-@media (max-width: 600px) {
-  .recording-welcome {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0;
-    padding-right: 0;
-  }
+@media (max-width: 620px) and (orientation: portrait) {
+    @supports not (height: 100dvh) {
+        body:has(.calendar-scroll) .page {
+            height: calc(100vh - 152px - env(safe-area-inset-bottom, 0px));
+            max-height: calc(100vh - 152px - env(safe-area-inset-bottom, 0px));
+        }
+    }
 }
 
-/* 再生ボタン：A案の丸いボタンを確実に表示 */
-.recording-player .recording-play-button {
-  appearance: none;
-  -webkit-appearance: none;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 46px;
-  width: 46px;
-  min-width: 46px;
-  max-width: 46px;
-  height: 46px;
-  min-height: 46px;
-  margin: 0;
-  padding: 0 !important;
-  overflow: hidden;
-  border: 0 !important;
-  border-radius: 50% !important;
-  background: var(--purple) !important;
-  color: #fff !important;
-  line-height: 1;
-  box-shadow: 0 3px 9px rgba(0,0,0,.15);
+
+/* 修正：スマホ版カレンダーの各マスを広く保ち、表の横スクロールで確認できるようにする */
+@media (max-width: 620px) {
+    .calendar-grid-scroll {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    .calendar-grid-scroll .calendar-grid {
+        width: 1120px !important;
+        min-width: 1120px !important;
+        max-width: none !important;
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    }
 }
-.recording-player .recording-play-button svg {
-  display: none;
-  flex: 0 0 22px;
-  width: 22px;
-  height: 22px;
-  margin: 0;
-  color: #fff;
+
+
+/* 最終調整：calendar.html の実際のクラス名 .calendar-scroll に統一 */
+@media (max-width: 620px) {
+    /* 表の外側だけをスクロール領域にし、7列それぞれに十分な幅を確保 */
+    body:has(.calendar-scroll) .calendar-scroll {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        box-sizing: border-box;
+    }
+
+    body:has(.calendar-scroll) .calendar-scroll > .calendar-grid {
+        display: grid !important;
+        grid-template-columns: repeat(7, minmax(160px, 1fr)) !important;
+        width: 1120px !important;
+        min-width: 1120px !important;
+        max-width: none !important;
+        box-sizing: border-box;
+    }
+
+    body:has(.calendar-scroll) .calendar-scroll .calendar-weekday,
+    body:has(.calendar-scroll) .calendar-scroll .calendar-day {
+        min-width: 0 !important;
+        box-sizing: border-box;
+    }
+
+    /* 日付入力欄はモーダル内の幅からはみ出さない */
+    .calendar-modal {
+        width: 100% !important;
+        max-width: 520px !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+    .calendar-modal form,
+    .calendar-edit-form,
+    .calendar-add-form,
+    .calendar-edit-form label,
+    .calendar-add-form label {
+        width: 100%;
+        min-width: 0 !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    .calendar-modal input[type="date"],
+    .calendar-edit-form input[type="date"],
+    .calendar-add-form input[type="date"] {
+        display: block;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 16px;
+    }
 }
-.recording-player .recording-play-button .recording-play-icon { display: block; }
+
+/* iPhone/iOSアプリ：下部メニューの位置が一時的に跳ね上がる現象を抑える */
+.bottom-nav {
+    position: fixed !important;
+    top: auto !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* タッチ操作時の hover/focus 状態でメニュー全体が動かないようにする */
+.bottom-nav:hover,
+.bottom-nav:focus,
+.bottom-nav:focus-within {
+    top: auto !important;
+    bottom: 0 !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+}
+
+/* 録音ページ：検索ボタンを青色にし、文字切れを防止 */
+.recording-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    box-sizing: border-box;
+}
+.recording-search-submit {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    min-width: 56px;
+    width: auto;
+    max-width: 100%;
+    padding: 10px 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+    text-align: center;
+    border: 0;
+    border-radius: 10px;
+    background: #077AE3;
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.recording-search-submit:hover { background: #066bc7; }
+
+/* 再生ボタンは以前のシンプルな小型ボタンの見た目に戻す */
+.recording-play-button {
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--purple);
+    background: var(--surface);
+    cursor: pointer;
+    box-shadow: none;
+}
+.recording-play-button svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+.recording-play-button .recording-pause-icon { display: none; }
 .recording-player.is-playing .recording-play-button .recording-play-icon { display: none; }
 .recording-player.is-playing .recording-play-button .recording-pause-icon { display: block; }
 
-/* 再生時間は横並び・改行なしで表示崩れを防ぐ */
-.recording-player .recording-player-times {
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-width: 0;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  color: var(--muted);
-  font-size: 12px !important;
-  line-height: 1.4 !important;
-  font-weight: 400;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.recording-player .recording-player-times span {
-  display: inline-block;
-  flex: 0 0 auto;
-  width: auto;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  white-space: nowrap;
-}
-.recording-player .recording-progress {
-  display: block;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
+/* ダウンロード・並び替えは既存の控えめな枠付きボタンに統一 */
+.recording-download-all,
+.recording-sort-button,
+.recording-sort-select,
+.recording-toolbar button,
+.recording-toolbar select {
+    box-sizing: border-box;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
 }
 @media (max-width: 600px) {
-  .recording-player .recording-play-button {
-    flex-basis: 42px;
-    width: 42px;
-    min-width: 42px;
-    max-width: 42px;
-    height: 42px;
-    min-height: 42px;
-  }
-}
-
-/* タイトル位置の修正：中央寄せの親要素から独立させ、画面端から31pxに揃える */
-@media (max-width: 600px) {
-  .page > .recording-welcome {
-    position: relative !important;
-    left: calc(50% - 50vw + 31px) !important;
-    transform: none !important;
-    width: calc(100vw - 62px) !important;
-    max-width: none !important;
-    margin: 0 0 28px !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-    justify-content: space-between !important;
-    text-align: left !important;
-  }
-  .recording-welcome-copy {
-    margin: 0 !important;
-    padding: 0 !important;
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    text-align: left !important;
-  }
-  .recording-welcome-copy h1,
-  .recording-welcome-copy p {
-    margin-left: 0 !important;
-    text-align: left !important;
-  }
+    .recording-search-submit { min-width: 56px; padding: 9px 10px; font-size: 13px; }
+    .recording-play-button { flex-basis: 38px; width: 38px; min-width: 38px; height: 38px; }
 }
 
 
-/* 根本修正：録音ページのタイトルを一覧カードと同じコンテンツ左端に固定 */
-.page > section.recording-welcome {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 0 28px 0 !important;
-    padding: 0 !important;
-    position: static !important;
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-    box-sizing: border-box !important;
-    text-align: left !important;
-}
-.page > section.recording-welcome > .recording-welcome-copy {
-    display: block !important;
-    flex: 1 1 auto !important;
-    width: auto !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    position: static !important;
-    transform: none !important;
-    text-align: left !important;
-}
-.page > section.recording-welcome > .recording-welcome-copy > h1,
-.page > section.recording-welcome > .recording-welcome-copy > p {
-    display: block !important;
-    width: 100% !important;
-    max-width: none !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    text-align: left !important;
-}
+
+/* 修正版：時刻表の駅ボタン間に確実に余白を作る */
 @media (max-width: 620px) {
-    .page > section.recording-welcome {
-        flex-direction: row !important;
-        align-items: flex-start !important;
-        margin-bottom: 28px !important;
+    html body .page-container.operation-page .station-selector {
+        display: block !important;
+        box-sizing: border-box !important;
+        padding: 10px 10px 8px !important;
     }
-    .page > section.recording-welcome > .recording-search-toggle {
-        flex: 0 0 44px !important;
-        width: 44px !important;
-        height: 44px !important;
-        margin-left: 8px !important;
+
+    html body .page-container.operation-page .station-selector > .station-grid.station-grid-large {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        column-gap: 8px !important;
+        row-gap: 8px !important;
+        gap: 8px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        align-items: stretch !important;
     }
-}
 
-
-/* 録音管理画面 */
-.recording-admin-page { max-width: 820px; margin: 0 auto; padding: 8px 0 40px; }
-.recording-admin-page h1 { margin: 0 0 6px; }
-.recording-admin-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:18px; }
-.recording-admin-heading p, .recording-admin-note { color:var(--muted); font-size:13px; }
-.recording-admin-search { display:flex; gap:8px; margin:16px 0; }
-.recording-admin-search input, .recording-admin-edit input, .recording-admin-login input { min-width:0; width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid var(--border); border-radius:10px; background:var(--surface); color:inherit; }
-.recording-admin-search input { flex:1; }
-.recording-admin-search button, .recording-admin-edit button, .recording-admin-login button, .recording-admin-secondary { border:0; border-radius:10px; padding:11px 15px; background:var(--purple); color:white; cursor:pointer; }
-.recording-admin-secondary { background:var(--surface); color:inherit; border:1px solid var(--border); }
-.recording-admin-card { border:1px solid var(--border); border-radius:14px; padding:15px; margin:14px 0; background:var(--surface); }
-.recording-admin-file { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; overflow-wrap:anywhere; }
-.recording-admin-file small { color:var(--muted); font-size:12px; }
-.recording-admin-edit { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.recording-admin-edit label, .recording-admin-login label { display:flex; flex-direction:column; gap:6px; font-size:13px; }
-.recording-admin-edit button { grid-column:1 / -1; justify-self:start; }
-.recording-admin-login { max-width:420px; display:grid; gap:14px; }
-.recording-admin-error { color:#c62828; }
-@media(max-width:600px) { .recording-admin-edit { grid-template-columns:1fr; } .recording-admin-edit button { width:100%; } .recording-admin-heading { align-items:center; } .recording-admin-search button { flex:0 0 auto; } }
-
-/* 録音管理：一括保存・削除ボタン */
-.recording-admin-bulk-form { margin: 0; }
-.recording-admin-edit { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.recording-admin-edit label { display:flex; flex-direction:column; gap:6px; font-size:13px; min-width:0; }
-.recording-admin-card-actions { display:flex; justify-content:flex-end; margin-top:12px; }
-.recording-admin-card-actions .recording-admin-delete { border:1px solid #c62828; border-radius:10px; padding:9px 13px; color:#c62828; background:transparent; cursor:pointer; }
-.recording-admin-savebar { position:sticky; bottom:10px; z-index:5; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:20px 0; padding:12px; border:1px solid var(--border); border-radius:14px; background:var(--surface); box-shadow:0 4px 18px rgba(0,0,0,.12); }
-.recording-admin-savebar span { color:var(--muted); font-size:13px; }
-.recording-admin-save-all { border:0; border-radius:10px; padding:12px 20px; background:var(--purple); color:#fff; font-weight:700; cursor:pointer; white-space:nowrap; }
-.recording-admin-message { padding:10px 12px; border-radius:10px; background:var(--surface); border:1px solid var(--border); }
-.recording-admin-message.error { color:#c62828; }
-.recording-admin-message.success { color:#218838; }
-@media(max-width:600px) {
-  .recording-admin-edit { grid-template-columns:1fr; }
-  .recording-admin-savebar { align-items:stretch; flex-direction:column; }
-  .recording-admin-save-all { width:100%; }
-  .recording-admin-card-actions .recording-admin-delete { width:100%; }
-}
-
-
-/* 録音ページ：一括ダウンロード・並び替え・検索ボタンの見た目調整 */
-.recording-list-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.recording-download-all {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  box-sizing: border-box;
-  padding: 10px 15px;
-  border: 1px solid var(--purple);
-  border-radius: 10px;
-  background: var(--purple);
-  color: #fff !important;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-  text-align: center;
-  text-decoration: none !important;
-  cursor: pointer;
-  transition: opacity .15s ease, transform .15s ease;
-}
-.recording-download-all:hover { opacity: .88; }
-.recording-download-all:active { transform: translateY(1px); }
-.recording-sort-form {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-}
-.recording-sort-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  box-sizing: border-box;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text, inherit);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.recording-sort-form select {
-  min-height: 42px;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: 9px 30px 9px 11px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: inherit;
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
-}
-.recording-search-form .recording-search-submit,
-.recording-search-form .recording-search-reset {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  box-sizing: border-box;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-}
-.recording-search-form .recording-search-submit {
-  border: 1px solid #087bea;
-  background: #087bea;
-  color: #fff;
-}
-.recording-search-form .recording-search-submit:hover { background: #066bd0; border-color: #066bd0; }
-.recording-search-form .recording-search-reset {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: inherit;
-}
-.recording-search-form .recording-search-reset:hover { background: var(--purple-soft); }
-@media (max-width: 700px) {
-  .recording-list-actions { justify-content: flex-start; }
-  .recording-download-all { flex: 1 1 100%; }
-  .recording-sort-form { flex: 1 1 100%; }
-  .recording-sort-form select { flex: 1 1 auto; min-width: 0; }
-  .recording-search-form .recording-search-submit,
-  .recording-search-form .recording-search-reset { min-height: 42px; padding: 10px 12px; }
-}
-
-
-/* 録音ページ：並び替えボタンを押すと選択肢をまとめて表示 */
-.recording-sort-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-.recording-sort-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 42px;
-  box-sizing: border-box;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text, inherit);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.recording-sort-button:hover { border-color: #077AE3; }
-.recording-sort-options:not([hidden]) {
-  position: absolute;
-  z-index: 100;
-  top: calc(100% + 6px);
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 190px;
-  padding: 6px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, .18);
-}
-.recording-sort-options a {
-  display: block;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: var(--text, inherit);
-  font-size: 13px;
-  line-height: 1.4;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.recording-sort-options a:hover,
-.recording-sort-options a[aria-current="true"] {
-  background: rgba(7, 122, 227, .12);
-  color: #077AE3;
-}
-@media (max-width: 600px) {
-  .recording-sort-options:not([hidden]) { right: 0; left: auto; }
-}
-
-
-
-/* 録音管理：タグ表示順の編集 */
-.recording-tag-order-admin {
-  margin: 24px 0 30px;
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--surface);
-}
-.recording-tag-order-heading h2 { margin: 0 0 6px; font-size: 18px; }
-.recording-tag-order-heading p { margin: 0 0 16px; color: var(--muted, #777); font-size: 13px; }
-.recording-tag-order-list {
-  list-style: decimal;
-  padding-left: 28px;
-  margin: 0 0 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.recording-tag-order-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 9px 10px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--background, transparent);
-}
-.recording-tag-order-name { overflow-wrap: anywhere; }
-.recording-tag-order-actions { display: flex; gap: 6px; flex-shrink: 0; }
-.recording-tag-move {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: inherit;
-  font-size: 18px;
-  cursor: pointer;
-}
-.recording-tag-move:hover:not(:disabled) { border-color: #077AE3; color: #077AE3; }
-.recording-tag-move:disabled { opacity: .35; cursor: not-allowed; }
-@media (max-width: 600px) {
-  .recording-tag-order-admin { padding: 14px; }
-  .recording-tag-order-item { padding: 8px; }
-}
-
-/* スマートフォン：一括ダウンロードと並び替えを同じ行の右側に配置 */
-@media (max-width: 700px) {
-  .recording-list-actions {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .recording-list-actions > .recording-download-all {
-    flex: 0 1 auto;
-    min-width: 0;
-    min-height: 38px;
-    padding: 8px 9px;
-    font-size: 11px;
-    line-height: 1.15;
-    white-space: nowrap;
-  }
-
-  .recording-list-actions > .recording-sort-wrap {
-    flex: 0 0 auto;
-  }
-
-  .recording-list-actions > .recording-sort-wrap .recording-sort-button {
-    min-height: 38px;
-    padding: 8px 10px;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 360px) {
-  .recording-list-actions > .recording-download-all {
-    padding: 7px 6px;
-    font-size: 10px;
-  }
-  .recording-list-actions > .recording-sort-wrap .recording-sort-button {
-    padding: 7px 8px;
-    font-size: 11px;
-  }
+    html body .page-container.operation-page .station-selector > .station-grid.station-grid-large > a.station-button {
+        display: flex !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        border-radius: 8px !important;
+    }
 }
