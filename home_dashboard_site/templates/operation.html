@@ -13,47 +13,36 @@
         <div class="station-grid station-grid-large">
             <a class="station-button" href="/timetable?station=小山">
                 <span class="station-name">小山</span>
-                <span class="station-name-en">Oyama</span>
             </a>
             <a class="station-button" href="/timetable?station=思川">
                 <span class="station-name">思川</span>
-                <span class="station-name-en">Omoigawa</span>
             </a>
             <a class="station-button" href="/timetable?station=栃木">
                 <span class="station-name">栃木</span>
-                <span class="station-name-en">Tochigi</span>
             </a>
             <a class="station-button" href="/timetable?station=大平下">
                 <span class="station-name">大平下</span>
-                <span class="station-name-en">Ohirashita</span>
             </a>
             <a class="station-button" href="/timetable?station=岩舟">
                 <span class="station-name">岩舟</span>
-                <span class="station-name-en">Iwafune</span>
             </a>
             <a class="station-button" href="/timetable?station=佐野">
                 <span class="station-name">佐野</span>
-                <span class="station-name-en">Sano</span>
             </a>
             <a class="station-button" href="/timetable?station=富田">
                 <span class="station-name">富田</span>
-                <span class="station-name-en">Tomita</span>
             </a>
             <a class="station-button station-button-flower-park" href="/timetable?station=あしかがフラワーパーク">
                 <span class="station-name station-name-flower-park">あしかが<br>フラワーパーク</span>
-                <span class="station-name-en">Ashikaga Flower Park</span>
             </a>
             <a class="station-button" href="/timetable?station=足利">
                 <span class="station-name">足利</span>
-                <span class="station-name-en">Ashikaga</span>
             </a>
             <a class="station-button" href="/timetable?station=山前">
                 <span class="station-name">山前</span>
-                <span class="station-name-en">Yamamae</span>
             </a>
             <a class="station-button" href="/timetable?station=小俣">
                 <span class="station-name">小俣</span>
-                <span class="station-name-en">Omata</span>
             </a>
         </div>
     </section>
@@ -441,54 +430,60 @@ document.addEventListener("DOMContentLoaded", () => {
     line-height: 1.3 !important;
 }
 
-/* 駅ボタン：全駅を同じグリッド・同じサイズに */
+/* 駅選択ボタン：日本語のみ・角丸の横長ボタンを2列で表示 */
 .operation-page .station-selector {
-    width: 100%;
+    width: 100% !important;
 }
 
 .operation-page .station-grid.station-grid-large {
     display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     grid-auto-rows: 56px !important;
-    gap: 6px 6px !important;
-    row-gap: 6px !important;
-    grid-row-gap: 6px !important;
+    gap: 10px !important;
+    row-gap: 10px !important;
+    column-gap: 10px !important;
     align-content: start !important;
     align-items: stretch !important;
 }
 
-.operation-page .station-grid.station-grid-large .station-button {
+.operation-page .station-grid.station-grid-large > .station-button {
+    display: flex !important;
     box-sizing: border-box !important;
+    width: 100% !important;
     height: 56px !important;
     min-height: 56px !important;
     margin: 0 !important;
+    padding: 8px 10px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 16px !important;
+    background: #FFD900 !important;
+    border: 0 !important;
+    color: #111111 !important;
+    text-decoration: none !important;
+    overflow: hidden !important;
 }
 
 .operation-page .station-grid.station-grid-large .station-name {
-    display: block;
-    line-height: 1.35;
+    display: block !important;
+    margin: 0 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+    color: #111111 !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
 }
 
-/* 長い駅名は2行にして、駅ボタンのサイズを統一 */
 .operation-page .station-grid.station-grid-large .station-name-flower-park {
-    font-size: 13px;
-    line-height: 1.1;
-    overflow-wrap: normal;
-    word-break: keep-all;
+    font-size: 14px !important;
+    line-height: 1.15 !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
 }
 
-.operation-page .station-grid.station-grid-large .station-button-flower-park .station-name-en {
-    font-size: 10px;
-    white-space: nowrap;
-}
-
-.operation-page .station-grid.station-grid-large .station-name-en {
-    display: block;
-    margin-top: 1px;
-    font-size: 12px;
-    line-height: 1.25;
-    overflow-wrap: anywhere;
-}
+/* 英語表記はHTMLから削除済み */
 
 /* 運行情報：詳細文は省略せず左揃えで全文表示 */
 .operation-alert-card {
