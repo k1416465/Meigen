@@ -2919,29 +2919,6 @@ body.dark .timetable-card th {
         letter-spacing: normal;
     }
 
-    /* 時刻表：駅名の日本語・英語を近づけ、ボタンの縦幅を縮める */
-    .station-grid-large .station-button {
-        min-height: 66px;
-        gap: 1px;
-        padding-top: 6px;
-        padding-bottom: 6px;
-    }
-
-    .station-grid-large .station-name {
-        line-height: 1.12;
-    }
-
-    .station-grid-large .station-name-en {
-        line-height: 1.05;
-    }
-
-    /* あしかがフラワーパークは1行表示 */
-    a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name {
-        font-size: 11px;
-        line-height: 1.1;
-        white-space: nowrap;
-        letter-spacing: -.45px;
-    }
 
     a.station-button[href="https://ryomo-line-timetable.onrender.com/station/ashikaga_flower_park/timetable"] .station-name-en {
         font-size: 9px;
@@ -4592,28 +4569,30 @@ a.recording-tag:hover { opacity: .8; }
 }
 
 
-/* 駅選択：背景なし・黄色い丸・1行2駅 */
+
+/* 駅選択：2列・列ごとに駅を並べる */
 .operation-page .station-selector .station-grid.station-grid-large {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-auto-rows: auto !important;
-    gap: 8px 10px !important;
+    grid-template-rows: repeat(6, auto) !important;
+    grid-auto-flow: column !important;
+    gap: 3px 18px !important;
     align-items: center !important;
 }
 
-/* 駅の選択肢 */
+/* 駅の選択肢：背景色なし */
 .operation-page .station-selector .station-grid.station-grid-large > .station-button {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 8px !important;
+    gap: 9px !important;
     width: 100% !important;
     min-width: 0 !important;
-    min-height: 40px !important;
+    min-height: 34px !important;
     height: auto !important;
     margin: 0 !important;
-    padding: 5px 0 !important;
+    padding: 3px 0 !important;
     border: none !important;
     border-radius: 0 !important;
     background: transparent !important;
@@ -4623,44 +4602,53 @@ a.recording-tag:hover { opacity: .8; }
     cursor: pointer;
 }
 
-/* 選択中も背景は透明のまま */
+/* 選択中も背景は透明 */
 .operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
 }
 
-/* 黄色い丸 */
+/* 黄色い外側の丸 */
 .operation-page .station-selector .station-radio {
-    display: inline-block !important;
-    flex: 0 0 19px !important;
-    width: 19px !important;
-    height: 19px !important;
+    position: relative !important;
+    display: inline-flex !important;
+    flex: 0 0 20px !important;
+    width: 20px !important;
+    height: 20px !important;
     box-sizing: border-box !important;
+    align-items: center !important;
+    justify-content: center !important;
     border: 2px solid #FFD900 !important;
     border-radius: 50% !important;
     background: transparent !important;
-}
-
-/* 選択した駅の丸を黄色で塗る */
-.operation-page .station-selector .station-button.is-selected .station-radio {
-    background: #FFD900 !important;
     box-shadow: none !important;
 }
 
-/* 駅名 */
+/* 選択したときだけ中央に黄色い丸を表示して「◎」にする */
+.operation-page .station-selector .station-button.is-selected .station-radio::after {
+    content: "" !important;
+    display: block !important;
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    background: #FFD900 !important;
+}
+
+/* 駅名を大きく表示 */
 .operation-page .station-selector .station-name {
     display: block !important;
+    flex: 1 1 auto !important;
     min-width: 0 !important;
     margin: 0 !important;
     color: inherit !important;
-    font-size: 15px !important;
+    font-size: 17px !important;
     font-weight: 600 !important;
-    line-height: 1.4 !important;
+    line-height: 1.25 !important;
     overflow-wrap: anywhere !important;
 }
 
-/* 英語の駅名を非表示 */
+/* 英語表記は非表示 */
 .operation-page .station-selector .station-name-en {
     display: none !important;
 }
@@ -4669,22 +4657,30 @@ a.recording-tag:hover { opacity: .8; }
 @media (max-width: 600px) {
     .operation-page .station-selector .station-grid.station-grid-large {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 8px 10px !important;
+        grid-template-rows: repeat(6, auto) !important;
+        grid-auto-flow: column !important;
+        gap: 3px 12px !important;
     }
 
     .operation-page .station-selector .station-grid.station-grid-large > .station-button {
-        min-height: 40px !important;
         gap: 7px !important;
-        padding: 5px 0 !important;
+        min-height: 34px !important;
+        padding: 3px 0 !important;
     }
 
     .operation-page .station-selector .station-radio {
-        flex-basis: 17px !important;
-        width: 17px !important;
-        height: 17px !important;
+        flex-basis: 19px !important;
+        width: 19px !important;
+        height: 19px !important;
+    }
+
+    .operation-page .station-selector .station-button.is-selected .station-radio::after {
+        width: 9px !important;
+        height: 9px !important;
     }
 
     .operation-page .station-selector .station-name {
-        font-size: 14px !important;
+        font-size: 16px !important;
+        line-height: 1.25 !important;
     }
 }
