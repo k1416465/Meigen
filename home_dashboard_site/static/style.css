@@ -4629,10 +4629,12 @@ a.recording-tag:hover { opacity: .8; }
 .operation-page .station-selector .station-button.is-selected .station-radio::after {
     content: "" !important;
     display: block !important;
-    width: 10px !important;
-    height: 10px !important;
+    width: 8px !important;
+    height: 8px !important;
+    box-sizing: border-box !important;
+    border: 2px solid #FFD900 !important;
     border-radius: 50% !important;
-    background: #FFD900 !important;
+    background: transparent !important;
 }
 
 /* 駅名を大きく表示 */
@@ -4709,5 +4711,6 @@ html body.dark .operation-page .station-selector .station-grid.station-grid-larg
     border-color: #9CA3AF !important;
 }
 .operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected .station-radio::after {
-    background: #FFD900 !important;
+    background: transparent !important;
+    border-color: #FFD900 !important;
 }
