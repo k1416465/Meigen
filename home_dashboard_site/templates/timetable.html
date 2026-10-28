@@ -258,7 +258,7 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         if (rank) rank.remove();
       });
 
-      // 停車中の列車がある場合は停車中を「先発」、後続2本を「次発」「次々発」。
+      // 通常時：直近2本を「先発」「次発」。停車中：停車中を「先発」、後続2本を「次発」「次々発」。
       const ranked = [];
       const activeStopped = stoppedRows[0];
       if (activeStopped) {
@@ -267,21 +267,10 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
           if (ranked.length < 3) ranked.push({row: item.row, label: ranked.length === 1 ? '次発' : '次々発'});
         });
       } else {
-        // 停車中の列車がない場合も、直近3本を「先発」「次発」「次々発」で表示する。
-        upcoming.slice(0, 3).forEach((item, index) => {
-          ranked.push({row: item.row, label: ['先発', '次発', '次々発'][index]});
+        upcoming.slice(0, 2).forEach((item, index) => {
+          ranked.push({row: item.row, label: index === 0 ? '先発' : '次発'});
         });
       }
-
-      const rankedRows = new Set(ranked.map(item => item.row));
-      // 「到着まで」は先発・次発・次々発の列車だけに表示する。
-      rows.forEach(row => {
-        const kind = row.getAttribute('data-event-kind');
-        const countdown = row.querySelector('[data-countdown]');
-        if (countdown && kind === 'arrival' && !rankedRows.has(row)) {
-          countdown.textContent = '';
-        }
-      });
 
       ranked.forEach((item, index) => {
         item.row.classList.add(index === 0 ? 'tt-next' : 'tt-second');
@@ -298,11 +287,25 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
       // 行はすべて残し、3行目以降を一覧内スクロールで確認できるようにする。
       const links = Array.from(list.querySelectorAll('.tt-train-link'));
       const firstTwo = links.slice(0, 2);
-      const twoRowsHeight = firstTwo.reduce(
-        (sum, link) => sum + link.getBoundingClientRect().height,
-        0
-      );
+      // 備考・「到着まで」などの補助行も含め、列車カードそのものの実高さを測る。
+      // テキストが折り返してカードが高くなった場合も、先頭2列車が切れない高さにする。
+      const measureTwoRows = () => {
+        const rowsHeight = firstTwo.reduce((sum, link) => {
+          const card = link.querySelector('.tt-train');
+          if (!card) return sum + link.getBoundingClientRect().height;
+          return sum + Math.ceil(card.getBoundingClientRect().height);
+        }, 0);
+        const hasExtraLines = firstTwo.some(link => {
+          const note = link.querySelector('.tt-note');
+          const countdown = link.querySelector('.tt-countdown');
+          return (note && note.textContent.trim()) ||
+                 (countdown && countdown.textContent.trim());
+        });
+        // サブ行がある場合は境界線・端末ごとの丸め誤差ぶんを少し加算。
+        return rowsHeight + (hasExtraLines ? 4 : 2);
+      };
       const fallbackHeight = window.matchMedia('(max-width: 540px)').matches ? 112 : 180;
+      const twoRowsHeight = measureTwoRows();
       list.style.setProperty(
         '--tt-list-height',
         Math.max(72, twoRowsHeight || fallbackHeight) + 'px'
@@ -328,6 +331,11 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
   }
 
   updateCountdowns();
+  // 文字の折り返し・フォント読み込み後も、先頭2列車が見切れない高さに追従する。
+  window.addEventListener('resize', updateCountdowns, {passive:true});
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(updateCountdowns);
+  }
   // 発車済表示を12:01に確実に消すため、15秒ごとに状態を更新する。
   setInterval(updateCountdowns, 15000);
 })();
