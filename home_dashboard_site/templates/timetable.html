@@ -45,10 +45,9 @@
                   </div>
                   {% if train.note %}<p class="tt-note">{{ train.note }}</p>{% endif %}
                   <p class="tt-countdown" data-countdown>
-                    {% if train.is_stopped %}停車中{% elif train.is_past %}{% if train.departure_iso %}発車済{% else %}到着済{% endif %}{% elif train.minutes_until <= 1 %}{% if train.event_kind == 'arrival' %}まもなく到着{% else %}まもなく発車{% endif %}{% else %}{% if train.event_kind == 'arrival' %}到着まであと {{ train.minutes_until }} 分{% else %}発車まであと {{ train.minutes_until }} 分{% endif %}{% endif %}
+                    {% if train.is_stopped %}停車中{% elif train.minutes_until <= 1 %}{% if train.event_kind == 'arrival' %}まもなく到着{% else %}まもなく発車{% endif %}{% else %}{% if train.event_kind == 'arrival' %}到着まであと {{ train.minutes_until }} 分{% else %}発車まであと {{ train.minutes_until }} 分{% endif %}{% endif %}
                   </p>
                 </div>
-                <span class="tt-past-label">{% if train.departure_iso %}発車済{% else %}到着済{% endif %}</span>
               </article>
               </a>
             {% endfor %}
@@ -71,24 +70,24 @@
 </section>
 
 <style>
-.tt-page{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,30px);color:var(--text-color,#1f2937);box-sizing:border-box}
+.tt-page{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,30px);color:var(--text-color,#1f2937)}
 .tt-header{display:flex;align-items:flex-start;margin-bottom:16px}
 .tt-header h1{margin:0;font-size:clamp(1.35rem,4vw,2rem);line-height:1.25}
 .tt-subtitle{margin:5px 0 0;font-size:.9rem;opacity:.68;letter-spacing:.01em}
-.tt-directions{display:grid;gap:18px;min-height:0}
+.tt-directions{display:grid;gap:18px}
 .tt-direction{border:1px solid var(--border-color,#d7dce5);border-radius:18px;overflow:hidden;background:var(--card-bg,rgba(128,128,128,.035))}
 .tt-direction-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;background:rgba(100,116,139,.09);border-bottom:1px solid var(--border-color,#d7dce5)}
 .tt-platform{margin:0 0 4px;font-size:.8rem;font-weight:800;opacity:.75}
 .tt-direction-heading h2{margin:0;font-size:1.05rem}
 .tt-direction-tag{border:1px solid currentColor;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;opacity:.75}
-.tt-train-list{display:flex;flex:0 0 auto;flex-direction:column;height:var(--tt-list-height,180px);max-height:var(--tt-list-height,180px);min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.tt-train-link{display:block;flex:0 0 auto;min-height:0;color:inherit;text-decoration:none;outline-offset:-3px}.tt-train-link:focus-visible{outline:3px solid #2563eb}.tt-train-link:hover .tt-train{filter:brightness(.98)}
+.tt-train-list{display:grid;max-height:190px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tt-train-link{display:block;color:inherit;text-decoration:none;outline-offset:-3px}.tt-train-link:focus-visible{outline:3px solid #2563eb}.tt-train-link:hover .tt-train{filter:brightness(.98)}
 .tt-train{display:grid;grid-template-columns:85px minmax(0,1fr) auto;gap:13px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border-color,rgba(128,128,128,.2));position:relative}
 .tt-train:last-child{border-bottom:0}
 .tt-train.tt-next{background:rgba(37,99,235,.09);box-shadow:inset 4px 0 #2563eb}
 .tt-train.tt-second{background:rgba(37,99,235,.035);box-shadow:inset 4px 0 rgba(37,99,235,.4)}
-.tt-train.tt-stopped{background:rgba(16,185,129,.10);box-shadow:inset 4px 0 #10b981}
-.tt-train.tt-stopped .tt-countdown{color:#059669}
+.tt-train.tt-stopped{background:rgba(234,179,8,.16);box-shadow:inset 4px 0 #eab308}
+.tt-train.tt-stopped .tt-countdown{color:#a16207}
 .tt-time-column{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
 .tt-time{font-size:1.35rem;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .tt-rank{font-size:.72rem;font-weight:800;color:#2563eb}
@@ -98,7 +97,7 @@
 .tt-cars{font-size:.8rem;opacity:.72}
 .tt-countdown{margin:6px 0 0;font-size:.85rem;font-weight:750;color:#2563eb}
 .tt-note{margin:5px 0 0;font-size:.8rem;opacity:.72}
-.tt-past{opacity:.55}
+.tt-past{opacity:.55;filter:grayscale(1);background:rgba(107,114,128,.12)!important;box-shadow:inset 4px 0 #9ca3af!important}
 .tt-past .tt-countdown{color:inherit}
 .tt-past-label{display:none;font-size:.75rem;white-space:nowrap}
 .tt-past[data-past="true"] .tt-past-label{display:block}
@@ -106,45 +105,7 @@
 .tt-footer-action{display:flex;justify-content:center;margin:24px 0 8px}
 .tt-other-stations{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 22px;border-radius:999px;background:var(--button-bg,#2563eb);color:var(--button-text,#fff);text-decoration:none;font-weight:800;box-shadow:0 3px 10px rgba(0,0,0,.12)}
 .tt-other-stations:hover{filter:brightness(.96)}
-@media(max-width:540px){
-  html.tt-screen,html.tt-screen body{height:100%;overflow:hidden;overscroll-behavior:none}
-  html.tt-screen body{position:fixed;inset:0;width:100%;}
-  html.tt-screen body main,html.tt-screen body #content,html.tt-screen body .container,html.tt-screen body .main-content{min-height:0;overflow:hidden}
-  .tt-page{height:var(--tt-available-height,calc(100dvh - 8px));max-height:var(--tt-available-height,calc(100dvh - 8px));display:flex;flex-direction:column;gap:5px;padding:6px 9px;overflow:hidden}
-  .tt-header{flex:0 0 auto;margin:0}
-  .tt-header h1{font-size:clamp(.95rem,4.2vw,1.2rem);line-height:1.15}
-  .tt-subtitle{margin:2px 0 0;font-size:.68rem}
-  .tt-directions{flex:0 0 auto;grid-template-rows:none;gap:5px;min-height:0;overflow:visible}
-  .tt-direction{display:flex;flex-direction:column;min-height:0;border-radius:12px}
-  /* 一覧は直近2本分の高さに制限し、3本目以降は一覧内スクロールで確認 */
-  .tt-direction-heading{flex:0 0 auto;padding:5px 8px}
-  .tt-direction-heading h2{font-size:.78rem}
-  .tt-platform{font-size:.62rem;margin-bottom:2px}
-  .tt-direction-tag{font-size:.62rem;padding:2px 6px}
-  .tt-train-list{flex:0 0 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-  .tt-train-link{flex:0 0 auto;min-height:0;display:block}
-  .tt-train{width:100%;box-sizing:border-box;grid-template-columns:54px minmax(0,1fr);gap:6px;padding:5px 7px;align-content:center}
-  .tt-time{font-size:.9rem}
-  .tt-time-column{gap:2px}
-  .tt-train-title{gap:4px}
-  .tt-train-title>strong{font-size:.78rem}
-  .tt-type,.tt-cars,.tt-note,.tt-countdown{font-size:.62rem}
-  .tt-type{padding:2px 4px}
-  .tt-countdown{margin-top:2px}
-  .tt-note{margin-top:2px}
-  .tt-rank{font-size:.58rem}
-  .tt-past-label{grid-column:2;justify-self:start;font-size:.62rem}
-  .tt-footer-action{flex:0 0 auto;margin:0}
-  .tt-other-stations{min-height:30px;padding:5px 13px;font-size:.76rem}
-}
-@media(max-width:540px) and (max-height:650px){
-  .tt-page{padding-top:4px;padding-bottom:4px;gap:3px}
-  .tt-header{margin-bottom:0}
-  .tt-direction-heading{padding:4px 7px}
-  .tt-train{padding:4px 6px}
-  .tt-footer-action{margin-top:0}
-  .tt-other-stations{min-height:27px;padding:4px 11px}
-}
+@media(max-width:540px){.tt-train{grid-template-columns:70px minmax(0,1fr);gap:10px;padding:13px 12px}.tt-time{font-size:1.2rem}.tt-train-list{max-height:178px}.tt-past-label{grid-column:2;justify-self:start}.tt-direction-heading{padding:13px}.tt-direction-heading h2{font-size:.95rem}}
 /* ダークモード：文字・背景のコントラストを確保 */
 html body.dark .tt-page{color:#f8fafc}
 html body.dark .tt-direction{background:#171b22;border-color:#3b4350}
@@ -158,8 +119,8 @@ html body.dark .tt-train-link{color:#f8fafc;text-decoration:none}
 html body.dark .tt-train-link:hover .tt-train{filter:brightness(1.18)}
 html body.dark .tt-train.tt-next{background:#1e3558;box-shadow:inset 4px 0 #60a5fa}
 html body.dark .tt-train.tt-second{background:#202a3a;box-shadow:inset 4px 0 #527db8}
-html body.dark .tt-train.tt-stopped{background:#173b32;box-shadow:inset 4px 0 #34d399}
-html body.dark .tt-train.tt-stopped .tt-countdown{color:#6ee7b7}
+html body.dark .tt-train.tt-stopped{background:#493b16;box-shadow:inset 4px 0 #facc15}
+html body.dark .tt-train.tt-stopped .tt-countdown{color:#fde68a}
 html body.dark .tt-countdown,
 html body.dark .tt-rank{color:#93c5fd}
 html body.dark .tt-past .tt-countdown{color:#e5e7eb}
@@ -170,47 +131,28 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
 </style>
 <script>
 (function(){
-  const page = document.querySelector('.tt-page');
-
-  // スマートフォンではページ全体を画面内に固定し、列車一覧だけをスクロールさせる。
-  if (page && window.matchMedia('(max-width: 540px)').matches) {
-    document.documentElement.classList.add('tt-screen');
-    const fitPage = () => {
-      const top = Math.max(0, page.getBoundingClientRect().top);
-      page.style.setProperty('--tt-available-height', Math.max(250, window.innerHeight - top - 4) + 'px');
-    };
-    fitPage();
-    window.addEventListener('resize', fitPage, {passive:true});
-    window.addEventListener('orientationchange', fitPage, {passive:true});
-  }
-
   function updateCountdowns(){
     const now = new Date();
-
     document.querySelectorAll('.tt-train-list').forEach(list => {
       const rows = Array.from(list.querySelectorAll('.tt-train[data-event]'));
       const upcoming = [];
-      const stoppedRows = [];
 
       rows.forEach(row => {
-        const eventRaw = row.getAttribute('data-event');
+        const eventTime = new Date(row.getAttribute('data-event'));
         const arrivalRaw = row.getAttribute('data-arrival');
         const departureRaw = row.getAttribute('data-departure');
-        const eventTime = eventRaw ? new Date(eventRaw) : null;
         const arrival = arrivalRaw ? new Date(arrivalRaw) : null;
         const departure = departureRaw ? new Date(departureRaw) : null;
         const kind = row.getAttribute('data-event-kind');
         const countdown = row.querySelector('[data-countdown]');
         const pastLabel = row.querySelector('.tt-past-label');
-        if (!countdown || !eventTime || Number.isNaN(eventTime.getTime())) return;
+        if (!countdown || Number.isNaN(eventTime.getTime())) return;
 
-        const validArrival = !!(arrival && !Number.isNaN(arrival.getTime()));
-        const validDeparture = !!(departure && !Number.isNaN(departure.getTime()));
-        const stopped = validArrival && validDeparture && arrival <= now && now < departure;
-        const departed = validDeparture && now >= departure;
-        // 発車時刻の属する1分間だけ「発車済」を表示。12:00発なら12:00中に表示し、12:01に消す。
-        const departureFresh = departed && now.getTime() < departure.getTime() + 60000;
-        const arrivedAtTerminus = !validDeparture && validArrival && now >= arrival;
+        const validArrival = arrival && !Number.isNaN(arrival.getTime());
+        const validDeparture = departure && !Number.isNaN(departure.getTime());
+        const stopped = !!(validArrival && validDeparture && arrival <= now && now < departure);
+        const departed = !!(validDeparture && now >= departure);
+        const arrivedAtTerminus = !!(!validDeparture && validArrival && now >= arrival);
         const eventPassed = now >= eventTime;
         const past = !stopped && (departed || arrivedAtTerminus || (eventPassed && !validDeparture));
 
@@ -220,123 +162,71 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         row.classList.toggle('tt-past', past);
 
         if (stopped) {
-          stoppedRows.push(row);
           countdown.textContent = '停車中';
         } else if (departed) {
-          countdown.textContent = departureFresh ? '発車済' : '';
-        } else if (arrivedAtTerminus) {
-          countdown.textContent = '到着済';
-        } else if (eventTime > now) {
-          const minutes = Math.max(0, Math.ceil((eventTime.getTime() - now.getTime()) / 60000));
-          countdown.textContent = kind === 'arrival'
-            ? (minutes <= 1 ? 'まもなく到着' : '到着まであと ' + minutes + ' 分')
-            : (minutes <= 1 ? 'まもなく発車' : '発車まであと ' + minutes + ' 分');
-          upcoming.push({row, eventTime});
-        } else {
+          // 発車済の文字は表示せず、列車全体をグレー表示する。
           countdown.textContent = '';
+        } else if (arrivedAtTerminus) {
+          countdown.textContent = '';
+        } else {
+          const diffMs = eventTime.getTime() - now.getTime();
+          const minutes = Math.max(0, Math.ceil(diffMs / 60000));
+          if (kind === 'arrival') {
+            countdown.textContent = minutes <= 1 ? 'まもなく到着' : '到着まであと ' + minutes + ' 分';
+          } else {
+            countdown.textContent = minutes <= 1 ? 'まもなく発車' : '発車まであと ' + minutes + ' 分';
+          }
+          if (eventTime > now) upcoming.push({row, eventTime});
         }
 
-        if (pastLabel) {
-          pastLabel.textContent = stopped ? '' : (departed ? (departureFresh ? '発車済' : '') : (arrivedAtTerminus ? '到着済' : ''));
-        }
-
-        // 重要：列車行の display を none にしない。全列車をDOMに残してスクロール可能にする。
-        row.style.display = '';
       });
 
       upcoming.sort((a, b) => a.eventTime - b.eventTime);
-      stoppedRows.sort((a, b) => {
-        const aTime = new Date(a.getAttribute('data-departure')).getTime();
-        const bTime = new Date(b.getAttribute('data-departure')).getTime();
-        return aTime - bTime;
-      });
+      const nextTwo = new Set(upcoming.slice(0, 2).map(item => item.row));
 
-      // 既存の順位表示をリセットするが、行自体は削除・非表示にしない。
       rows.forEach(row => {
         row.classList.remove('tt-next', 'tt-second');
         const rank = row.querySelector('.tt-rank');
         if (rank) rank.remove();
+        const countdown = row.querySelector('[data-countdown]');
+        if (!countdown) return;
+
+        const isStopped = row.getAttribute('data-stopped') === 'true';
+        const isPast = row.getAttribute('data-past') === 'true';
+        const departureRaw = row.getAttribute('data-departure');
+        const departure = departureRaw ? new Date(departureRaw) : null;
+        const departed = !!(departure && !Number.isNaN(departure.getTime()) && now >= departure);
+        const arrivalRaw = row.getAttribute('data-arrival');
+        const arrival = arrivalRaw ? new Date(arrivalRaw) : null;
+        const arrivedAtTerminus = !!(!departure && arrival && !Number.isNaN(arrival.getTime()) && now >= arrival);
+
+        // 直近2列車以外はカウントダウンを隠す。停車中は状態表示を維持。
+        if (!nextTwo.has(row) && !isStopped) {
+          countdown.textContent = '';
+        }
       });
 
-      // 通常時：直近2本を「先発」「次発」。停車中：停車中を「先発」、後続2本を「次発」「次々発」。
-      const ranked = [];
-      const activeStopped = stoppedRows[0];
-      if (activeStopped) {
-        ranked.push({row: activeStopped, label: '先発'});
-        upcoming.forEach(item => {
-          if (ranked.length < 3) ranked.push({row: item.row, label: ranked.length === 1 ? '次発' : '次々発'});
-        });
-      } else {
-        upcoming.slice(0, 2).forEach((item, index) => {
-          ranked.push({row: item.row, label: index === 0 ? '先発' : '次発'});
-        });
-      }
-
-      ranked.forEach((item, index) => {
+      upcoming.slice(0, 2).forEach((item, index) => {
         item.row.classList.add(index === 0 ? 'tt-next' : 'tt-second');
         const column = item.row.querySelector('.tt-time-column');
         if (column) {
           const rank = document.createElement('span');
           rank.className = 'tt-rank';
-          rank.textContent = item.label;
+          rank.textContent = index === 0 ? '次発' : '次々発';
           column.appendChild(rank);
         }
       });
 
-      // PC・スマートフォン共通で、一覧の表示高を先頭2行分に合わせる。
-      // 行はすべて残し、3行目以降を一覧内スクロールで確認できるようにする。
-      const links = Array.from(list.querySelectorAll('.tt-train-link'));
-      const firstTwo = links.slice(0, 2);
-      // 備考・「到着まで」などの補助行も含め、列車カードそのものの実高さを測る。
-      // テキストが折り返してカードが高くなった場合も、先頭2列車が切れない高さにする。
-      const measureTwoRows = () => {
-        const rowsHeight = firstTwo.reduce((sum, link) => {
-          const card = link.querySelector('.tt-train');
-          if (!card) return sum + link.getBoundingClientRect().height;
-          return sum + Math.ceil(card.getBoundingClientRect().height);
-        }, 0);
-        const hasExtraLines = firstTwo.some(link => {
-          const note = link.querySelector('.tt-note');
-          const countdown = link.querySelector('.tt-countdown');
-          return (note && note.textContent.trim()) ||
-                 (countdown && countdown.textContent.trim());
-        });
-        // サブ行がある場合は境界線・端末ごとの丸め誤差ぶんを少し加算。
-        return rowsHeight + (hasExtraLines ? 4 : 2);
-      };
-      const fallbackHeight = window.matchMedia('(max-width: 540px)').matches ? 112 : 180;
-      const twoRowsHeight = measureTwoRows();
-      list.style.setProperty(
-        '--tt-list-height',
-        Math.max(72, twoRowsHeight || fallbackHeight) + 'px'
-      );
-
-      // 初回だけ、直近列車（または停車中の列車）が見える位置に合わせる。
       if (!list.dataset.initialPositioned) {
-        const target = activeStopped || upcoming[0]?.row;
-        if (target) {
-          const link = target.closest('.tt-train-link');
-          if (link) {
-            list.scrollTop = Math.max(
-              0,
-              link.getBoundingClientRect().top -
-                list.getBoundingClientRect().top +
-                list.scrollTop
-            );
-          }
-        }
+        const firstUpcoming = upcoming[0]?.row;
+        const stoppedRow = rows.find(row => row.getAttribute('data-stopped') === 'true');
+        const target = stoppedRow || firstUpcoming;
+        if (target) list.scrollTop = Math.max(0, target.offsetTop - list.offsetTop);
         list.dataset.initialPositioned = 'true';
       }
     });
   }
-
   updateCountdowns();
-  // 文字の折り返し・フォント読み込み後も、先頭2列車が見切れない高さに追従する。
-  window.addEventListener('resize', updateCountdowns, {passive:true});
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(updateCountdowns);
-  }
-  // 発車済表示を12:01に確実に消すため、15秒ごとに状態を更新する。
   setInterval(updateCountdowns, 15000);
 })();
 </script>
