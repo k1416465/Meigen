@@ -806,6 +806,84 @@ document.addEventListener("DOMContentLoaded", () => {
     box-sizing: border-box !important;
 }
 
+
+
+/* 駅選択：背景は塗りつぶさず、黄色い丸の右に駅名を表示。2列固定 */
+.operation-page .station-selector .station-grid.station-grid-large {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: auto !important;
+    gap: 10px 14px !important;
+    align-items: center !important;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 6px 2px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: inherit !important;
+    text-align: left !important;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+.operation-page .station-selector .station-radio {
+    position: relative !important;
+    display: inline-block !important;
+    flex: 0 0 19px !important;
+    width: 19px !important;
+    height: 19px !important;
+    box-sizing: border-box !important;
+    border: 2px solid #FFD900 !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+}
+.operation-page .station-selector .station-button.is-selected .station-radio {
+    background: #FFD900 !important;
+    box-shadow: inset 0 0 0 4px transparent !important;
+}
+.operation-page .station-selector .station-name {
+    display: block !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    color: inherit !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    overflow-wrap: anywhere !important;
+}
+.operation-page .station-selector .station-name-en { display: none !important; }
+@media (max-width: 600px) {
+    .operation-page .station-selector .station-grid.station-grid-large {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px 10px !important;
+    }
+    .operation-page .station-selector .station-grid.station-grid-large > .station-button {
+        min-height: 40px !important;
+        gap: 7px !important;
+        padding: 5px 0 !important;
+    }
+    .operation-page .station-selector .station-radio {
+        flex-basis: 17px !important;
+        width: 17px !important;
+        height: 17px !important;
+    }
+    .operation-page .station-selector .station-name { font-size: 14px !important; }
+}
+
 </style>
 
 
