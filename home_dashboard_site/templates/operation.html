@@ -646,7 +646,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     .operation-page .station-grid.station-grid-large {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: 2px !important;
+        column-gap: 6px !important; /* 横の隙間 */
+        row-gap: 3px !important;    /* 縦の隙間 */
     }
 
     .operation-page .station-grid.station-grid-large .station-button {
