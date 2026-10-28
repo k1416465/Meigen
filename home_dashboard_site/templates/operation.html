@@ -645,8 +645,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     .operation-page .station-grid.station-grid-large {
-        rid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        vgrid-auto-rows: 62px !important; /* 56pxのボタン＋6pxの隙間 */
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        grid-auto-rows: 62px !important; /* 56pxのボタン＋6pxの隙間 */
         column-gap: 6px !important;
         row-gap: 0 !important;
         align-content: start !important;
@@ -671,16 +671,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     .operation-page .station-grid.station-grid-large .station-name-flower-park {
+        max-width: 100% !important;
         font-size: 11px !important;
         line-height: 1.1 !important;
-        white-space: nowrap !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
     }
 
-
     .operation-page .station-grid.station-grid-large .station-button-flower-park .station-name-en {
+        max-width: 100% !important;
         font-size: 8px !important;
-        line-height: 1 !important;
-        white-space: nowrap !important;
+        line-height: 1.1 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
     }
 
     .operation-page .station-grid.station-grid-large .station-name-en {
