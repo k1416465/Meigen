@@ -448,25 +448,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 .operation-page .station-grid.station-grid-large {
     display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 12px !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-auto-rows: 56px !important;
+    gap: 6px 6px !important;
+    row-gap: 6px !important;
+    grid-row-gap: 6px !important;
+    align-content: start !important;
     align-items: stretch !important;
-    grid-auto-rows: 82px !important;
 }
 
 .operation-page .station-grid.station-grid-large .station-button {
     box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    min-height: 82px !important;
-    height: 82px !important;
-    padding: 8px 8px !important;
-    text-align: center !important;
-    overflow-wrap: anywhere !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    margin: 0 !important;
 }
 
 .operation-page .station-grid.station-grid-large .station-name {
