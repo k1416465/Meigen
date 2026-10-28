@@ -4714,3 +4714,31 @@ html body.dark .operation-page .station-selector .station-grid.station-grid-larg
     background: transparent !important;
     border-color: #FFD900 !important;
 }
+
+/* 最終修正：カスタムの丸をやめ、ブラウザー標準のラジオボタンだけを表示 */
+.operation-page .station-selector .station-radio,
+.operation-page .station-selector .station-grid.station-grid-large .station-radio {
+    appearance: auto !important;
+    -webkit-appearance: radio !important;
+    display: inline-block !important;
+    flex: 0 0 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    margin: 0 7px 0 0 !important;
+    padding: 0 !important;
+    border: initial !important;
+    border-radius: initial !important;
+    background: initial !important;
+    box-shadow: none !important;
+    accent-color: #FFD900 !important;
+    position: static !important;
+}
+.operation-page .station-selector .station-radio::before,
+.operation-page .station-selector .station-radio::after,
+.operation-page .station-selector .station-button.is-selected .station-radio::before,
+.operation-page .station-selector .station-button.is-selected .station-radio::after {
+    content: none !important;
+    display: none !important;
+}
