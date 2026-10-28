@@ -4558,33 +4558,21 @@ a.recording-tag:hover { opacity: .8; }
   }
 }
 
-
-/* 修正：駅ボタン間の隙間を視覚的にも確保（style.zip 内 style.css 用） */
-html body .page-container.operation-page .station-selector .station-grid.station-grid-large {
+/* 時刻表ページ：駅選択ボタンを日本語のみ・2列の角丸黄色ボタンに */
+.operation-page .station-grid.station-grid-large {
     display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    column-gap: 8px !important;
-    row-gap: 8px !important;
-    gap: 8px !important;
-    padding: 8px !important;
-    box-sizing: border-box !important;
-    background: #ffffff !important;
-    border-radius: 10px !important;
-    align-items: stretch !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    row-gap: 10px !important;
+    column-gap: 10px !important;
 }
-html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button,
-html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:link,
-html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:visited,
-html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:hover,
-html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:active,
-html body .page-container.operation-page .station-selector .station-grid.station-grid-large > a.station-button:focus {
-    width: auto !important;
-    min-width: 0 !important;
+.operation-page .station-grid.station-grid-large > .station-button {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 56px !important;
     margin: 0 !important;
-    box-sizing: border-box !important;
-}
-@media (min-width: 621px) {
-    html body .page-container.operation-page .station-selector .station-grid.station-grid-large {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    }
+    border-radius: 16px !important;
+    background: #FFD900 !important;
+    border: 0 !important;
+    color: #111 !important;
 }
