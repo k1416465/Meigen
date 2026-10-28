@@ -5,16 +5,14 @@
   const selector = document.querySelector('.operation-page .station-selector');
   if (!selector || selector.dataset.selectionReady === 'true') return;
   selector.dataset.selectionReady = 'true';
-  const buttons = selector.querySelectorAll('.station-button[data-station]');
+  const radios = selector.querySelectorAll('input.station-radio[name="station"]');
+  const choices = selector.querySelectorAll('.station-button[data-station]');
   const confirmButton = selector.querySelector('#stationConfirm');
   let selectedStation = '';
-  buttons.forEach(button => button.addEventListener('click', () => {
-    selectedStation = button.dataset.station;
-    buttons.forEach(item => {
-      const selected = item === button;
-      item.classList.toggle('is-selected', selected);
-      item.setAttribute('aria-pressed', String(selected));
-    });
+  radios.forEach(radio => radio.addEventListener('change', () => {
+    if (!radio.checked) return;
+    selectedStation = radio.value;
+    choices.forEach(choice => choice.classList.toggle('is-selected', choice.dataset.station === selectedStation));
     confirmButton.disabled = !selectedStation;
   }));
   confirmButton.addEventListener('click', () => {
@@ -35,18 +33,18 @@
 
     <!-- 駅選択 -->
     <section class="station-selector">
-        <div class="station-grid station-grid-large" role="group" aria-label="駅を選択">
-            <button type="button" class="station-button" data-station="小山" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">小山</span></button>
-            <button type="button" class="station-button" data-station="思川" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">思川</span></button>
-            <button type="button" class="station-button" data-station="栃木" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">栃木</span></button>
-            <button type="button" class="station-button" data-station="大平下" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">大平下</span></button>
-            <button type="button" class="station-button" data-station="岩舟" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">岩舟</span></button>
-            <button type="button" class="station-button" data-station="佐野" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">佐野</span></button>
-            <button type="button" class="station-button" data-station="富田" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">富田</span></button>
-            <button type="button" class="station-button" data-station="あしかがフラワーパーク" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">あしかが<br>フラワーパーク</span></button>
-            <button type="button" class="station-button" data-station="足利" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">足利</span></button>
-            <button type="button" class="station-button" data-station="山前" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">山前</span></button>
-            <button type="button" class="station-button" data-station="小俣" aria-pressed="false"><span class="station-radio" aria-hidden="true"></span><span class="station-name">小俣</span></button>
+        <div class="station-grid station-grid-large" role="radiogroup" aria-label="駅を選択">
+            <label class="station-button" data-station="小山"><input type="radio" class="station-radio" name="station" value="小山" aria-label="小山"><span class="station-name">小山</span></label>
+            <label class="station-button" data-station="思川"><input type="radio" class="station-radio" name="station" value="思川" aria-label="思川"><span class="station-name">思川</span></label>
+            <label class="station-button" data-station="栃木"><input type="radio" class="station-radio" name="station" value="栃木" aria-label="栃木"><span class="station-name">栃木</span></label>
+            <label class="station-button" data-station="大平下"><input type="radio" class="station-radio" name="station" value="大平下" aria-label="大平下"><span class="station-name">大平下</span></label>
+            <label class="station-button" data-station="岩舟"><input type="radio" class="station-radio" name="station" value="岩舟" aria-label="岩舟"><span class="station-name">岩舟</span></label>
+            <label class="station-button" data-station="佐野"><input type="radio" class="station-radio" name="station" value="佐野" aria-label="佐野"><span class="station-name">佐野</span></label>
+            <label class="station-button" data-station="富田"><input type="radio" class="station-radio" name="station" value="富田" aria-label="富田"><span class="station-name">富田</span></label>
+            <label class="station-button" data-station="あしかがフラワーパーク"><input type="radio" class="station-radio" name="station" value="あしかがフラワーパーク" aria-label="あしかがフラワーパーク"><span class="station-name">あしかが<br>フラワーパーク</span></label>
+            <label class="station-button" data-station="足利"><input type="radio" class="station-radio" name="station" value="足利" aria-label="足利"><span class="station-name">足利</span></label>
+            <label class="station-button" data-station="山前"><input type="radio" class="station-radio" name="station" value="山前" aria-label="山前"><span class="station-name">山前</span></label>
+            <label class="station-button" data-station="小俣"><input type="radio" class="station-radio" name="station" value="小俣" aria-label="小俣"><span class="station-name">小俣</span></label>
         </div>
         <button type="button" id="stationConfirm" class="station-confirm" disabled>決定</button>
     </section>
@@ -840,20 +838,29 @@ document.addEventListener("DOMContentLoaded", () => {
     border: 0 !important;
     box-shadow: none !important;
 }
-.operation-page .station-selector .station-radio {
+.operation-page .station-selector input.station-radio {
+    appearance: none !important;
+    -webkit-appearance: none !important;
     position: relative !important;
     display: inline-block !important;
     flex: 0 0 19px !important;
     width: 19px !important;
     height: 19px !important;
+    min-width: 19px !important;
+    min-height: 19px !important;
+    margin: 0 !important;
     box-sizing: border-box !important;
-    border: 2px solid #FFD900 !important;
+    border: 2px solid #888 !important;
     border-radius: 50% !important;
     background: transparent !important;
+    cursor: pointer !important;
 }
-.operation-page .station-selector .station-button.is-selected .station-radio {
-    background: #FFD900 !important;
-    box-shadow: inset 0 0 0 4px transparent !important;
+.operation-page .station-selector input.station-radio:checked {
+    border-color: #888 !important;
+    background: transparent !important;
+}
+.operation-page .station-selector .station-button {
+    cursor: pointer !important;
 }
 .operation-page .station-selector .station-name {
     display: block !important;
@@ -912,3 +919,18 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 {% endblock %}
+
+<style>
+.operation-page .station-selector input.station-radio:focus-visible {
+  outline: 3px solid #1685e8 !important;
+  outline-offset: 3px !important;
+}
+.operation-page .station-selector .station-button {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+@media (prefers-color-scheme: dark) {
+  .operation-page .station-selector .station-name { color: #fff !important; }
+}
+</style>
