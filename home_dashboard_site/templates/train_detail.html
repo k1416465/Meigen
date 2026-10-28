@@ -1,20 +1,20 @@
 {% extends "base.html" %}
-{% block title %}{{ train.train_number }} 列車時刻表｜迷言{% endblock %}
+{% block title %}{{ train.train_number }}｜迷言{% endblock %}
 {% block content %}
 <section class="td-page">
   <header class="td-header">
-    <p class="td-eyebrow">{{ line_name }}・列車時刻表</p>
+    <p class="td-eyebrow">{{ line_name }} 列車時刻表</p>
     <h1>{{ train.train_number }} <span>{{ train.type }}</span></h1>
     <p class="td-route">{{ train.origin }} <span aria-hidden="true">→</span> {{ train.destination }}</p>
     <div class="td-meta">
-      <span>{{ train.direction }}列車</span>
+      <span>{{ train.direction }}</span>
       {% if train.cars %}<span>{{ train.cars }}両</span>{% endif %}
     </div>
     {% if train.note %}<p class="td-note">{{ train.note }}</p>{% endif %}
   </header>
 
   <section class="td-card" aria-label="停車駅と時刻">
-    <div class="td-card-heading"><h2>停車駅・到着／発車時刻</h2><p>各駅の到着時刻と発車時刻</p></div>
+    <div class="td-card-heading"><h2>各駅の到着･発車時刻</h2></div>
     <ol class="td-stops">
       {% for stop in stops %}
       <li class="td-stop">
@@ -37,7 +37,7 @@
 
   <div class="td-actions">
     {% if back_station %}<a class="td-button td-primary" href="{{ url_for('timetable_page', station=back_station) }}">駅の時刻表に戻る</a>{% endif %}
-    <a class="td-button" href="/operation">ほかの駅を選ぶ</a>
+    <a class="td-button" href="/operation">他の駅を選ぶ</a>
   </div>
 </section>
 <style>
