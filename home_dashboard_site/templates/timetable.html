@@ -48,7 +48,7 @@
                     {% if train.is_stopped %}停車中{% elif train.is_past %}{% if train.departure_iso %}発車済{% else %}到着済{% endif %}{% elif train.minutes_until <= 1 %}{% if train.event_kind == 'arrival' %}まもなく到着{% else %}まもなく発車{% endif %}{% else %}{% if train.event_kind == 'arrival' %}到着まであと {{ train.minutes_until }} 分{% else %}発車まであと {{ train.minutes_until }} 分{% endif %}{% endif %}
                   </p>
                 </div>
-                <span class="tt-past-label">{% if train.departure_iso %}発車済{% else %}到着済{% endif %}</span>
+
               </article>
               </a>
             {% endfor %}
@@ -272,16 +272,6 @@
     color: inherit;
 }
 
-.tt-past-label {
-    display: none;
-    font-size: .75rem;
-    white-space: nowrap;
-}
-
-.tt-past[data-past="true"] .tt-past-label {
-    display: block;
-}
-
 .tt-empty {
     padding: 16px;
     border: 1px dashed var(--border-color, #cbd5e1);
@@ -390,12 +380,6 @@
 
     .tt-rank {
         font-size: .68rem;
-    }
-
-    .tt-past-label {
-        grid-column: 2;
-        justify-self: start;
-        font-size: .75rem;
     }
 
     .tt-footer-action {
@@ -572,7 +556,6 @@ html body.dark .tt-other-stations {
 
                 const kind = row.getAttribute('data-event-kind');
                 const countdown = row.querySelector('[data-countdown]');
-                const pastLabel = row.querySelector('.tt-past-label');
 
                 if (!countdown || !eventTime || Number.isNaN(eventTime.getTime())) {
                     return;
@@ -633,15 +616,6 @@ html body.dark .tt-other-stations {
                     countdown.textContent = '';
                 }
 
-                if (pastLabel) {
-                    pastLabel.textContent = stopped
-                        ? ''
-                        : departed
-                            ? (departureFresh ? '発車済' : '')
-                            : arrivedAtTerminus
-                                ? '到着済'
-                                : '';
-                }
 
                 // 行は非表示にせず、すべてスクロール可能な状態で残す。
                 row.style.display = '';
