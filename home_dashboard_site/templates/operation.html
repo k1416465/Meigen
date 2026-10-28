@@ -793,6 +793,26 @@ document.addEventListener("DOMContentLoaded", () => {
         font-size: 12px !important;
     }
 }
+
+/* 駅選択ボタンの間隔を強制的に確保 */
+.operation-page .station-selector .station-grid.station-grid-large {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    column-gap: 8px !important;
+    row-gap: 8px !important;
+    gap: 8px !important;
+    grid-auto-rows: 56px !important;
+    height: auto !important;
+}
+
+.operation-page .station-selector .station-grid.station-grid-large > .station-button {
+    width: auto !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
 </style>
 
 {% endblock %}
