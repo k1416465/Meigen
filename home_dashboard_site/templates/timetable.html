@@ -569,22 +569,21 @@ html body.dark .tt-other-stations {
             list.querySelectorAll('.tt-train-link')
         );
 
-        const visibleRows = links.slice(0, VISIBLE_TRAIN_COUNT);
+        const visibleTrainCount = 3;
+        const visibleRows = links.slice(0, visibleTrainCount);
 
         if (visibleRows.length === 0) {
             list.style.setProperty('--tt-list-height', '0px');
             return;
         }
 
-        // getBoundingClientRect() は小数ピクセルを含む実寸を返す。
-        // 順位ラベル・備考欄を反映したレイアウト確定後に測定する。
+        // 先頭3本の実際の高さを合計する
         const exactHeight = visibleRows.reduce((sum, link) => {
             return sum + link.getBoundingClientRect().height;
         }, 0);
 
-        // 切り上げると4本目がわずかに見える場合があるため、
-        // 一覧の高さは合計値を切り下げる。
-        const fittedHeight = Math.max(0, Math.floor(exactHeight));
+        // 端数を切り上げて、3本目の下端が欠けないようにする
+        const fittedHeight = Math.ceil(exactHeight);
 
         list.style.setProperty(
             '--tt-list-height',
