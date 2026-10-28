@@ -640,28 +640,38 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 @media (max-width: 768px) {
+    .operation-page > .page-header {
+        margin-bottom: 18px !important;
+    }
+
     .operation-page .station-grid.station-grid-large {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        grid-auto-rows: 56px !important;
+        column-gap: 6px !important; /* 横の隙間 */
+        row-gap: 6px !important;    /* 縦の隙間を横と同じにする */
         align-content: start !important;
         align-items: stretch !important;
-        justify-content: start !important;
-        column-gap: 6px !important;
-        row-gap: 8px !important;
     }
 
     .operation-page .station-grid.station-grid-large .station-button {
-        box-sizing: border-box !important;
-        width: 100% !important;
+        background: #FFFDE7 !important;
         min-height: 56px !important;
         height: 56px !important;
         padding: 4px 6px !important;
-        margin: 0 !important;
-        gap: 0 !important;
-        background: #FFFDE7 !important;
         border: 1px solid #FCD800 !important;
+        gap: 0 !important;
     }
-}
+
+    .operation-page .station-grid.station-grid-large .station-name {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+    }
+
+
+    .operation-page .station-grid.station-grid-large .station-name-flower-park {
+        font-size: 11px !important;
+        line-height: 1.1 !important;
+        white-space: nowrap !important;
+    }
 
 
     .operation-page .station-grid.station-grid-large .station-button-flower-park .station-name-en {
