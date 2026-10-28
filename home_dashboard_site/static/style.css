@@ -4702,3 +4702,12 @@ html body.dark .operation-page .station-selector .station-grid.station-grid-larg
     color: #fff !important;
     -webkit-text-fill-color: #fff !important;
 }
+
+/* 未選択・選択中とも外側の円はグレー。選択中は内側だけ黄色 */
+.operation-page .station-selector .station-grid.station-grid-large > .station-button:not(.is-selected) .station-radio,
+.operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected .station-radio {
+    border-color: #9CA3AF !important;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected .station-radio::after {
+    background: #FFD900 !important;
+}
