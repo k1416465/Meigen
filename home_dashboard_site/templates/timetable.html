@@ -72,6 +72,7 @@
 </section>
 
 <style>
+@media(min-width:541px){html,body{height:auto;min-height:100%;overflow-y:auto!important} .tt-page{height:auto;max-height:none;overflow:visible}}
 .tt-page{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,30px);color:var(--text-color,#1f2937);box-sizing:border-box}
 .tt-header{display:flex;align-items:flex-start;margin-bottom:16px}
 .tt-header h1{margin:0;font-size:clamp(1.35rem,4vw,2rem);line-height:1.25}
@@ -82,7 +83,7 @@
 .tt-platform{margin:0 0 4px;font-size:.8rem;font-weight:800;opacity:.75}
 .tt-direction-heading h2{margin:0;font-size:1.05rem}
 .tt-direction-tag{border:1px solid currentColor;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;opacity:.75}
-.tt-train-list{display:flex;flex-direction:column;min-height:0;height:var(--tt-list-height,auto);max-height:var(--tt-list-height,100%);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.tt-train-list{display:flex;flex-direction:column;min-height:0;height:auto;max-height:none;overflow:visible;overscroll-behavior:contain}
 .tt-train-link{display:block;flex:1 1 0;min-height:0;color:inherit;text-decoration:none;outline-offset:-3px}.tt-train-link:focus-visible{outline:3px solid #2563eb}.tt-train-link:hover .tt-train{filter:brightness(.98)}
 .tt-train{display:grid;grid-template-columns:85px minmax(0,1fr) auto;gap:13px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border-color,rgba(128,128,128,.2));position:relative}
 .tt-train:last-child{border-bottom:0}
@@ -121,7 +122,7 @@
   .tt-direction-heading h2{font-size:.78rem}
   .tt-platform{font-size:.62rem;margin-bottom:2px}
   .tt-direction-tag{font-size:.62rem;padding:2px 6px}
-  .tt-train-list{flex:1 1 auto;min-height:0;height:auto;max-height:var(--tt-list-height,100%);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .tt-train-list{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
   .tt-train-link{flex:0 0 auto;min-height:0;display:block}
   .tt-train{width:100%;box-sizing:border-box;grid-template-columns:54px minmax(0,1fr);gap:6px;padding:5px 7px;align-content:center}
   .tt-time{font-size:.9rem}
@@ -170,17 +171,6 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
 </style>
 <script>
 (function(){
-  const page = document.querySelector('.tt-page');
-  if (page && window.matchMedia('(max-width: 540px)').matches) {
-    document.documentElement.classList.add('tt-screen');
-    const fitPage = () => {
-      const top = Math.max(0, page.getBoundingClientRect().top);
-      page.style.setProperty('--tt-available-height', Math.max(250, window.innerHeight - top - 4) + 'px');
-    };
-    fitPage();
-    window.addEventListener('resize', fitPage, {passive:true});
-    window.addEventListener('orientationchange', fitPage, {passive:true});
-  }
   function updateCountdowns(){
     const now = new Date();
     document.querySelectorAll('.tt-train-list').forEach(list => {
@@ -288,16 +278,6 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
           column.appendChild(rank);
         }
       });
-
-      // 備考・カウントダウン込みの実測高さで、スクロール領域に2列車分を確保。
-      const links = Array.from(list.querySelectorAll('.tt-train-link'));
-      const rankedLinks = ranked.map(item => item.row.closest('.tt-train-link')).filter(Boolean);
-      const firstTwo = rankedLinks.slice(0, 2);
-      const measuredHeight = firstTwo.reduce((sum, link) => sum + link.getBoundingClientRect().height, 0);
-      if (measuredHeight > 0) {
-        list.style.setProperty('--tt-list-height', Math.ceil(measuredHeight) + 'px');
-      }
-      list.style.overflowY = links.length > 2 ? 'auto' : 'hidden';
 
       if (!list.dataset.initialPositioned) {
         const firstUpcoming = upcoming[0]?.row;
