@@ -21,8 +21,8 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 # 録音管理画面の設定：運用前に必ず自分だけが知る値へ変更してください。
-RECORDING_ADMIN_PASSWORD = "Meigen123"
-FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
+RECORDING_ADMIN_PASSWORD = ""
+FLASK_SESSION_SECRET = ""
 app.secret_key = FLASK_SESSION_SECRET
 
 JST = timezone(timedelta(hours=9))
@@ -1047,6 +1047,11 @@ def _extract_detail(text, status, status_index):
         text = text[:min(positions)]
 
     text = _normalise_text(text)
+
+    # 詳細欄に混入する操作案内・状態ラベルを除去
+    text = re.sub(r"路線を登録", "", text)
+    text = re.sub(r"列車遅延", "", text)
+    text = re.sub(r"[ \t　]{2,}", " ", text).strip(" \t　・|｜-—")
 
     # 先頭に路線名が残っている場合は除去
     route_names = (
