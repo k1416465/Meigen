@@ -6,92 +6,78 @@
     <div>
       <h1>{% if station %}{{ line_name }}{{ station }}駅時刻表{% else %}{{ line_name }}時刻表{% endif %}</h1>
       {% if station and station_info.en %}
-        <p class="tt-subtitle">Ryomo Line {{ station_info.en }} Station Timetable</p>
+      <p class="tt-subtitle">Ryomo Line {{ station_info.en }} Station Timetable</p>
       {% endif %}
     </div>
   </header>
 
   {% if station %}
     {% if departures_by_direction %}
-      <div class="tt-directions">
+    <div class="tt-directions">
       {% for direction, section in departures_by_direction.items() %}
-        <section class="tt-direction">
-          <div class="tt-direction-heading">
-            <div>
-              {% if section.info.platform %}<p class="tt-platform">{{ section.info.platform }}</p>{% endif %}
-              <h2>{{ section.info.direction_label }}</h2>
-            </div>
-            <span class="tt-direction-tag">{{ direction }}</span>
+      <section class="tt-direction">
+        <div class="tt-direction-heading">
+          <div>
+            {% if section.info.platform %}
+            <p class="tt-platform">{{ section.info.platform }}</p>
+            {% endif %}
+            <h2>{{ section.info.direction_label }}</h2>
           </div>
+          <span class="tt-direction-tag">{{ direction }}</span>
+        </div>
 
-          {% if section.trains %}
-            <div class="tt-train-list">
-            {% for train in section.trains %}
-              <a href="{{ url_for('train_detail', train_number=train.train_number, station=station) }}"
-                 class="tt-train-link"
-                 aria-label="{{ train.train_number }} {{ train.type }} {{ train.destination }}行きの停車駅時刻表を見る">
-                <article class="tt-train {% if train.upcoming_rank == 1 %}tt-next{% elif train.upcoming_rank == 2 %}tt-second{% endif %} {% if train.is_past %}tt-past{% endif %}"
-                         data-event="{{ train.event_iso }}"
-                         data-arrival="{{ train.arrival_iso }}"
-                         data-departure="{{ train.departure_iso }}"
-                         data-event-kind="{{ train.event_kind }}"
-                         data-past="{{ 'true' if train.is_past else 'false' }}"
-                         data-stopped="{{ 'true' if train.is_stopped else 'false' }}">
-                  <div class="tt-time-column">
-                    <strong class="tt-time">{{ train.time }}</strong>
-                    {% if train.upcoming_rank == 1 %}
-                      <span class="tt-rank">次発</span>
-                    {% elif train.upcoming_rank == 2 %}
-                      <span class="tt-rank">次々発</span>
-                    {% endif %}
-                  </div>
+        {% if section.trains %}
+        <div class="tt-train-list">
+          {% for train in section.trains %}
+          <a href="{{ url_for('train_detail', train_number=train.train_number, station=station) }}"
+             class="tt-train-link"
+             aria-label="{{ train.train_number }} {{ train.type }} {{ train.destination }}行きの停車駅時刻表を見る">
+            <article class="tt-train"
+              data-event="{{ train.event_iso }}"
+              data-arrival="{{ train.arrival_iso }}"
+              data-departure="{{ train.departure_iso }}"
+              data-event-kind="{{ train.event_kind }}"
+              data-past="{{ 'true' if train.is_past else 'false' }}"
+              data-stopped="{{ 'true' if train.is_stopped else 'false' }}">
+              <div class="tt-time-column">
+                <strong class="tt-time">{{ train.time }}</strong>
+              </div>
 
-                  <div class="tt-train-main">
-                    <div class="tt-train-title">
-                      <span class="tt-type">{{ train.type }}</span>
-                      <strong>{{ train.destination }}</strong>
-                      {% if train.cars %}<span class="tt-cars">{{ train.cars }}両</span>{% endif %}
-                    </div>
-
-                    {% if train.note %}<p class="tt-note">{{ train.note }}</p>{% endif %}
-
-                    <p class="tt-countdown" data-countdown>
-                      {% if train.is_stopped %}
-                        停車中
-                      {% elif train.is_past %}
-                        {% if train.departure_iso %}発車済{% else %}到着済{% endif %}
-                      {% elif train.minutes_until <= 1 %}
-                        {% if train.event_kind == 'arrival' %}まもなく到着{% else %}まもなく発車{% endif %}
-                      {% else %}
-                        {% if train.event_kind == 'arrival' %}
-                          到着まであと {{ train.minutes_until }} 分
-                        {% else %}
-                          発車まであと {{ train.minutes_until }} 分
-                        {% endif %}
-                      {% endif %}
-                    </p>
-                  </div>
-
-                  <span class="tt-past-label">{% if train.departure_iso %}発車済{% else %}到着済{% endif %}</span>
-                </article>
-              </a>
-            {% endfor %}
-            </div>
-          {% else %}
-            <p class="tt-empty">この方面の発車時刻はありません。</p>
-          {% endif %}
-        </section>
+              <div class="tt-train-main">
+                <div class="tt-train-title">
+                  <span class="tt-type">{{ train.type }}</span>
+                  <strong>{{ train.destination }}</strong>
+                  {% if train.cars %}<span class="tt-cars">{{ train.cars }}両</span>{% endif %}
+                </div>
+                {% if train.note %}<p class="tt-note">{{ train.note }}</p>{% endif %}
+                <p class="tt-countdown" data-countdown>
+                  {% if train.is_stopped %}停車中
+                  {% elif train.is_past %}発車済
+                  {% elif train.event_kind == 'arrival' %}到着まであと {{ train.minutes_until }} 分
+                  {% else %}発車まであと {{ train.minutes_until }} 分
+                  {% endif %}
+                </p>
+              </div>
+              <span class="tt-past-label"></span>
+            </article>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="tt-empty">この方面の発車時刻はありません。</p>
+        {% endif %}
+      </section>
       {% endfor %}
-      </div>
+    </div>
     {% else %}
-      <p class="tt-empty">この駅の時刻表データが見つかりませんでした。</p>
+    <p class="tt-empty">この駅の時刻表データが見つかりませんでした。</p>
     {% endif %}
   {% endif %}
 
   {% if station %}
-    <div class="tt-footer-action">
-      <a class="tt-other-stations" href="/operation">ほかの駅を選ぶ</a>
-    </div>
+  <div class="tt-footer-action">
+    <a class="tt-other-stations" href="/operation">ほかの駅を選ぶ</a>
+  </div>
   {% endif %}
 </section>
 
@@ -99,14 +85,15 @@
 .tt-page{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,30px);color:var(--text-color,#1f2937);box-sizing:border-box}
 .tt-header{display:flex;align-items:flex-start;margin-bottom:16px}
 .tt-header h1{margin:0;font-size:clamp(1.35rem,4vw,2rem);line-height:1.25}
-.tt-subtitle{margin:5px 0 0;font-size:.9rem;opacity:.68;letter-spacing:.01em}
+.tt-subtitle{margin:5px 0 0;font-size:.9rem;opacity:.68}
 .tt-directions{display:grid;gap:18px;min-height:0}
 .tt-direction{border:1px solid var(--border-color,#d7dce5);border-radius:18px;overflow:hidden;background:var(--card-bg,rgba(128,128,128,.035))}
 .tt-direction-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;background:rgba(100,116,139,.09);border-bottom:1px solid var(--border-color,#d7dce5)}
 .tt-platform{margin:0 0 4px;font-size:.8rem;font-weight:800;opacity:.75}
 .tt-direction-heading h2{margin:0;font-size:1.05rem}
 .tt-direction-tag{border:1px solid currentColor;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;opacity:.75}
-.tt-train-list{display:flex;flex:0 0 auto;flex-direction:column;height:var(--tt-list-height,180px);max-height:var(--tt-list-height,180px);min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+
+.tt-train-list{display:flex;flex-direction:column;height:var(--tt-list-height,240px);max-height:var(--tt-list-height,240px);min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .tt-train-link{display:block;flex:0 0 auto;min-height:0;color:inherit;text-decoration:none;outline-offset:-3px}
 .tt-train-link:focus-visible{outline:3px solid #2563eb}
 .tt-train-link:hover .tt-train{filter:brightness(.98)}
@@ -114,12 +101,9 @@
 .tt-train:last-child{border-bottom:0}
 .tt-train.tt-next{background:rgba(37,99,235,.09);box-shadow:inset 4px 0 #2563eb}
 .tt-train.tt-second{background:rgba(37,99,235,.035);box-shadow:inset 4px 0 rgba(37,99,235,.4)}
-
-/* 停車中：黄色 */
 .tt-train.tt-stopped{background:rgba(250,204,21,.20);box-shadow:inset 4px 0 #eab308}
 .tt-train.tt-stopped .tt-countdown{color:#a16207}
-
-.tt-time-column{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.tt-time-column{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
 .tt-time{font-size:1.35rem;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .tt-rank{font-size:.72rem;font-weight:800;color:#2563eb}
 .tt-train-title{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
@@ -131,11 +115,9 @@
 .tt-past{opacity:.55}
 .tt-past .tt-countdown{color:inherit}
 .tt-past-label{display:none;font-size:.75rem;white-space:nowrap}
-.tt-past[data-past="true"] .tt-past-label{display:block}
 .tt-empty{padding:16px;border:1px dashed var(--border-color,#cbd5e1);border-radius:12px;opacity:.75}
 .tt-footer-action{display:flex;justify-content:center;margin:24px 0 8px}
 .tt-other-stations{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 22px;border-radius:999px;background:var(--button-bg,#2563eb);color:var(--button-text,#fff);text-decoration:none;font-weight:800;box-shadow:0 3px 10px rgba(0,0,0,.12)}
-.tt-other-stations:hover{filter:brightness(.96)}
 
 @media(max-width:540px){
   html.tt-screen,html.tt-screen body{height:100%;overflow:hidden;overscroll-behavior:none}
@@ -148,132 +130,52 @@
   .tt-page{
     height:var(--tt-available-height,calc(100dvh - 8px));
     max-height:var(--tt-available-height,calc(100dvh - 8px));
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    padding:8px 9px;
-    overflow:hidden;
+    display:flex;flex-direction:column;gap:5px;
+    padding:6px 8px;overflow:hidden;
   }
-
   .tt-header{flex:0 0 auto;margin:0}
-  .tt-header h1{font-size:1.1rem;line-height:1.25}
-  .tt-subtitle{margin:3px 0 0;font-size:.72rem}
-
-  .tt-directions{
-    flex:0 0 auto;
-    grid-template-rows:none;
-    gap:6px;
-    min-height:0;
-    overflow:visible;
-  }
-
+  .tt-header h1{font-size:1rem;line-height:1.2}
+  .tt-subtitle{margin:2px 0 0;font-size:.66rem}
+  .tt-directions{flex:0 0 auto;grid-template-rows:none;gap:5px;min-height:0;overflow:visible}
   .tt-direction{display:flex;flex-direction:column;min-height:0;border-radius:12px}
-  .tt-direction-heading{flex:0 0 auto;padding:7px 9px}
-  .tt-direction-heading h2{font-size:.85rem}
-  .tt-platform{font-size:.68rem;margin-bottom:2px}
-  .tt-direction-tag{font-size:.66rem;padding:3px 6px}
-
-  .tt-train-list{
-    flex:0 0 auto;
-    min-height:0;
-    overflow-x:hidden;
-    overflow-y:auto;
-    overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;
-  }
-
-  .tt-train-link{flex:0 0 auto;min-height:0;display:block}
-
-  /* スマホ版：1列車の高さを拡大しつつ、2列車分の表示領域を確保 */
-  .tt-train{
-    width:100%;
-    box-sizing:border-box;
-    grid-template-columns:64px minmax(0,1fr);
-    gap:8px;
-    padding:9px 9px;
-    align-content:center;
-  }
-
-  .tt-time{
-    font-size:1.08rem;
-    line-height:1.25;
-  }
-  .tt-time-column{gap:3px}
-
-  .tt-train-title{gap:5px}
-  .tt-train-title>strong{font-size:.9rem;line-height:1.3}
-  .tt-type{font-size:.7rem;padding:3px 5px}
-  .tt-cars{font-size:.72rem}
-
-  .tt-countdown{
-    margin-top:4px;
-    font-size:.72rem;
-    line-height:1.35;
-  }
-  .tt-note{
-    margin-top:3px;
-    font-size:.7rem;
-    line-height:1.35;
-  }
-  .tt-rank{font-size:.66rem}
-
-  .tt-past-label{
-    grid-column:2;
-    justify-self:start;
-    font-size:.68rem;
-  }
-
-  .tt-footer-action{flex:0 0 auto;margin:0}
-  .tt-other-stations{min-height:34px;padding:6px 14px;font-size:.8rem}
-}
-
-/* 高さの低いスマホでは、2列車を表示しやすいよう余白を少し縮小 */
-@media(max-width:540px) and (max-height:650px){
-  .tt-page{padding:5px 8px;gap:4px}
-  .tt-header h1{font-size:1rem}
-  .tt-subtitle{font-size:.66rem}
-  .tt-direction-heading{padding:5px 8px}
+  .tt-direction-heading{flex:0 0 auto;padding:5px 8px}
   .tt-direction-heading h2{font-size:.8rem}
-  .tt-platform{font-size:.62rem}
+  .tt-platform{font-size:.62rem;margin-bottom:2px}
   .tt-direction-tag{font-size:.6rem;padding:2px 5px}
 
+  .tt-train-list{flex:0 0 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .tt-train-link{flex:0 0 auto;min-height:0;display:block}
   .tt-train{
-    grid-template-columns:58px minmax(0,1fr);
-    gap:6px;
-    padding:7px 7px;
+    width:100%;box-sizing:border-box;
+    grid-template-columns:56px minmax(0,1fr);
+    gap:5px;padding:5px 7px;align-content:center;
   }
-
-  .tt-time{font-size:1rem}
-  .tt-train-title>strong{font-size:.82rem}
+  .tt-time{font-size:1rem;line-height:1.2}
+  .tt-time-column{gap:2px}
+  .tt-train-title{gap:4px}
+  .tt-train-title>strong{font-size:.82rem;line-height:1.25}
   .tt-type{font-size:.64rem;padding:2px 4px}
   .tt-cars{font-size:.66rem}
-  .tt-countdown{font-size:.66rem;margin-top:3px}
-  .tt-note{font-size:.64rem;margin-top:2px}
+  .tt-countdown{margin-top:3px;font-size:.66rem;line-height:1.3}
+  .tt-note{margin-top:2px;font-size:.64rem;line-height:1.3}
   .tt-rank{font-size:.6rem}
+  .tt-past-label{grid-column:2;justify-self:start;font-size:.65rem}
+  .tt-footer-action{flex:0 0 auto;margin:0}
   .tt-other-stations{min-height:29px;padding:4px 11px;font-size:.74rem}
 }
 
-/* ダークモード：文字・背景のコントラストを確保 */
 html body.dark .tt-page{color:#f8fafc}
 html body.dark .tt-direction{background:#171b22;border-color:#3b4350}
 html body.dark .tt-direction-heading{background:#252c37;border-color:#3b4350}
-html body.dark .tt-platform,
-html body.dark .tt-subtitle,
-html body.dark .tt-note,
-html body.dark .tt-cars{color:#d1d5db;opacity:1}
+html body.dark .tt-platform,html body.dark .tt-subtitle,html body.dark .tt-note,html body.dark .tt-cars{color:#d1d5db;opacity:1}
 html body.dark .tt-train{color:#f8fafc;border-color:#3b4350}
 html body.dark .tt-train-link{color:#f8fafc;text-decoration:none}
 html body.dark .tt-train-link:hover .tt-train{filter:brightness(1.18)}
 html body.dark .tt-train.tt-next{background:#1e3558;box-shadow:inset 4px 0 #60a5fa}
 html body.dark .tt-train.tt-second{background:#202a3a;box-shadow:inset 4px 0 #527db8}
-
-/* ダークモード：停車中も黄色 */
 html body.dark .tt-train.tt-stopped{background:#493d16;box-shadow:inset 4px 0 #facc15}
 html body.dark .tt-train.tt-stopped .tt-countdown{color:#fde047}
-
-html body.dark .tt-countdown,
-html body.dark .tt-rank{color:#93c5fd}
-html body.dark .tt-past .tt-countdown{color:#e5e7eb}
+html body.dark .tt-countdown,html body.dark .tt-rank{color:#93c5fd}
 html body.dark .tt-type{background:#374151;color:#f3f4f6}
 html body.dark .tt-direction-tag{color:#e5e7eb}
 html body.dark .tt-empty{color:#e5e7eb;border-color:#596273}
@@ -285,19 +187,17 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
   const page = document.querySelector('.tt-page');
   const mobileQuery = window.matchMedia('(max-width: 540px)');
 
-  // スマートフォンではページ全体を画面内に固定する。
-  // 列車一覧の中だけをスクロールさせる。
+  function fitPage(){
+    if (!page || !mobileQuery.matches) return;
+    const top = Math.max(0, page.getBoundingClientRect().top);
+    page.style.setProperty(
+      '--tt-available-height',
+      Math.max(250, window.innerHeight - top - 4) + 'px'
+    );
+  }
+
   if (page && mobileQuery.matches) {
     document.documentElement.classList.add('tt-screen');
-
-    const fitPage = () => {
-      const top = Math.max(0, page.getBoundingClientRect().top);
-      page.style.setProperty(
-        '--tt-available-height',
-        Math.max(250, window.innerHeight - top - 4) + 'px'
-      );
-    };
-
     fitPage();
     window.addEventListener('resize', fitPage, {passive:true});
     window.addEventListener('orientationchange', fitPage, {passive:true});
@@ -315,11 +215,9 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         const eventRaw = row.getAttribute('data-event');
         const arrivalRaw = row.getAttribute('data-arrival');
         const departureRaw = row.getAttribute('data-departure');
-
         const eventTime = eventRaw ? new Date(eventRaw) : null;
         const arrival = arrivalRaw ? new Date(arrivalRaw) : null;
         const departure = departureRaw ? new Date(departureRaw) : null;
-
         const kind = row.getAttribute('data-event-kind');
         const countdown = row.querySelector('[data-countdown]');
         const pastLabel = row.querySelector('.tt-past-label');
@@ -328,16 +226,11 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
 
         const validArrival = !!(arrival && !Number.isNaN(arrival.getTime()));
         const validDeparture = !!(departure && !Number.isNaN(departure.getTime()));
-
         const stopped = validArrival && validDeparture && arrival <= now && now < departure;
         const departed = validDeparture && now >= departure;
-
-        // 発車時刻の属する1分間だけ「発車済」を表示。
-        // 12:00発なら12:00中に表示し、12:01に消す。
         const departureFresh = departed && now.getTime() < departure.getTime() + 60000;
         const arrivedAtTerminus = !validDeparture && validArrival && now >= arrival;
-        const eventPassed = now >= eventTime;
-        const past = !stopped && (departed || arrivedAtTerminus || (eventPassed && !validDeparture));
+        const past = !stopped && (departed || arrivedAtTerminus);
 
         row.setAttribute('data-stopped', stopped ? 'true' : 'false');
         row.setAttribute('data-past', past ? 'true' : 'false');
@@ -352,45 +245,31 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         } else if (arrivedAtTerminus) {
           countdown.textContent = '到着済';
         } else if (eventTime > now) {
-          const minutes = Math.max(
-            0,
-            Math.ceil((eventTime.getTime() - now.getTime()) / 60000)
-          );
-
+          const minutes = Math.max(0, Math.ceil((eventTime - now) / 60000));
           countdown.textContent = kind === 'arrival'
             ? (minutes <= 1 ? 'まもなく到着' : '到着まであと ' + minutes + ' 分')
             : (minutes <= 1 ? 'まもなく発車' : '発車まであと ' + minutes + ' 分');
-
           upcoming.push({row, eventTime});
         } else {
           countdown.textContent = '';
         }
 
         if (pastLabel) {
-          pastLabel.textContent = stopped
-            ? ''
-            : (departed
-                ? (departureFresh ? '発車済' : '')
-                : (arrivedAtTerminus ? '到着済' : ''));
+          pastLabel.textContent = stopped ? '' :
+            (departed ? (departureFresh ? '発車済' : '') :
+            (arrivedAtTerminus ? '到着済' : ''));
         }
-
-        // 行自体は非表示にせず、一覧内スクロールで確認できるようにする。
         row.style.display = '';
       });
 
-      // 発車・到着予定時刻の早い順に並べる。
-      upcoming.sort((a, b) => a.eventTime - b.eventTime);
+      upcoming.sort((a,b) => a.eventTime - b.eventTime);
+      stoppedRows.sort((a,b) =>
+        new Date(a.getAttribute('data-departure')) -
+        new Date(b.getAttribute('data-departure'))
+      );
 
-      stoppedRows.sort((a, b) => {
-        const aTime = new Date(a.getAttribute('data-departure')).getTime();
-        const bTime = new Date(b.getAttribute('data-departure')).getTime();
-        return aTime - bTime;
-      });
-
-      // 既存の順位表示をリセットする。列車行自体は残す。
       rows.forEach(row => {
-        row.classList.remove('tt-next', 'tt-second');
-
+        row.classList.remove('tt-next','tt-second');
         const rank = row.querySelector('.tt-rank');
         if (rank) rank.remove();
       });
@@ -399,47 +278,35 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
       const activeStopped = stoppedRows[0];
 
       if (activeStopped) {
-        // 停車中の列車がある場合：
-        // 停車中を「先発」、後続を「次発」「次々発」にする。
-        ranked.push({row: activeStopped, label: '先発'});
-
+        ranked.push({row:activeStopped,label:'先発'});
         upcoming.forEach(item => {
           if (ranked.length < 3) {
             ranked.push({
-              row: item.row,
-              label: ranked.length === 1 ? '次発' : '次々発'
+              row:item.row,
+              label:ranked.length === 1 ? '次発' : '次々発'
             });
           }
         });
       } else {
-        // 停車中の列車がない場合：
-        // 直近2本だけを「先発」「次発」にする。
-        upcoming.slice(0, 2).forEach((item, index) => {
-          ranked.push({
-            row: item.row,
-            label: ['先発', '次発'][index]
-          });
+        upcoming.slice(0,2).forEach((item,index) => {
+          ranked.push({row:item.row,label:['先発','次発'][index]});
         });
       }
 
       const rankedRows = new Set(ranked.map(item => item.row));
 
-      // 順位のない列車は「到着まで」の表示を消す。
       rows.forEach(row => {
-        const kind = row.getAttribute('data-event-kind');
         const countdown = row.querySelector('[data-countdown]');
-
-        if (countdown && kind === 'arrival' && !rankedRows.has(row)) {
+        if (countdown &&
+            row.getAttribute('data-event-kind') === 'arrival' &&
+            !rankedRows.has(row)) {
           countdown.textContent = '';
         }
       });
 
-      // 順位ラベルを表示する。
-      ranked.forEach((item, index) => {
+      ranked.forEach((item,index) => {
         item.row.classList.add(index === 0 ? 'tt-next' : 'tt-second');
-
         const column = item.row.querySelector('.tt-time-column');
-
         if (column) {
           const rank = document.createElement('span');
           rank.className = 'tt-rank';
@@ -448,46 +315,37 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         }
       });
 
-      // 先頭2列車の実際の高さを測り、一覧の高さを調整する。
-      // これにより、カードを大きくしても2列車分の表示領域を確保する。
+      // スマホは3列車分、PCは2列車分の高さを確保する。
       const links = Array.from(list.querySelectorAll('.tt-train-link'));
-      const firstTwo = links.slice(0, 2);
-
-      const twoRowsHeight = firstTwo.reduce(
-        (sum, link) => sum + link.getBoundingClientRect().height,
-        0
+      const visibleCount = mobileQuery.matches ? 3 : 2;
+      const visibleRows = links.slice(0, visibleCount);
+      const visibleRowsHeight = visibleRows.reduce(
+        (sum, link) => sum + link.getBoundingClientRect().height, 0
       );
-
-      const fallbackHeight = mobileQuery.matches ? 120 : 180;
-      const targetHeight = Math.max(72, twoRowsHeight || fallbackHeight);
+      const targetHeight = Math.max(
+        72, visibleRowsHeight || (mobileQuery.matches ? 180 : 180)
+      );
 
       list.style.setProperty('--tt-list-height', targetHeight + 'px');
 
-      // 初回だけ、停車中の列車または直近列車が見える位置に合わせる。
       if (!list.dataset.initialPositioned) {
         const target = activeStopped || upcoming[0]?.row;
-
         if (target) {
           const link = target.closest('.tt-train-link');
-
           if (link) {
             list.scrollTop = Math.max(
               0,
               link.getBoundingClientRect().top -
-                list.getBoundingClientRect().top +
-                list.scrollTop
+              list.getBoundingClientRect().top + list.scrollTop
             );
           }
         }
-
         list.dataset.initialPositioned = 'true';
       }
     });
   }
 
   updateCountdowns();
-
-  // 発車済表示を12:01に確実に消すため、15秒ごとに状態を更新する。
   setInterval(updateCountdowns, 15000);
 })();
 </script>
