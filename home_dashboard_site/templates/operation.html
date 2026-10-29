@@ -56,9 +56,24 @@
             </div>
         </div>
 
-        {% if operation_alerts %}
-        <div class="operation-alert-list">
-            {% for alert in operation_alerts %}
+
+    {% if operation_alerts %}
+        {% set ns = namespace(cross=[], triangle=[], other=[]) %}
+
+        {% for alert in operation_alerts %}
+            {% if '×' in alert.status %}
+                {% set _ = ns.cross.append(alert) %}
+            {% elif '△' in alert.status %}
+                {% set _ = ns.triangle.append(alert) %}
+            {% else %}
+                {% set _ = ns.other.append(alert) %}
+            {% endif %}
+        {% endfor %}
+
+    <div class="operation-alert-list">
+        {% for alert in ns.cross + ns.triangle + ns.other %}
+
+
             <article class="card operation-alert-card">
                 <div class="operation-alert-icon">
                     <img
