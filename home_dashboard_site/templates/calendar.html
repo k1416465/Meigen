@@ -150,7 +150,7 @@
     .calendar-edit-actions { flex-direction:row; align-items:center; gap:8px; }
     .calendar-edit-actions button { padding:10px 11px; }
     .calendar-scroll { max-width:100%; overflow-x:auto; }
-    .calendar-scroll .calendar-grid { min-width:1000px; }
+    .calendar-scroll .calendar-grid { min-width:1100px; }
     .calendar-modal { padding:16px; }
 
     /* iPhone Safari：日付欄と予定名欄を同じ親幅・同じ寸法ルールに統一 */
@@ -185,6 +185,13 @@
       -webkit-appearance:none;
       appearance:none;
       border-radius:8px;
+    }
+
+    /* スマホ版：カレンダーの日付マスの縦の高さ */
+    @media (max-width: 600px) {
+        .calendar-scroll .calendar-day {
+            min-height: 120px;
+        }
     }
   }
 </style>
