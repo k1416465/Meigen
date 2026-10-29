@@ -62,7 +62,6 @@
         <img class="stamp-image" src="{{ url_for('static', filename='stamps/' ~ item['filename']) }}" alt="{{ item['title'] or item['filename'] }}" loading="lazy">
       </a>
       <div class="stamp-card-info">
-        <div class="stamp-card-number">{{ item['number'] }}</div>
         <h3>{{ item['title'] or item['filename'] }}</h3>
         {% if item['people'] %}<p class="stamp-people">{{ item['people'] }}</p>{% endif %}
         {% if item['tags'] %}<div class="recording-tags stamp-tags">
