@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block title %}時刻表｜迷言{% endblock %}
 {% block content %}
@@ -175,6 +176,7 @@
   overflow-y:auto;
   overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;
+  scroll-behavior:auto;
 }
 
 .tt-train-link{
@@ -334,9 +336,7 @@
   filter:brightness(.96);
 }
 
-/* ==================================================
-   パソコン版：列車一覧を独立してスクロール
-   ================================================== */
+/* パソコン版：列車一覧を独立してスクロール */
 @media(min-width:541px){
   .tt-directions{
     align-items:start;
@@ -357,9 +357,7 @@
   }
 }
 
-/* ==================================================
-   スマホ：画面の残りスペースを列車一覧に割り当てる
-   ================================================== */
+/* スマホ：画面の残りスペースを列車一覧に割り当てる */
 @media(max-width:540px){
   html.tt-screen,
   html.tt-screen body{
@@ -409,10 +407,6 @@
     font-size:.7rem;
   }
 
-  /*
-   * 列車3本分の固定高さにはせず、
-   * 見出し・フッターを除いた空きスペースを配分する。
-   */
   .tt-directions{
     flex:1 1 0;
     display:flex;
@@ -451,10 +445,6 @@
     padding:3px 6px;
   }
 
-  /*
-   * 列車一覧は親の空きスペースに合わせて伸縮。
-   * 溢れた列車だけ一覧内でスクロールする。
-   */
   .tt-train-list{
     flex:1 1 0;
     height:auto;
@@ -476,7 +466,7 @@
     width:100%;
     grid-template-columns:60px minmax(0,1fr);
     gap:7px;
-    padding:8px 8px;
+    padding:8px;
     align-content:center;
   }
 
@@ -543,7 +533,7 @@
   }
 }
 
-/* 画面の高さが低いスマホ */
+/* 高さが低いスマホ */
 @media(max-width:540px) and (max-height:650px){
   .tt-page{
     gap:5px;
@@ -625,9 +615,7 @@
   }
 }
 
-/* ==================================================
-   ダークモード
-   ================================================== */
+/* ダークモード */
 html body.dark .tt-page{
   color:#f8fafc;
 }
@@ -674,7 +662,6 @@ html body.dark .tt-train.tt-second{
   box-shadow:inset 4px 0 #527db8;
 }
 
-/* ダークモード：停車中も黄色 */
 html body.dark .tt-train.tt-stopped{
   background:#493d16;
   box-shadow:inset 4px 0 #facc15;
@@ -719,8 +706,8 @@ html body.dark .tt-other-stations{
   const mobileQuery = window.matchMedia('(max-width: 540px)');
 
   /*
-   * スマホではページに使える高さだけを求める。
-   * 列車の本数やカードの高さから一覧の高さは計算しない。
+   * スマホではページに使える高さだけを計算する。
+   * 列車一覧の高さは列車数から計算しない。
    */
   function fitPage(){
     if (!page || !mobileQuery.matches) return;
@@ -737,7 +724,7 @@ html body.dark .tt-other-stations{
     );
   }
 
-  function enableMobileLayout(){
+  function updateMobileLayout(){
     if (!page) return;
 
     if (mobileQuery.matches) {
@@ -749,10 +736,41 @@ html body.dark .tt-other-stations{
     }
   }
 
-  enableMobileLayout();
+  updateMobileLayout();
 
-  window.addEventListener('resize', enableMobileLayout, {passive:true});
-  window.addEventListener('orientationchange', enableMobileLayout, {passive:true});
+  window.addEventListener('resize', updateMobileLayout, {passive:true});
+  window.addEventListener('orientationchange', updateMobileLayout, {passive:true});
+
+  /*
+   * 対象列車が変わったときだけ一覧をスクロールする。
+   * 同じ列車が対象の間は、利用者のスクロール位置を維持する。
+   */
+  function scrollToTargetIfChanged(list, targetRow){
+    if (!targetRow) {
+      list._ttCurrentTarget = null;
+      return;
+    }
+
+    // 同じ列車が引き続き対象なら何もしない。
+    if (list._ttCurrentTarget === targetRow) {
+      return;
+    }
+
+    list._ttCurrentTarget = targetRow;
+
+    const targetLink = targetRow.closest('.tt-train-link');
+
+    if (!targetLink) return;
+
+    // 一覧のスクロール領域の先頭に対象列車を合わせる。
+    const listRect = list.getBoundingClientRect();
+    const targetRect = targetLink.getBoundingClientRect();
+
+    const targetScrollTop =
+      list.scrollTop + targetRect.top - listRect.top;
+
+    list.scrollTop = Math.max(0, targetScrollTop);
+  }
 
   function updateCountdowns(){
     const now = new Date();
@@ -880,7 +898,7 @@ html body.dark .tt-other-stations{
               );
         }
 
-        // 行は非表示にせず、一覧内スクロールで確認できるようにする。
+        // 過去の列車も非表示にはせず、一覧内で確認できるようにする。
         row.style.display = '';
       });
 
@@ -915,15 +933,15 @@ html body.dark .tt-other-stations{
       if (activeStopped) {
         // 停車中の列車を「先発」とする。
         ranked.push({
-          row: activeStopped,
-          label: '先発'
+          row:activeStopped,
+          label:'先発'
         });
 
         upcoming.forEach(item => {
           if (ranked.length < 3) {
             ranked.push({
-              row: item.row,
-              label: ranked.length === 1 ? '次発' : '次々発'
+              row:item.row,
+              label:ranked.length === 1 ? '次発' : '次々発'
             });
           }
         });
@@ -931,8 +949,8 @@ html body.dark .tt-other-stations{
         // 停車中の列車がない場合は直近2本を表示する。
         upcoming.slice(0, 2).forEach((item, index) => {
           ranked.push({
-            row: item.row,
-            label: ['先発', '次発'][index]
+            row:item.row,
+            label:['先発','次発'][index]
           });
         });
       }
@@ -971,14 +989,26 @@ html body.dark .tt-other-stations{
         }
       });
 
-      // 列車一覧の高さはJSから変更しない。
-      // スマホはflex、PCはmax-heightとoverflowでスクロールする。
+      /*
+       * スクロール対象を決定する。
+       * 停車中の列車があればそれを優先し、
+       * なければ最も早い次の列車を対象にする。
+       */
+      const targetRow = activeStopped || (
+        upcoming.length > 0 ? upcoming[0].row : null
+      );
+
+      /*
+       * 初回表示時と対象列車が切り替わったときだけスクロール。
+       * 15秒ごとの更新で対象が同じならスクロール位置を維持する。
+       */
+      scrollToTargetIfChanged(list, targetRow);
     });
   }
 
   updateCountdowns();
 
-  // 発車済表示などを定期的に更新する。
+  // カウントダウンは15秒ごとに更新する。
   setInterval(updateCountdowns, 15000);
 })();
 </script>
