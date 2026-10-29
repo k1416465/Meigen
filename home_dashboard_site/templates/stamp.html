@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}迷言｜スタンプ{% endblock %}
+
+{% block content %}
+<section class="welcome-row recording-welcome stamp-welcome">
+  <div class="recording-welcome-copy">
+    <h1>スタンプ</h1>
+    <p>画像を人物名やタグから検索できます。</p>
+  </div>
+  <button class="recording-search-toggle" type="button" id="stamp-search-toggle"
+          aria-expanded="{{ 'true' if query else 'false' }}" aria-controls="stamp-search-panel"
+          aria-label="検索欄を開く／閉じる" title="検索">
+    <img class="recording-search-icon recording-search-light" src="{{ url_for('static', filename='icons/light/search.png') }}" alt="">
+    <img class="recording-search-icon recording-search-dark" src="{{ url_for('static', filename='icons/dark/search.png') }}" alt="">
+  </button>
+</section>
+
+<section class="recording-search-section" aria-label="スタンプを検索">
+  <div class="recording-search-panel" id="stamp-search-panel" {% if not query %}hidden{% endif %}>
+    <form class="recording-search-form" method="get" action="{{ url_for('stamp_page') }}">
+      <input type="search" name="q" value="{{ query }}" placeholder="タイトル・人物・タグで検索" aria-label="スタンプを検索" id="stamp-search-input">
+      <input type="hidden" name="scope" value="all">
+      <input type="hidden" name="sort" value="{{ sort_by }}">
+      <button type="submit" class="recording-search-submit">検索</button>
+      <a class="recording-search-reset" href="{{ url_for('stamp_page', sort=sort_by) }}">リセット</a>
+    </form>
+    {% if person_options %}
+    <div class="recording-tag-choices" aria-label="人物から検索"><span class="recording-tag-choices-label">人物から検索</span><div class="recording-tag-choice-list">
+      {% for person in person_options %}<a class="recording-tag-choice{% if query == person and search_scope == 'people' %} is-active{% endif %}" href="{{ url_for('stamp_page', q=person, scope='people', sort=sort_by) }}">{{ person }}</a>{% endfor %}
+    </div></div>
+    {% endif %}
+    {% if tag_options %}
+    <div class="recording-tag-choices" aria-label="タグから検索"><span class="recording-tag-choices-label">タグから検索</span><div class="recording-tag-choice-list">
+      {% for tag in tag_options %}<a class="recording-tag-choice{% if query == tag and search_scope == 'tags' %} is-active{% endif %}" href="{{ url_for('stamp_page', q=tag, scope='tags', sort=sort_by) }}">{{ tag }}</a>{% endfor %}
+    </div></div>
+    {% else %}<p class="recording-tag-choices-empty">スタンプ情報にタグを登録すると、ここに検索候補が表示されます。</p>{% endif %}
+  </div>
+</section>
+
+<section class="recording-list-section stamp-list-section">
+  <div class="section-heading">
+    <div><h2>{% if query %}検索結果{% else %}スタンプ一覧{% endif %} <span class="recording-count">{{ stamps|length }}件</span></h2></div>
+    <div class="recording-list-actions">
+      <a class="recording-download-all" href="{{ url_for('stamp_admin') }}">スタンプ管理</a>
+      <div class="recording-sort-wrap stamp-sort-wrap">
+        <button type="button" class="recording-sort-button" id="stamp-sort-toggle" aria-expanded="false" aria-controls="stamp-sort-options">並び替え <span aria-hidden="true">▾</span></button>
+        <div class="recording-sort-options" id="stamp-sort-options" hidden>
+          <a href="{{ url_for('stamp_page', q=query, scope=search_scope, sort='number') }}"{% if sort_by == 'number' %} aria-current="true"{% endif %}>番号順（1〜）{% if sort_by == 'number' %} ✓{% endif %}</a>
+          <a href="{{ url_for('stamp_page', q=query, scope=search_scope, sort='people') }}"{% if sort_by == 'people' %} aria-current="true"{% endif %}>人物順{% if sort_by == 'people' %} ✓{% endif %}</a>
+          <a href="{{ url_for('stamp_page', q=query, scope=search_scope, sort='tags') }}"{% if sort_by == 'tags' %} aria-current="true"{% endif %}>タグ順{% if sort_by == 'tags' %} ✓{% endif %}</a>
+          <a href="{{ url_for('stamp_page', q=query, scope=search_scope, sort='title') }}"{% if sort_by == 'title' %} aria-current="true"{% endif %}>タイトル順{% if sort_by == 'title' %} ✓{% endif %}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if stamps %}
+  <div class="stamp-grid">
+    {% for item in stamps %}
+    <article class="card stamp-card">
+      <a class="stamp-image-link" href="{{ url_for('static', filename='stamps/' ~ item['filename']) }}" target="_blank" rel="noopener" aria-label="{{ item['title'] or item['filename'] }}の画像を開く">
+        <img class="stamp-image" src="{{ url_for('static', filename='stamps/' ~ item['filename']) }}" alt="{{ item['title'] or item['filename'] }}" loading="lazy">
+      </a>
+      <div class="stamp-card-info">
+        <div class="stamp-card-number">{{ item['number'] }}</div>
+        <h3>{{ item['title'] or item['filename'] }}</h3>
+        {% if item['people'] %}<p class="stamp-people">{{ item['people'] }}</p>{% endif %}
+        {% if item['tags'] %}<div class="recording-tags stamp-tags">
+          {% for tag in item['tags'].replace('、', ',').split(',') %}{% if tag.strip() %}<a class="recording-tag" href="{{ url_for('stamp_page', q=tag.strip(), scope='tags', sort=sort_by) }}">{{ tag.strip() }}</a>{% endif %}{% endfor %}
+        </div>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card recording-empty">
+    <h3>{% if query %}該当するスタンプがありません{% else %}スタンプ画像はまだありません{% endif %}</h3>
+    {% if query %}<p>別のタイトル・人物名・タグで検索してみてください。</p><a class="text-link" href="{{ url_for('stamp_page') }}">検索をクリア</a>
+    {% else %}<p><code>static/stamps/</code> に画像ファイルを入れると、ここに表示されます。</p><p>対応形式：PNG、JPG、JPEG、GIF、WEBP、AVIF、BMP</p>{% endif %}
+  </div>
+  {% endif %}
+</section>
+<script>
+(function () {
+  var toggle = document.getElementById('stamp-search-toggle');
+  var panel = document.getElementById('stamp-search-panel');
+  var input = document.getElementById('stamp-search-input');
+  function updateSearchIcon() {
+    var dark = document.body.classList.contains('dark');
+    document.querySelectorAll('.recording-search-light').forEach(function (img) { img.style.display = dark ? 'none' : 'block'; });
+    document.querySelectorAll('.recording-search-dark').forEach(function (img) { img.style.display = dark ? 'block' : 'none'; });
+  }
+  if (toggle && panel) toggle.addEventListener('click', function () {
+    var opening = panel.hidden; panel.hidden = !opening;
+    toggle.setAttribute('aria-expanded', String(opening));
+    if (opening && input) input.focus();
+  });
+  var sortButton = document.getElementById('stamp-sort-toggle');
+  var sortOptions = document.getElementById('stamp-sort-options');
+  if (sortButton && sortOptions) {
+    sortButton.addEventListener('click', function () {
+      var opening = sortOptions.hidden; sortOptions.hidden = !opening;
+      sortButton.setAttribute('aria-expanded', String(opening));
+    });
+    document.addEventListener('click', function (event) {
+      if (!event.target.closest('.stamp-sort-wrap')) { sortOptions.hidden = true; sortButton.setAttribute('aria-expanded', 'false'); }
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') { sortOptions.hidden = true; sortButton.setAttribute('aria-expanded', 'false'); }
+    });
+  }
+  updateSearchIcon();
+  if (window.MutationObserver) new MutationObserver(updateSearchIcon).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+{% endblock %}

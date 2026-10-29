@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}迷言｜スタンプ管理{% endblock %}
+{% block content %}
+<section class="welcome-row recording-welcome"><div class="recording-welcome-copy"><h1>スタンプ管理</h1><p>画像は <code>static/stamps/</code> に配置してください。新しい画像は自動で一覧に追加されます。</p></div></section>
+<section class="stamp-admin-section">
+  <div class="stamp-admin-top"><a class="recording-search-reset" href="{{ url_for('stamp_page') }}">← スタンプ一覧へ戻る</a><a class="recording-search-reset" href="{{ url_for('recording_admin') }}">録音管理へ</a></div>
+  <form class="recording-search-form stamp-admin-search" method="get" action="{{ url_for('stamp_admin') }}"><input type="search" name="q" value="{{ query }}" placeholder="タイトル・人物・タグ・ファイル名で検索" aria-label="管理対象を検索"><button type="submit" class="recording-search-submit">検索</button><a class="recording-search-reset" href="{{ url_for('stamp_admin') }}">リセット</a></form>
+
+  <details class="recording-admin-order" open>
+    <summary>タグの表示順を設定</summary>
+    {% if tag_order %}<form method="post" class="stamp-order-form"><input type="hidden" name="action" value="save_tag_order"><input type="hidden" name="q" value="{{ query }}"><p class="recording-admin-note">上下ボタンで順番を変更します。この順番は一覧のタグ順や検索候補に反映されます。</p><ol class="stamp-order-list" data-order-list>{% for tag in tag_order %}<li><span>{{ tag }}</span><input type="hidden" name="tag_order" value="{{ tag }}"><div><button type="button" data-move="up" aria-label="{{ tag }}を上へ">↑</button><button type="button" data-move="down" aria-label="{{ tag }}を下へ">↓</button></div></li>{% endfor %}</ol><button type="submit" class="recording-admin-save-all">タグ順を保存</button></form>{% else %}<p class="recording-admin-note">タグが登録されると、ここで順番を設定できます。</p>{% endif %}
+  </details>
+  <details class="recording-admin-order" open>
+    <summary>人物の表示順を設定</summary>
+    {% if people_order %}<form method="post" class="stamp-order-form"><input type="hidden" name="action" value="save_people_order"><input type="hidden" name="q" value="{{ query }}"><p class="recording-admin-note">上下ボタンで順番を変更します。人物順の並び替えと検索候補に反映されます。</p><ol class="stamp-order-list" data-order-list>{% for person in people_order %}<li><span>{{ person }}</span><input type="hidden" name="people_order" value="{{ person }}"><div><button type="button" data-move="up" aria-label="{{ person }}を上へ">↑</button><button type="button" data-move="down" aria-label="{{ person }}を下へ">↓</button></div></li>{% endfor %}</ol><button type="submit" class="recording-admin-save-all">人物順を保存</button></form>{% else %}<p class="recording-admin-note">人物名が登録されると、ここで順番を設定できます。</p>{% endif %}
+  </details>
+
+  <div class="section-heading stamp-admin-heading"><h2>画像情報 <span class="recording-count">{{ stamps|length }}件</span></h2></div>
+  <form method="post" id="stampAdminBulkForm" class="stamp-admin-bulk-form"><input type="hidden" name="action" value="save_all"><input type="hidden" name="q" value="{{ query }}">
+    {% for item in stamps %}
+    <article class="recording-admin-card stamp-admin-card">
+      <div class="stamp-admin-preview"><img src="{{ url_for('static', filename='stamps/' ~ item['filename']) }}" alt="{{ item['title'] or item['filename'] }}" loading="lazy"><div><strong>{{ item['filename'] }}</strong><small>表示番号: {{ item['number'] }} / ID: {{ item['id'] }}</small></div></div>
+      <input type="hidden" name="stamp_ids" value="{{ item['id'] }}">
+      <div class="recording-admin-edit"><label>番号（1以上）<input type="number" name="number_{{ item['id'] }}" value="{{ item['number'] }}" min="1" step="1" required></label><label>タイトル<input name="title_{{ item['id'] }}" value="{{ item['title'] }}" required maxlength="200"></label><label>人物名<input name="people_{{ item['id'] }}" value="{{ item['people'] }}" maxlength="200" placeholder="例：先生、友人"></label><label>タグ（カンマ区切り）<input name="tags_{{ item['id'] }}" value="{{ item['tags'] }}" placeholder="例：挨拶, 日常, リアクション"></label></div>
+      <div class="recording-admin-card-actions"><button type="button" class="recording-admin-delete" onclick="deleteStamp({{ item['id'] }}, {{ (item['title'] or item['filename'])|tojson }})">この画像を削除</button></div>
+    </article>
+    {% else %}<p class="recording-admin-note">管理する画像がありません。画像を <code>static/stamps/</code> に追加してください。</p>{% endfor %}
+    {% if stamps %}<div class="recording-admin-savebar"><span>編集内容を確認して保存してください。</span><button type="submit" class="recording-admin-save-all">すべて保存</button></div>{% endif %}
+  </form>
+  <form method="post" id="stampDeleteForm" hidden><input type="hidden" name="action" value="delete"><input type="hidden" name="q" value="{{ query }}"><input type="hidden" name="id" id="stampDeleteId"></form>
+  <p class="recording-admin-note">タグはカンマ（,）で区切ってください。削除すると管理情報と画像ファイルの両方が削除されます。必要な画像は事前にバックアップしてください。</p>
+</section>
+<script>
+function deleteStamp(id, title) {
+  if (!confirm('「' + title + '」の情報と画像ファイルを削除します。この操作は元に戻せません。削除しますか？')) return;
+  document.getElementById('stampDeleteId').value = id;
+  document.getElementById('stampDeleteForm').submit();
+}
+document.querySelectorAll('[data-order-list]').forEach(function (list) {
+  function refresh() {
+    Array.from(list.children).forEach(function (item, index, items) {
+      item.querySelector('[data-move="up"]').disabled = index === 0;
+      item.querySelector('[data-move="down"]').disabled = index === items.length - 1;
+    });
+  }
+  list.addEventListener('click', function (event) {
+    var button = event.target.closest('button[data-move]'); if (!button) return;
+    var item = button.closest('li');
+    if (button.dataset.move === 'up' && item.previousElementSibling) list.insertBefore(item, item.previousElementSibling);
+    if (button.dataset.move === 'down' && item.nextElementSibling) list.insertBefore(item.nextElementSibling, item);
+    refresh();
+  });
+  refresh();
+});
+</script>
+{% endblock %}
