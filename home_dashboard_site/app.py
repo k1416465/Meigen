@@ -1808,9 +1808,12 @@ def recording_admin_login():
             submitted.encode("utf-8"), configured_password.encode("utf-8")
         ):
             session["recording_admin_authenticated"] = True
+            next_url = request.form.get("next", request.args.get("next", ""))
+            if next_url.startswith("/") and not next_url.startswith("//"):
+                return redirect(next_url)
             return redirect(url_for("recording_admin"))
         error = "管理用パスワードが未設定か、パスワードが違います。"
-    return render_template("recording_admin_login.html", error=error)
+    return render_template("recording_admin_login.html", error=error, next_url=request.args.get("next", ""))
 
 
 @app.route("/recording/admin/logout", methods=["POST"])
@@ -1965,13 +1968,249 @@ def recording_admin():
     return render_template("recording_admin.html", recordings=rows, query=query, tag_order=all_tags, people_order=all_people)
 
 
-@app.route("/stamp")
+# ==================================================
+# スタンプ（画像は static/stamps/ に手動で配置）
+# 録音とは別DBを使い、既存の録音データに影響しないようにします。
+# ==================================================
+STAMP_DIR = BASE_DIR / "static" / "stamps"
+STAMP_DB = BASE_DIR / "stamps.db"
+STAMP_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".bmp"}
+STAMP_TAG_ORDER_SETTING_KEY = "stamp_tag_order"
+STAMP_PEOPLE_ORDER_SETTING_KEY = "stamp_people_order"
+
+
+def get_stamp_db():
+    conn = sqlite3.connect(STAMP_DB)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_stamp_db():
+    STAMP_DIR.mkdir(parents=True, exist_ok=True)
+    with get_stamp_db() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS stamp_settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS stamps (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT NOT NULL UNIQUE,
+                title TEXT NOT NULL DEFAULT '',
+                people TEXT NOT NULL DEFAULT '',
+                tags TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        # 既存DBにも番号列を追加し、既存スタンプにはID順で1から番号を付けます。
+        columns = {row[1] for row in conn.execute("PRAGMA table_info(stamps)").fetchall()}
+        if "number" not in columns:
+            conn.execute("ALTER TABLE stamps ADD COLUMN number INTEGER NOT NULL DEFAULT 0")
+            existing = conn.execute("SELECT id FROM stamps ORDER BY id").fetchall()
+            for number, row in enumerate(existing, start=1):
+                conn.execute("UPDATE stamps SET number = ? WHERE id = ?", (number, row["id"]))
+        # フォルダに新しく置かれた画像を自動登録。既存のタイトル等は上書きしません。
+        for path in STAMP_DIR.iterdir():
+            if path.is_file() and path.suffix.lower() in STAMP_IMAGE_EXTENSIONS and not path.name.startswith("."):
+                conn.execute(
+                    "INSERT OR IGNORE INTO stamps (filename, title) VALUES (?, ?)",
+                    (path.name, path.stem.replace("_", " "))
+                )
+        # 新しく検出した画像には、現在の最大番号の次の番号を付けます。
+        next_number = conn.execute("SELECT COALESCE(MAX(number), 0) + 1 FROM stamps").fetchone()[0]
+        unnumbered = conn.execute("SELECT id FROM stamps WHERE number IS NULL OR number <= 0 ORDER BY id").fetchall()
+        for row in unnumbered:
+            conn.execute("UPDATE stamps SET number = ? WHERE id = ?", (next_number, row["id"]))
+            next_number += 1
+        # フォルダからなくなった画像の管理情報も一覧から除外します。
+        rows = conn.execute("SELECT id, filename FROM stamps").fetchall()
+        for row in rows:
+            filename = Path(row["filename"]).name
+            if filename != row["filename"] or not (STAMP_DIR / filename).is_file():
+                conn.execute("DELETE FROM stamps WHERE id = ?", (row["id"],))
+
+
+def get_stamp_saved_order(conn, key):
+    row = conn.execute("SELECT value FROM stamp_settings WHERE key = ?", (key,)).fetchone()
+    if not row:
+        return []
+    try:
+        value = json.loads(row["value"])
+        return [str(item).strip() for item in value if isinstance(item, str) and item.strip()]
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return []
+
+
+def stamp_metadata_options(rows):
+    tags, people, seen_tags, seen_people = [], [], set(), set()
+    for row in rows:
+        for tag in split_tags(row["tags"]):
+            if tag.casefold() not in seen_tags:
+                seen_tags.add(tag.casefold())
+                tags.append(tag)
+        for person in (row["people"] or "").replace("、", ",").split(","):
+            person = person.strip()
+            if person and person.casefold() not in seen_people:
+                seen_people.add(person.casefold())
+                people.append(person)
+    return tags, people
+
+
+@app.route("/stamp", methods=["GET"])
 def stamp_page():
+    init_stamp_db()
+    query = request.args.get("q", "").strip()
+    search_scope = request.args.get("scope", "all").strip().lower()
+    if search_scope not in {"all", "title", "people", "tags"}:
+        search_scope = "all"
+    sort_by = request.args.get("sort", "people").strip().lower()
+    if sort_by not in {"number", "title", "people", "tags"}:
+        sort_by = "people"
+
+    with get_stamp_db() as conn:
+        all_rows = conn.execute("SELECT * FROM stamps").fetchall()
+        tag_options, person_options = stamp_metadata_options(all_rows)
+        saved_tags = get_stamp_saved_order(conn, STAMP_TAG_ORDER_SETTING_KEY)
+        saved_people = get_stamp_saved_order(conn, STAMP_PEOPLE_ORDER_SETTING_KEY)
+
+    tag_rank = {item.casefold(): i for i, item in enumerate(saved_tags)}
+    people_rank = {item.casefold(): i for i, item in enumerate(saved_people)}
+    tag_options.sort(key=lambda item: (0, tag_rank[item.casefold()]) if item.casefold() in tag_rank else (1, item.casefold()))
+    person_options.sort(key=lambda item: (0, people_rank[item.casefold()]) if item.casefold() in people_rank else (1, item.casefold()))
+
+    rows = list(all_rows)
+    if query:
+        q = query.casefold()
+        def matches(row):
+            fields = {
+                "title": [row["title"], row["filename"]],
+                "people": [row["people"]],
+                "tags": [row["tags"]],
+                "all": [row["title"], row["filename"], row["people"], row["tags"]],
+            }[search_scope]
+            return any(q in (value or "").casefold() for value in fields)
+        rows = [row for row in rows if matches(row)]
+
+    def sort_key(row):
+        title_key = (row["title"] or row["filename"]).casefold()
+        if sort_by == "number":
+            return (int(row["number"] or 0), title_key, row["filename"].casefold())
+        if sort_by == "title":
+            return (title_key, row["filename"].casefold())
+        if sort_by == "tags":
+            vals = split_tags(row["tags"])
+            rank = min([(0, tag_rank[v.casefold()], v.casefold()) if v.casefold() in tag_rank else (1, 0, v.casefold()) for v in vals], default=(2, 0, ""))
+            # タグのグループ内では、スタンプ番号の昇順に並べる
+            return (rank, int(row["number"] or 0), title_key, row["filename"].casefold())
+        vals = [v.strip() for v in (row["people"] or "").replace("、", ",").split(",") if v.strip()]
+        rank = min([(0, people_rank[v.casefold()], v.casefold()) if v.casefold() in people_rank else (1, len(people_rank), v.casefold()) for v in vals], default=(2, len(people_rank), ""))
+        # 同じ人物のグループ内では、スタンプ番号の昇順に並べる
+        return (rank, int(row["number"] or 0), title_key, row["filename"].casefold())
+    rows.sort(key=sort_key)
     return render_template(
-        "tool_page.html",
-        tool_name="スタンプ",
-        description="スタンプのページです。"
+        "stamp.html", stamps=rows, query=query, search_scope=search_scope,
+        sort_by=sort_by, tag_options=tag_options, person_options=person_options,
+        weather_place=selected_weather_place(), railway_label=ROUTE_OPTIONS[selected_route()]
     )
+
+
+@app.route("/stamp/admin", methods=["GET", "POST"])
+def stamp_admin():
+    if not session.get("recording_admin_authenticated"):
+        return redirect(url_for("recording_admin_login", next=url_for("stamp_admin")))
+    init_stamp_db()
+    query = request.args.get("q", "").strip()
+    if request.method == "POST":
+        action = request.form.get("action", "save_all")
+        query = request.form.get("q", query).strip()
+        if action in {"save_tag_order", "save_people_order"}:
+            is_tags = action == "save_tag_order"
+            key = STAMP_TAG_ORDER_SETTING_KEY if is_tags else STAMP_PEOPLE_ORDER_SETTING_KEY
+            field = "tag_order" if is_tags else "people_order"
+            submitted, seen = [], set()
+            for raw in request.form.getlist(field):
+                value = raw.strip()
+                if value and value.casefold() not in seen:
+                    submitted.append(value)
+                    seen.add(value.casefold())
+            with get_stamp_db() as conn:
+                all_rows = conn.execute("SELECT tags, people FROM stamps").fetchall()
+                _, all_people = stamp_metadata_options(all_rows)
+                all_tags, _ = stamp_metadata_options(all_rows)
+                existing = all_tags if is_tags else all_people
+                for value in existing:
+                    if value.casefold() not in seen:
+                        submitted.append(value)
+                        seen.add(value.casefold())
+                conn.execute("INSERT INTO stamp_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (key, json.dumps(submitted, ensure_ascii=False)))
+                conn.commit()
+            flash(("タグ" if is_tags else "人物") + "の表示順を保存しました。", "success")
+            return redirect(url_for("stamp_admin", q=query))
+        if action == "delete":
+            stamp_id = request.form.get("id", type=int)
+            with get_stamp_db() as conn:
+                row = conn.execute("SELECT filename FROM stamps WHERE id = ?", (stamp_id,)).fetchone()
+                if row is None:
+                    flash("削除対象のスタンプが見つかりませんでした。", "error")
+                else:
+                    filename = Path(row["filename"]).name
+                    conn.execute("DELETE FROM stamps WHERE id = ?", (stamp_id,))
+                    conn.commit()
+                    image_path = (STAMP_DIR / filename).resolve()
+                    if image_path.parent == STAMP_DIR.resolve() and image_path.is_file():
+                        try:
+                            image_path.unlink()
+                            flash("スタンプ情報と画像を削除しました。", "success")
+                        except OSError:
+                            flash("情報は削除しましたが、画像ファイルを削除できませんでした。", "error")
+                    else:
+                        flash("スタンプ情報を削除しました。画像ファイルは見つかりませんでした。", "success")
+            return redirect(url_for("stamp_admin", q=query))
+        if action == "save_all":
+            saved = errors = 0
+            with get_stamp_db() as conn:
+                for raw_id in request.form.getlist("stamp_ids"):
+                    try:
+                        stamp_id = int(raw_id)
+                    except (TypeError, ValueError):
+                        errors += 1
+                        continue
+                    title = request.form.get(f"title_{stamp_id}", "").strip()
+                    people = request.form.get(f"people_{stamp_id}", "").strip()
+                    tags = ",".join(dict.fromkeys(tag.strip() for tag in request.form.get(f"tags_{stamp_id}", "").replace("、", ",").split(",") if tag.strip()))
+                    try:
+                        number = int(request.form.get(f"number_{stamp_id}", "").strip())
+                    except (TypeError, ValueError):
+                        errors += 1
+                        continue
+                    if not title or number < 1:
+                        errors += 1
+                        continue
+                    result = conn.execute("UPDATE stamps SET number=?, title=?, people=?, tags=? WHERE id=?", (number, title, people, tags, stamp_id))
+                    if result.rowcount:
+                        saved += 1
+                conn.commit()
+            flash(f"{saved}件のスタンプ情報を保存しました。" + (f" {errors}件は未保存です。" if errors else ""), "error" if errors else "success")
+            return redirect(url_for("stamp_admin", q=query))
+
+    with get_stamp_db() as conn:
+        if query:
+            like = f"%{query}%"
+            rows = conn.execute("SELECT * FROM stamps WHERE title LIKE ? OR filename LIKE ? OR people LIKE ? OR tags LIKE ? ORDER BY number, title COLLATE NOCASE", (like, like, like, like)).fetchall()
+        else:
+            rows = conn.execute("SELECT * FROM stamps ORDER BY number, title COLLATE NOCASE").fetchall()
+        all_rows = conn.execute("SELECT * FROM stamps").fetchall()
+        tags, people = stamp_metadata_options(all_rows)
+        saved_tags = get_stamp_saved_order(conn, STAMP_TAG_ORDER_SETTING_KEY)
+        saved_people = get_stamp_saved_order(conn, STAMP_PEOPLE_ORDER_SETTING_KEY)
+    trank = {v.casefold(): i for i, v in enumerate(saved_tags)}
+    prank = {v.casefold(): i for i, v in enumerate(saved_people)}
+    tags.sort(key=lambda v: (0, trank[v.casefold()]) if v.casefold() in trank else (1, v.casefold()))
+    people.sort(key=lambda v: (0, prank[v.casefold()]) if v.casefold() in prank else (1, v.casefold()))
+    return render_template("stamp_admin.html", stamps=rows, query=query, tag_order=tags, people_order=people,
+                           weather_place=selected_weather_place(), railway_label=ROUTE_OPTIONS[selected_route()])
 
 
 @app.route("/video")
