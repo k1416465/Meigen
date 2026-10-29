@@ -18,11 +18,10 @@ import jpholiday
 import requests
 from bs4 import BeautifulSoup
 
-
 app = Flask(__name__)
 # 録音管理画面の設定：運用前に必ず自分だけが知る値へ変更してください。
-RECORDING_ADMIN_PASSWORD = ""
-FLASK_SESSION_SECRET = ""
+RECORDING_ADMIN_PASSWORD = "Meigen123"
+FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
 app.secret_key = FLASK_SESSION_SECRET
 
 JST = timezone(timedelta(hours=9))
@@ -898,8 +897,10 @@ def _find_status(text):
         if index >= 0:
             return "平常運転", index
 
+
     # ------------------------------------------
     # 2. 運転見合わせ・運転中止
+    #    ただし「直通運転を中止」は遅延より優先しない
     # ------------------------------------------
     suspension_options = (
         "運転見合わせ",
@@ -910,10 +911,42 @@ def _find_status(text):
         "運転を中止",
     )
 
+    # 「直通運転を中止」は路線全体の運転中止と区別する
+    direct_stop_phrases = (
+        "直通運転を中止",
+        "直通運転中止",
+    )
+
+    has_direct_stop = any(
+        phrase in text for phrase in direct_stop_phrases
+    )
+
+    # 遅延・遅れの記載があるか確認
+    delay_phrases = (
+        "列車遅延",
+        "遅延",
+        "遅れ",
+    )
+
+    has_delay = any(
+        phrase in text for phrase in delay_phrases
+    )
+
+    # 直通運転中止と遅延が併記されている場合は「遅延」を優先
+    if has_direct_stop and has_delay:
+        delay_indexes = [
+            text.find(phrase)
+            for phrase in delay_phrases
+            if text.find(phrase) >= 0
+        ]
+        return "遅延", min(delay_indexes)
+
+    # 通常の運転中止・見合わせは従来どおり判定
     suspension_matches = [
         (text.find(phrase), phrase)
         for phrase in suspension_options
         if text.find(phrase) >= 0
+        and phrase not in direct_stop_phrases
     ]
 
     if suspension_matches:
