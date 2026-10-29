@@ -96,27 +96,92 @@
 </section>
 
 <style>
-.tt-page{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,30px);color:var(--text-color,#1f2937);box-sizing:border-box}
+.tt-page{
+  max-width:900px;
+  margin:0 auto;
+  padding:clamp(16px,3vw,30px);
+  color:var(--text-color,#1f2937);
+  box-sizing:border-box;
+}
+
 .tt-header{display:flex;align-items:flex-start;margin-bottom:16px}
 .tt-header h1{margin:0;font-size:clamp(1.35rem,4vw,2rem);line-height:1.25}
 .tt-subtitle{margin:5px 0 0;font-size:.9rem;opacity:.68;letter-spacing:.01em}
+
 .tt-directions{display:grid;gap:18px;min-height:0}
-.tt-direction{border:1px solid var(--border-color,#d7dce5);border-radius:18px;overflow:hidden;background:var(--card-bg,rgba(128,128,128,.035))}
-.tt-direction-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;background:rgba(100,116,139,.09);border-bottom:1px solid var(--border-color,#d7dce5)}
+
+.tt-direction{
+  border:1px solid var(--border-color,#d7dce5);
+  border-radius:18px;
+  overflow:hidden;
+  background:var(--card-bg,rgba(128,128,128,.035));
+}
+
+.tt-direction-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px;
+  background:rgba(100,116,139,.09);
+  border-bottom:1px solid var(--border-color,#d7dce5);
+}
+
 .tt-platform{margin:0 0 4px;font-size:.8rem;font-weight:800;opacity:.75}
 .tt-direction-heading h2{margin:0;font-size:1.05rem}
 .tt-direction-tag{border:1px solid currentColor;border-radius:999px;padding:4px 9px;font-size:.75rem;font-weight:800;opacity:.75}
-.tt-train-list{display:flex;flex:0 0 auto;flex-direction:column;height:var(--tt-list-height,180px);max-height:var(--tt-list-height,180px);min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.tt-train-link{display:block;flex:0 0 auto;min-height:0;color:inherit;text-decoration:none;outline-offset:-3px}
+
+.tt-train-list{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+
+.tt-train-link{
+  display:block;
+  flex:0 0 auto;
+  min-height:0;
+  color:inherit;
+  text-decoration:none;
+  outline-offset:-3px;
+}
+
 .tt-train-link:focus-visible{outline:3px solid #2563eb}
 .tt-train-link:hover .tt-train{filter:brightness(.98)}
-.tt-train{display:grid;grid-template-columns:85px minmax(0,1fr) auto;gap:13px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border-color,rgba(128,128,128,.2));position:relative}
+
+.tt-train{
+  display:grid;
+  grid-template-columns:85px minmax(0,1fr) auto;
+  gap:13px;
+  align-items:center;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border-color,rgba(128,128,128,.2));
+  position:relative;
+  box-sizing:border-box;
+}
+
 .tt-train:last-child{border-bottom:0}
-.tt-train.tt-next{background:rgba(37,99,235,.09);box-shadow:inset 4px 0 #2563eb}
-.tt-train.tt-second{background:rgba(37,99,235,.035);box-shadow:inset 4px 0 rgba(37,99,235,.4)}
+
+.tt-train.tt-next{
+  background:rgba(37,99,235,.09);
+  box-shadow:inset 4px 0 #2563eb;
+}
+
+.tt-train.tt-second{
+  background:rgba(37,99,235,.035);
+  box-shadow:inset 4px 0 rgba(37,99,235,.4);
+}
 
 /* 停車中：黄色 */
-.tt-train.tt-stopped{background:rgba(250,204,21,.20);box-shadow:inset 4px 0 #eab308}
+.tt-train.tt-stopped{
+  background:rgba(250,204,21,.20);
+  box-shadow:inset 4px 0 #eab308;
+}
+
 .tt-train.tt-stopped .tt-countdown{color:#a16207}
 
 .tt-time-column{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
@@ -134,47 +199,115 @@
 .tt-past[data-past="true"] .tt-past-label{display:block}
 .tt-empty{padding:16px;border:1px dashed var(--border-color,#cbd5e1);border-radius:12px;opacity:.75}
 .tt-footer-action{display:flex;justify-content:center;margin:24px 0 8px}
-.tt-other-stations{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 22px;border-radius:999px;background:var(--button-bg,#2563eb);color:var(--button-text,#fff);text-decoration:none;font-weight:800;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.tt-other-stations{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:11px 22px;
+  border-radius:999px;
+  background:var(--button-bg,#2563eb);
+  color:var(--button-text,#fff);
+  text-decoration:none;
+  font-weight:800;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
 .tt-other-stations:hover{filter:brightness(.96)}
 
+/* スマホ：画面の残りスペースを列車一覧に割り当てる */
 @media(max-width:540px){
-  html.tt-screen,html.tt-screen body{height:100%;overflow:hidden;overscroll-behavior:none}
-  html.tt-screen body{position:fixed;inset:0;width:100%}
+  html.tt-screen,
+  html.tt-screen body{
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  html.tt-screen body{
+    position:fixed;
+    inset:0;
+    width:100%;
+  }
+
   html.tt-screen body main,
   html.tt-screen body #content,
   html.tt-screen body .container,
-  html.tt-screen body .main-content{min-height:0;overflow:hidden}
-
-  .tt-page{
-    height:var(--tt-available-height,calc(100dvh - 8px));
-    max-height:var(--tt-available-height,calc(100dvh - 8px));
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    padding:8px 9px;
+  html.tt-screen body .main-content{
+    min-height:0;
+    height:100%;
     overflow:hidden;
   }
 
-  .tt-header{flex:0 0 auto;margin:0}
-  .tt-header h1{font-size:1.1rem;line-height:1.25}
-  .tt-subtitle{margin:3px 0 0;font-size:.72rem}
-
-  .tt-directions{
-    flex:0 0 auto;
-    grid-template-rows:none;
-    gap:6px;
+  .tt-page{
+    height:var(--tt-available-height,100dvh);
+    max-height:var(--tt-available-height,100dvh);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:8px 9px;
+    overflow:hidden;
     min-height:0;
-    overflow:visible;
   }
 
-  .tt-direction{display:flex;flex-direction:column;min-height:0;border-radius:12px}
-  .tt-direction-heading{flex:0 0 auto;padding:7px 9px}
-  .tt-direction-heading h2{font-size:.85rem}
-  .tt-platform{font-size:.68rem;margin-bottom:2px}
-  .tt-direction-tag{font-size:.66rem;padding:3px 6px}
-
-  .tt-train-list{
+  .tt-header{
     flex:0 0 auto;
+    margin:0;
+  }
+
+  .tt-header h1{
+    font-size:1.08rem;
+    line-height:1.25;
+  }
+
+  .tt-subtitle{
+    margin:3px 0 0;
+    font-size:.7rem;
+  }
+
+  /*
+   * 一覧の高さを列車3本分から計算しない。
+   * 見出し・フッターを除いた残りの高さを方面全体に配分する。
+   */
+  .tt-directions{
+    flex:1 1 0;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  /*
+   * 方面が複数ある場合も、残りの高さを均等に分ける。
+   * 各方面内の列車一覧が、その方面の残りの高さを使う。
+   */
+  .tt-direction{
+    flex:1 1 0;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    min-height:0;
+    border-radius:12px;
+  }
+
+  .tt-direction-heading{
+    flex:0 0 auto;
+    padding:7px 9px;
+    gap:8px;
+  }
+
+  .tt-direction-heading h2{font-size:.84rem}
+  .tt-platform{font-size:.66rem;margin-bottom:2px}
+  .tt-direction-tag{font-size:.64rem;padding:3px 6px}
+
+  /*
+   * 列車一覧は親の空きスペースに合わせて伸縮。
+   * 高さを3列車分に固定せず、溢れた分だけ内部スクロールする。
+   */
+  .tt-train-list{
+    flex:1 1 0;
+    height:auto;
+    max-height:none;
     min-height:0;
     overflow-x:hidden;
     overflow-y:auto;
@@ -182,85 +315,100 @@
     -webkit-overflow-scrolling:touch;
   }
 
-  .tt-train-link{flex:0 0 auto;min-height:0;display:block}
+  .tt-train-link{
+    flex:0 0 auto;
+    display:block;
+    min-height:0;
+  }
 
-  /* スマホ版：1列車の高さを拡大しつつ、2列車分の表示領域を確保 */
   .tt-train{
     width:100%;
-    box-sizing:border-box;
-    grid-template-columns:64px minmax(0,1fr);
-    gap:8px;
-    padding:9px 9px;
+    grid-template-columns:60px minmax(0,1fr);
+    gap:7px;
+    padding:8px 8px;
     align-content:center;
   }
 
   .tt-time{
-    font-size:1.08rem;
-    line-height:1.25;
+    font-size:1.03rem;
+    line-height:1.2;
   }
+
   .tt-time-column{gap:3px}
-
-  .tt-train-title{gap:5px}
-  .tt-train-title>strong{font-size:.9rem;line-height:1.3}
-  .tt-type{font-size:.7rem;padding:3px 5px}
-  .tt-cars{font-size:.72rem}
-
-  .tt-countdown{
-    margin-top:4px;
-    font-size:.72rem;
-    line-height:1.35;
-  }
-  .tt-note{
-    margin-top:3px;
-    font-size:.7rem;
-    line-height:1.35;
-  }
-  .tt-rank{font-size:.66rem}
+  .tt-train-title{gap:4px}
+  .tt-train-title>strong{font-size:.86rem;line-height:1.3}
+  .tt-type{font-size:.67rem;padding:2px 5px}
+  .tt-cars{font-size:.68rem}
+  .tt-countdown{margin-top:3px;font-size:.69rem;line-height:1.3}
+  .tt-note{margin-top:3px;font-size:.67rem;line-height:1.3}
+  .tt-rank{font-size:.62rem}
 
   .tt-past-label{
     grid-column:2;
     justify-self:start;
-    font-size:.68rem;
+    font-size:.65rem;
   }
 
-  .tt-footer-action{flex:0 0 auto;margin:0}
-  .tt-other-stations{min-height:34px;padding:6px 14px;font-size:.8rem}
+  .tt-footer-action{
+    flex:0 0 auto;
+    justify-content:center;
+    margin:0;
+    padding-top:2px;
+  }
+
+  .tt-other-stations{
+    min-height:33px;
+    padding:5px 14px;
+    font-size:.78rem;
+  }
 }
 
-/* 高さの低いスマホでは、2列車を表示しやすいよう余白を少し縮小 */
+/* 画面の高さが低いスマホ：全体の余白を減らしてバランスを取る */
 @media(max-width:540px) and (max-height:650px){
-  .tt-page{padding:5px 8px;gap:4px}
+  .tt-page{gap:5px;padding:5px 7px}
   .tt-header h1{font-size:1rem}
-  .tt-subtitle{font-size:.66rem}
-  .tt-direction-heading{padding:5px 8px}
-  .tt-direction-heading h2{font-size:.8rem}
-  .tt-platform{font-size:.62rem}
-  .tt-direction-tag{font-size:.6rem;padding:2px 5px}
+  .tt-subtitle{font-size:.63rem;margin-top:2px}
+
+  .tt-directions{gap:5px}
+  .tt-direction-heading{padding:5px 7px}
+  .tt-direction-heading h2{font-size:.78rem}
+  .tt-platform{font-size:.6rem;margin-bottom:1px}
+  .tt-direction-tag{font-size:.58rem;padding:2px 5px}
 
   .tt-train{
-    grid-template-columns:58px minmax(0,1fr);
-    gap:6px;
-    padding:7px 7px;
+    grid-template-columns:54px minmax(0,1fr);
+    gap:5px;
+    padding:5px 7px;
   }
 
-  .tt-time{font-size:1rem}
-  .tt-train-title>strong{font-size:.82rem}
-  .tt-type{font-size:.64rem;padding:2px 4px}
-  .tt-cars{font-size:.66rem}
-  .tt-countdown{font-size:.66rem;margin-top:3px}
-  .tt-note{font-size:.64rem;margin-top:2px}
-  .tt-rank{font-size:.6rem}
-  .tt-other-stations{min-height:29px;padding:4px 11px;font-size:.74rem}
+  .tt-time{font-size:.94rem}
+  .tt-train-title>strong{font-size:.78rem}
+  .tt-type{font-size:.61rem;padding:2px 4px}
+  .tt-cars{font-size:.62rem}
+  .tt-countdown{font-size:.62rem;margin-top:2px}
+  .tt-note{font-size:.6rem;margin-top:2px}
+  .tt-rank{font-size:.58rem}
+
+  .tt-other-stations{
+    min-height:27px;
+    padding:3px 10px;
+    font-size:.7rem;
+  }
 }
 
-/* ダークモード：文字・背景のコントラストを確保 */
+/* ダークモード */
 html body.dark .tt-page{color:#f8fafc}
 html body.dark .tt-direction{background:#171b22;border-color:#3b4350}
 html body.dark .tt-direction-heading{background:#252c37;border-color:#3b4350}
+
 html body.dark .tt-platform,
 html body.dark .tt-subtitle,
 html body.dark .tt-note,
-html body.dark .tt-cars{color:#d1d5db;opacity:1}
+html body.dark .tt-cars{
+  color:#d1d5db;
+  opacity:1;
+}
+
 html body.dark .tt-train{color:#f8fafc;border-color:#3b4350}
 html body.dark .tt-train-link{color:#f8fafc;text-decoration:none}
 html body.dark .tt-train-link:hover .tt-train{filter:brightness(1.18)}
@@ -268,9 +416,12 @@ html body.dark .tt-train.tt-next{background:#1e3558;box-shadow:inset 4px 0 #60a5
 html body.dark .tt-train.tt-second{background:#202a3a;box-shadow:inset 4px 0 #527db8}
 
 /* ダークモード：停車中も黄色 */
-html body.dark .tt-train.tt-stopped{background:#493d16;box-shadow:inset 4px 0 #facc15}
-html body.dark .tt-train.tt-stopped .tt-countdown{color:#fde047}
+html body.dark .tt-train.tt-stopped{
+  background:#493d16;
+  box-shadow:inset 4px 0 #facc15;
+}
 
+html body.dark .tt-train.tt-stopped .tt-countdown{color:#fde047}
 html body.dark .tt-countdown,
 html body.dark .tt-rank{color:#93c5fd}
 html body.dark .tt-past .tt-countdown{color:#e5e7eb}
@@ -285,20 +436,27 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
   const page = document.querySelector('.tt-page');
   const mobileQuery = window.matchMedia('(max-width: 540px)');
 
-  // スマートフォンではページ全体を画面内に固定する。
-  // 列車一覧の中だけをスクロールさせる。
+  /*
+   * スマホでは、画面上の位置からページに使える高さだけを求める。
+   * 列車の本数・列車カードの高さから一覧の高さは計算しない。
+   */
+  function fitPage(){
+    if (!page || !mobileQuery.matches) return;
+
+    const top = Math.max(0, page.getBoundingClientRect().top);
+    const availableHeight = Math.max(250, window.innerHeight - top - 4);
+
+    page.style.setProperty(
+      '--tt-available-height',
+      availableHeight + 'px'
+    );
+  }
+
   if (page && mobileQuery.matches) {
     document.documentElement.classList.add('tt-screen');
 
-    const fitPage = () => {
-      const top = Math.max(0, page.getBoundingClientRect().top);
-      page.style.setProperty(
-        '--tt-available-height',
-        Math.max(250, window.innerHeight - top - 4) + 'px'
-      );
-    };
-
     fitPage();
+
     window.addEventListener('resize', fitPage, {passive:true});
     window.addEventListener('orientationchange', fitPage, {passive:true});
   }
@@ -329,18 +487,29 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         const validArrival = !!(arrival && !Number.isNaN(arrival.getTime()));
         const validDeparture = !!(departure && !Number.isNaN(departure.getTime()));
 
-        const stopped = validArrival && validDeparture && arrival <= now && now < departure;
+        const stopped =
+          validArrival &&
+          validDeparture &&
+          arrival <= now &&
+          now < departure;
+
         const departed = validDeparture && now >= departure;
 
         // 発車時刻の属する1分間だけ「発車済」を表示。
-        // 12:00発なら12:00中に表示し、12:01に消す。
-        const departureFresh = departed && now.getTime() < departure.getTime() + 60000;
-        const arrivedAtTerminus = !validDeparture && validArrival && now >= arrival;
+        const departureFresh =
+          departed && now.getTime() < departure.getTime() + 60000;
+
+        const arrivedAtTerminus =
+          !validDeparture && validArrival && now >= arrival;
+
         const eventPassed = now >= eventTime;
-        const past = !stopped && (departed || arrivedAtTerminus || (eventPassed && !validDeparture));
+        const past =
+          !stopped &&
+          (departed || arrivedAtTerminus || (eventPassed && !validDeparture));
 
         row.setAttribute('data-stopped', stopped ? 'true' : 'false');
         row.setAttribute('data-past', past ? 'true' : 'false');
+
         row.classList.toggle('tt-stopped', stopped);
         row.classList.toggle('tt-past', past);
 
@@ -374,11 +543,10 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
                 : (arrivedAtTerminus ? '到着済' : ''));
         }
 
-        // 行自体は非表示にせず、一覧内スクロールで確認できるようにする。
+        // 列車行は非表示にせず、一覧内スクロールで確認できるようにする。
         row.style.display = '';
       });
 
-      // 発車・到着予定時刻の早い順に並べる。
       upcoming.sort((a, b) => a.eventTime - b.eventTime);
 
       stoppedRows.sort((a, b) => {
@@ -387,7 +555,7 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         return aTime - bTime;
       });
 
-      // 既存の順位表示をリセットする。列車行自体は残す。
+      // 既存の順位表示をリセットする。
       rows.forEach(row => {
         row.classList.remove('tt-next', 'tt-second');
 
@@ -399,32 +567,30 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
       const activeStopped = stoppedRows[0];
 
       if (activeStopped) {
-        // 停車中の列車がある場合：
-        // 停車中を「先発」、後続を「次発」「次々発」にする。
-        ranked.push({row: activeStopped, label: '先発'});
+        // 停車中の列車を「先発」とする。
+        ranked.push({row:activeStopped, label:'先発'});
 
         upcoming.forEach(item => {
           if (ranked.length < 3) {
             ranked.push({
-              row: item.row,
-              label: ranked.length === 1 ? '次発' : '次々発'
+              row:item.row,
+              label:ranked.length === 1 ? '次発' : '次々発'
             });
           }
         });
       } else {
-        // 停車中の列車がない場合：
-        // 直近2本だけを「先発」「次発」にする。
+        // 停車中の列車がない場合は直近2本を表示順位にする。
         upcoming.slice(0, 2).forEach((item, index) => {
           ranked.push({
-            row: item.row,
-            label: ['先発', '次発'][index]
+            row:item.row,
+            label:['先発', '次発'][index]
           });
         });
       }
 
       const rankedRows = new Set(ranked.map(item => item.row));
 
-      // 順位のない列車は「到着まで」の表示を消す。
+      // 順位のない列車は「到着まで」のカウントダウンを消す。
       rows.forEach(row => {
         const kind = row.getAttribute('data-event-kind');
         const countdown = row.querySelector('[data-countdown]');
@@ -448,46 +614,16 @@ html body.dark .tt-other-stations{background:#2563eb;color:#fff}
         }
       });
 
-      // 先頭2列車の実際の高さを測り、一覧の高さを調整する。
-      // これにより、カードを大きくしても2列車分の表示領域を確保する。
-      const links = Array.from(list.querySelectorAll('.tt-train-link'));
-      const firstTwo = links.slice(0, 2);
-
-      const twoRowsHeight = firstTwo.reduce(
-        (sum, link) => sum + link.getBoundingClientRect().height,
-        0
-      );
-
-      const fallbackHeight = mobileQuery.matches ? 120 : 180;
-      const targetHeight = Math.max(72, twoRowsHeight || fallbackHeight);
-
-      list.style.setProperty('--tt-list-height', targetHeight + 'px');
-
-      // 初回だけ、停車中の列車または直近列車が見える位置に合わせる。
-      if (!list.dataset.initialPositioned) {
-        const target = activeStopped || upcoming[0]?.row;
-
-        if (target) {
-          const link = target.closest('.tt-train-link');
-
-          if (link) {
-            list.scrollTop = Math.max(
-              0,
-              link.getBoundingClientRect().top -
-                list.getBoundingClientRect().top +
-                list.scrollTop
-            );
-          }
-        }
-
-        list.dataset.initialPositioned = 'true';
-      }
+      /*
+       * ここでは列車一覧の高さを変更しない。
+       * スマホではCSSのflexレイアウトが画面内の空きスペースを配分する。
+       */
     });
   }
 
   updateCountdowns();
 
-  // 発車済表示を12:01に確実に消すため、15秒ごとに状態を更新する。
+  // 発車済表示を定期的に更新する。
   setInterval(updateCountdowns, 15000);
 })();
 </script>
