@@ -4917,3 +4917,62 @@ html body.dark .operation-page .station-selector .station-grid.station-grid-larg
     color: #292524 !important;
     -webkit-text-fill-color: #292524 !important;
 }
+
+
+/* ===== 駅選択：ホバー・クリック時の黄色表示を最優先 ===== */
+@media (hover: hover) and (pointer: fine) {
+  html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button:hover {
+    background: #facc15 !important;
+    background-color: #facc15 !important;
+    border-color: #eab308 !important;
+    color: #292524 !important;
+    box-shadow: none !important;
+  }
+  html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button:hover .station-name {
+    color: #292524 !important;
+    -webkit-text-fill-color: #292524 !important;
+  }
+}
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button:active,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button.is-selected {
+  background: #facc15 !important;
+  background-color: #facc15 !important;
+  border-color: #eab308 !important;
+  color: #292524 !important;
+  box-shadow: none !important;
+}
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button:active .station-name,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button.is-selected .station-name {
+  color: #292524 !important;
+  -webkit-text-fill-color: #292524 !important;
+}
+
+/* 最終調整：長い駅名でもボタンの高さを変えず、全選択肢を同じ高さに固定 */
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large {
+    grid-template-rows: repeat(6, 60px) !important;
+    grid-auto-rows: 60px !important;
+    align-items: stretch !important;
+    align-content: start !important;
+}
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button:hover,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button:active,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button:focus,
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button.is-selected {
+    height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+    align-self: stretch !important;
+    box-sizing: border-box !important;
+    padding: 6px 10px !important;
+    overflow: hidden !important;
+}
+html body .page-container.operation-page .station-selector .station-grid.station-grid-large > label.station-button > .station-name {
+    display: block !important;
+    width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    overflow: hidden !important;
+}
