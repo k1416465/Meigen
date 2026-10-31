@@ -912,7 +912,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* 駅選択肢の高さ：全行・全ボタンを同じ高さに固定 */
 .operation-page .station-selector .station-grid.station-grid-large {
-    --station-choice-height: 80px;
+    --station-choice-height: 60px;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     grid-auto-rows: var(--station-choice-height) !important;
@@ -948,7 +948,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* 角の丸さと押下時の色 */
 .operation-page .station-selector .station-grid.station-grid-large {
-    --station-choice-radius: 15px; /* 角の丸さはこの数値で調整 */
+    --station-choice-radius: 8px; /* 角の丸さはこの数値で調整 */
 }
 .operation-page .station-selector .station-grid.station-grid-large > .station-button {
     border-radius: var(--station-choice-radius) !important;
@@ -963,6 +963,20 @@ document.addEventListener("DOMContentLoaded", () => {
 .operation-page .station-selector .station-grid.station-grid-large > .station-button:active .station-name {
     color: #292524 !important;
 }
+
+/* 押下中・クリック直後は選択肢全体を黄色で塗りつぶす */
+.operation-page .station-selector .station-grid.station-grid-large > .station-button:active,
+.operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected {
+    background: #facc15 !important;
+    background-color: #facc15 !important;
+    border: 1px solid #eab308 !important;
+    color: #292524 !important;
+    box-shadow: none !important;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button:active .station-name,
+.operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected .station-name {
+    color: #292524 !important;
+}
 </style>
 
 
@@ -971,13 +985,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const selector = document.querySelector('.operation-page .station-selector');
   if (!selector || selector.dataset.directNavigationReady === 'true') return;
   selector.dataset.directNavigationReady = 'true';
-  selector.querySelectorAll('.station-button[data-station]').forEach(button => {
-    button.addEventListener('click', event => {
-      event.preventDefault();
-      const station = button.dataset.station;
-      if (!station) return;
-      window.location.href = '/timetable?station=' + encodeURIComponent(station);
+
+  // 戻る操作などでこのページが復元されたら、選択状態を必ず解除
+  const resetSelection = () => {
+    selector.querySelectorAll('.station-button.is-selected').forEach(button => {
+      button.classList.remove('is-selected');
+      button.removeAttribute('aria-pressed');
     });
+  };
+  window.addEventListener('pageshow', resetSelection);
+  resetSelection();
+
+  selector.addEventListener('click', event => {
+    const button = event.target.closest('.station-button[data-station]');
+    if (!button || !selector.contains(button)) return;
+    event.preventDefault();
+    const station = button.dataset.station;
+    if (!station || button.dataset.navigating === 'true') return;
+
+    resetSelection();
+    button.dataset.navigating = 'true';
+    button.classList.add('is-selected');
+    button.setAttribute('aria-pressed', 'true');
+    // 黄色が描画される時間を確保してから遷移
+    window.setTimeout(() => {
+      window.location.assign('/timetable?station=' + encodeURIComponent(station));
+    }, 220);
   });
 })();
 </script>
