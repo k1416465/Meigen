@@ -1,27 +1,7 @@
 {% extends "base.html" %}
 {% block title %}迷言｜時刻表{% endblock %}
 
-<script>
-(() => {
-  const selector = document.querySelector('.operation-page .station-selector');
-  if (!selector || selector.dataset.selectionReady === 'true') return;
-  selector.dataset.selectionReady = 'true';
-  const radios = selector.querySelectorAll('input.station-radio[name="station"]');
-  const choices = selector.querySelectorAll('.station-button[data-station]');
-  const confirmButton = selector.querySelector('#stationConfirm');
-  let selectedStation = '';
-  radios.forEach(radio => radio.addEventListener('change', () => {
-    if (!radio.checked) return;
-    selectedStation = radio.value;
-    choices.forEach(choice => choice.classList.toggle('is-selected', choice.dataset.station === selectedStation));
-    confirmButton.disabled = !selectedStation;
-  }));
-  confirmButton.addEventListener('click', () => {
-    if (!selectedStation) return;
-    window.location.href = '/timetable?station=' + encodeURIComponent(selectedStation);
-  });
-})();
-</script>
+
 
 {% block content %}
 <div class="page-container operation-page">
@@ -33,19 +13,18 @@
     <!-- 駅選択 -->
     <section class="station-selector">
         <div class="station-grid station-grid-large" role="radiogroup" aria-label="駅を選択">
-            <label class="station-button" data-station="小山"><input type="radio" class="station-radio" name="station" value="小山" aria-label="小山"><span class="station-name">小山</span></label>
-            <label class="station-button" data-station="思川"><input type="radio" class="station-radio" name="station" value="思川" aria-label="思川"><span class="station-name">思川</span></label>
-            <label class="station-button" data-station="栃木"><input type="radio" class="station-radio" name="station" value="栃木" aria-label="栃木"><span class="station-name">栃木</span></label>
-            <label class="station-button" data-station="大平下"><input type="radio" class="station-radio" name="station" value="大平下" aria-label="大平下"><span class="station-name">大平下</span></label>
-            <label class="station-button" data-station="岩舟"><input type="radio" class="station-radio" name="station" value="岩舟" aria-label="岩舟"><span class="station-name">岩舟</span></label>
-            <label class="station-button" data-station="佐野"><input type="radio" class="station-radio" name="station" value="佐野" aria-label="佐野"><span class="station-name">佐野</span></label>
-            <label class="station-button" data-station="富田"><input type="radio" class="station-radio" name="station" value="富田" aria-label="富田"><span class="station-name">富田</span></label>
-            <label class="station-button" data-station="あしかがフラワーパーク"><input type="radio" class="station-radio" name="station" value="あしかがフラワーパーク" aria-label="あしかがフラワーパーク"><span class="station-name">あしかが<br>フラワーパーク</span></label>
-            <label class="station-button" data-station="足利"><input type="radio" class="station-radio" name="station" value="足利" aria-label="足利"><span class="station-name">足利</span></label>
-            <label class="station-button" data-station="山前"><input type="radio" class="station-radio" name="station" value="山前" aria-label="山前"><span class="station-name">山前</span></label>
-            <label class="station-button" data-station="小俣"><input type="radio" class="station-radio" name="station" value="小俣" aria-label="小俣"><span class="station-name">小俣</span></label>
+            <label class="station-button" data-station="小山"><span class="station-name">小山</span></label>
+            <label class="station-button" data-station="思川"><span class="station-name">思川</span></label>
+            <label class="station-button" data-station="栃木"><span class="station-name">栃木</span></label>
+            <label class="station-button" data-station="大平下"><span class="station-name">大平下</span></label>
+            <label class="station-button" data-station="岩舟"><span class="station-name">岩舟</span></label>
+            <label class="station-button" data-station="佐野"><span class="station-name">佐野</span></label>
+            <label class="station-button" data-station="富田"><span class="station-name">富田</span></label>
+            <label class="station-button" data-station="あしかがフラワーパーク"><span class="station-name">あしかが<br>フラワーパーク</span></label>
+            <label class="station-button" data-station="足利"><span class="station-name">足利</span></label>
+            <label class="station-button" data-station="山前"><span class="station-name">山前</span></label>
+            <label class="station-button" data-station="小俣"><span class="station-name">小俣</span></label>
         </div>
-        <button type="button" id="stationConfirm" class="station-confirm" disabled>決定</button>
     </section>
 
     <!-- 運行情報 -->
@@ -905,29 +884,100 @@ document.addEventListener("DOMContentLoaded", () => {
     .operation-page .station-selector .station-name { font-size: 14px !important; }
 }
 
+/* 駅選択肢：丸を隠し、駅名を中央揃え。全項目を同じ高さに統一 */
+.operation-page .station-selector .station-grid.station-grid-large {
+    grid-auto-rows: 68px !important;
+    align-items: stretch !important;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 68px !important;
+    min-height: 68px !important;
+    padding: 8px 10px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+.operation-page .station-selector input.station-radio {
+    display: none !important;
+}
+.operation-page .station-selector .station-name {
+    width: 100% !important;
+    text-align: center !important;
+}
+
+
+
+/* 駅選択肢の高さ：全行・全ボタンを同じ高さに固定 */
+.operation-page .station-selector .station-grid.station-grid-large {
+    --station-choice-height: 80px;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: var(--station-choice-height) !important;
+    grid-auto-flow: row !important;
+    align-items: stretch !important;
+    align-content: start !important;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button {
+    display: flex !important;
+    width: 100% !important;
+    height: var(--station-choice-height) !important;
+    min-height: var(--station-choice-height) !important;
+    max-height: var(--station-choice-height) !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    align-self: stretch !important;
+    justify-self: stretch !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    padding: 8px 10px !important;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button .station-name {
+    display: block !important;
+    width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    overflow: hidden !important;
+}
+
+/* 角の丸さと押下時の色 */
+.operation-page .station-selector .station-grid.station-grid-large {
+    --station-choice-radius: 15px; /* 角の丸さはこの数値で調整 */
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button {
+    border-radius: var(--station-choice-radius) !important;
+    transition: background-color .12s ease, border-color .12s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button:active {
+    background: #facc15 !important;
+    border-color: #eab308 !important;
+    color: #292524 !important;
+}
+.operation-page .station-selector .station-grid.station-grid-large > .station-button:active .station-name {
+    color: #292524 !important;
+}
 </style>
 
 
 <script>
 (() => {
   const selector = document.querySelector('.operation-page .station-selector');
-  if (!selector || selector.dataset.selectionReady === 'true') return;
-  selector.dataset.selectionReady = 'true';
-  const buttons = selector.querySelectorAll('.station-button[data-station]');
-  const confirmButton = selector.querySelector('#stationConfirm');
-  let selectedStation = '';
-  buttons.forEach(button => button.addEventListener('click', () => {
-    selectedStation = button.dataset.station;
-    buttons.forEach(item => {
-      const selected = item === button;
-      item.classList.toggle('is-selected', selected);
-      item.setAttribute('aria-pressed', String(selected));
+  if (!selector || selector.dataset.directNavigationReady === 'true') return;
+  selector.dataset.directNavigationReady = 'true';
+  selector.querySelectorAll('.station-button[data-station]').forEach(button => {
+    button.addEventListener('click', event => {
+      event.preventDefault();
+      const station = button.dataset.station;
+      if (!station) return;
+      window.location.href = '/timetable?station=' + encodeURIComponent(station);
     });
-    confirmButton.disabled = !selectedStation;
-  }));
-  confirmButton.addEventListener('click', () => {
-    if (!selectedStation) return;
-    window.location.href = '/timetable?station=' + encodeURIComponent(selectedStation);
   });
 })();
 </script>
@@ -946,5 +996,46 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 @media (prefers-color-scheme: dark) {
   .operation-page .station-selector .station-name { color: #fff !important; }
+}
+</style>
+
+<style>
+/* 駅選択肢：グレーの枠線付き四角形。選択時は黄色で塗りつぶす */
+.operation-page .station-selector .station-grid.station-grid-large > .station-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    min-height: 48px !important;
+    height: auto !important;
+    padding: 8px 10px !important;
+    border: 1px solid #999 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: inherit !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+/* ラジオの丸印は表示せず、選択状態は四角形全体で表現 */
+.operation-page .station-selector input.station-radio {
+    display: none !important;
+}
+
+.operation-page .station-selector .station-button.is-selected {
+    border-color: #eab308 !important;
+    background: #facc15 !important;
+    color: #292524 !important;
+}
+
+.operation-page .station-selector .station-button.is-selected .station-name {
+    color: #292524 !important;
+}
+
+.operation-page .station-selector .station-button:focus-visible {
+    outline: 3px solid #1685e8 !important;
+    outline-offset: 2px !important;
 }
 </style>
