@@ -4845,3 +4845,75 @@ html body.dark .operation-page .station-selector .station-grid.station-grid-larg
   .stamp-tags { margin-top: 5px; gap: 3px; }
   .stamp-tags .recording-tag { font-size: .62rem; padding: 2px 5px; }
 }
+
+
+/* ==================================================
+   運行情報画面：駅選択肢の四角ボタンデザイン（最終上書き）
+   未選択＝グレー枠／選択中＝黄色塗りつぶし
+   ================================================== */
+html body .operation-page .station-selector .station-grid.station-grid-large > label.station-button,
+html body .operation-page .station-selector .station-grid.station-grid-large > label.station-button:hover,
+html body .operation-page .station-selector .station-grid.station-grid-large > label.station-button:active,
+html body .operation-page .station-selector .station-grid.station-grid-large > label.station-button:focus {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    min-height: 48px !important;
+    height: auto !important;
+    padding: 8px 10px !important;
+    border: 1px solid #9ca3af !important;
+    border-radius: 5px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: var(--text, inherit) !important;
+    text-align: center !important;
+    cursor: pointer !important;
+}
+
+html body .operation-page .station-selector input.station-radio {
+    display: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+}
+
+html body .operation-page .station-selector .station-button.is-selected,
+html body .operation-page .station-selector .station-grid.station-grid-large > .station-button.is-selected,
+html body .operation-page .station-selector .station-grid.station-grid-large > .station-button:has(input.station-radio:checked) {
+    border: 1px solid #eab308 !important;
+    background: #facc15 !important;
+    background-color: #facc15 !important;
+    box-shadow: none !important;
+    color: #292524 !important;
+}
+
+html body .operation-page .station-selector .station-button.is-selected .station-name,
+html body .operation-page .station-selector .station-button:has(input.station-radio:checked) .station-name {
+    color: #292524 !important;
+    -webkit-text-fill-color: #292524 !important;
+}
+
+html body.dark .operation-page .station-selector .station-grid.station-grid-large > label.station-button,
+html body.dark .operation-page .station-selector .station-grid.station-grid-large > label.station-button:hover,
+html body.dark .operation-page .station-selector .station-grid.station-grid-large > label.station-button:focus {
+    border: 1px solid #9ca3af !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: #fff !important;
+}
+
+html body.dark .operation-page .station-selector .station-grid.station-grid-large > label.station-button.is-selected,
+html body.dark .operation-page .station-selector .station-grid.station-grid-large > label.station-button:has(input.station-radio:checked) {
+    border: 1px solid #eab308 !important;
+    background: #facc15 !important;
+    background-color: #facc15 !important;
+    color: #292524 !important;
+}
+
+html body.dark .operation-page .station-selector .station-grid.station-grid-large > label.station-button.is-selected .station-name,
+html body.dark .operation-page .station-selector .station-grid.station-grid-large > label.station-button:has(input.station-radio:checked) .station-name {
+    color: #292524 !important;
+    -webkit-text-fill-color: #292524 !important;
+}
