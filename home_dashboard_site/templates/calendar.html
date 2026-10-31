@@ -194,6 +194,69 @@
         }
     }
   }
+
+
+  /* =========================================
+     ダークモード：予定追加・日付詳細・編集モーダル
+     body.dark は base.html / style.css のテーマ切替に合わせる
+  ========================================= */
+  body.dark .calendar-modal {
+    background: #252b36 !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #414b5b;
+  }
+
+  body.dark .calendar-modal h2,
+  body.dark .calendar-modal p,
+  body.dark .calendar-modal label,
+  body.dark .calendar-modal-help,
+  body.dark .calendar-modal-event,
+  body.dark .calendar-modal-event-title,
+  body.dark .calendar-modal-event-detail,
+  body.dark .calendar-modal-header {
+    color: #f1f5f9;
+  }
+
+  body.dark .calendar-add-form input[type="date"],
+  body.dark .calendar-add-form input[type="text"],
+  body.dark .calendar-add-form textarea,
+  body.dark .calendar-edit-form input[type="date"],
+  body.dark .calendar-edit-form input[type="text"],
+  body.dark .calendar-edit-form textarea {
+    background: #343d4b !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #596579 !important;
+    color-scheme: dark;
+  }
+
+  body.dark .calendar-add-form input::placeholder,
+  body.dark .calendar-add-form textarea::placeholder,
+  body.dark .calendar-edit-form input::placeholder,
+  body.dark .calendar-edit-form textarea::placeholder {
+    color: #aab4c3 !important;
+    opacity: 1;
+  }
+
+  body.dark .calendar-modal-close,
+  body.dark .calendar-secondary-button {
+    background: #3a4555 !important;
+    color: #f1f5f9 !important;
+  }
+
+  body.dark .calendar-modal-event {
+    background: #303947;
+  }
+
+  body.dark .calendar-modal-event.school { color: #8fc5ff; }
+  body.dark .calendar-modal-event.holiday { color: #ff9aa5; }
+  body.dark .calendar-modal-event.personal { color: #f1f5f9; }
+
+  body.dark .calendar-add-form button[type="submit"],
+  body.dark .calendar-edit-form button[type="submit"],
+  body.dark .calendar-primary-button {
+    color: #fff !important;
+  }
+
 </style>
 
 <div class="calendar-modal-backdrop" id="calendarAddBackdrop" hidden>
