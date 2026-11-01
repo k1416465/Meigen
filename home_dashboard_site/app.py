@@ -628,6 +628,12 @@ TIMETABLE_STATIONS = {
     },
 }
 
+# 設定画面のMy駅選択肢（両毛線：小山～小俣）
+MY_STATION_OPTIONS = [
+    "小山", "思川", "栃木", "大平下", "岩舟", "佐野",
+    "富田", "あしかがフラワーパーク", "足利", "山前", "小俣",
+]
+
 @app.route("/timetable", methods=["GET"])
 def timetable_page():
     station = request.args.get("station", "").strip()
@@ -761,6 +767,7 @@ def settings():
         my_route = request.form.get("my_route", "ryomo")
         weather_place = request.form.get("weather_place", "sano")
         appearance = request.form.get("appearance", "system")
+        my_station = request.form.get("my_station", "").strip()
 
         if class_name not in CLASS_SCHEDULES:
             class_name = ""
@@ -770,6 +777,8 @@ def settings():
             weather_place = "sano"
         if appearance not in ("light", "dark", "system"):
             appearance = "system"
+        if my_station not in MY_STATION_OPTIONS:
+            my_station = ""
 
         response = make_response(redirect(url_for("settings")))
 
@@ -786,6 +795,10 @@ def settings():
         response.set_cookie("myHomeRoute", my_route, **cookie_options)
         response.set_cookie("myHomeWeather", weather_place, **cookie_options)
         response.set_cookie("myHomeAppearance", appearance, **cookie_options)
+        if my_station:
+            response.set_cookie("myHomeStation", my_station, **cookie_options)
+        else:
+            response.delete_cookie("myHomeStation")
 
         return response
 
@@ -797,6 +810,8 @@ def settings():
         route_options=ROUTE_OPTIONS,
         weather_place=selected_weather_place(),
         weather_options=WEATHER_OPTIONS,
+        my_station=request.cookies.get("myHomeStation", "") if request.cookies.get("myHomeStation", "") in MY_STATION_OPTIONS else "",
+        station_options=MY_STATION_OPTIONS,
     )
 
 
@@ -1366,7 +1381,7 @@ def fetch_operation_alerts():
             status = "遅延"
 
         if status == "直通運転中止":
-            icon = "direct_stop.svg"
+            icon = "direct_stop.png"
 
         elif any(word in status for word in (
             "運転見合わせ",
