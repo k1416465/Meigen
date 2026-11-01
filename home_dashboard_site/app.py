@@ -65,6 +65,21 @@ CLASS_SCHEDULES = {
 
 CLASS_NAMES = list(CLASS_SCHEDULES.keys())
 
+# 日付ごとの特別時間割（アプリと同じフォルダのJSONに保存）
+SPECIAL_SCHEDULE_FILE = Path(__file__).resolve().parent / "special_schedule.json"
+
+def load_special_schedule():
+    try:
+        data = json.loads(SPECIAL_SCHEDULE_FILE.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+def save_special_schedule(data):
+    SPECIAL_SCHEDULE_FILE.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
 
 # ==================================================
 # 路線・天気の設定
@@ -420,57 +435,58 @@ def _operation_result(route_key, ok, status, detail, source_url):
 @app.route("/")
 def home():
     now = datetime.now(JST)
-    # index.html の前日・翌日ボタンから渡される日付オフセット
-    day_offset = request.args.get("day_offset", default=0, type=int)
-    # URLに極端な値が渡されても過剰な日付計算にならないよう制限
-    day_offset = max(-3650, min(day_offset, 3650))
+    day_offset = max(-3650, min(request.args.get("day_offset", default=0, type=int), 3650))
     selected_day = now + timedelta(days=day_offset)
+    weekday = WEEKDAYS[selected_day.weekday()] if selected_day.weekday() < 5 else ("土曜日" if selected_day.weekday() == 5 else "日曜日")
+    class_name = selected_class(); weather_place = selected_weather_place()
+    key = selected_day.strftime("%Y-%m-%d"); entry = load_special_schedule().get(key, {})
+    mode = entry.get("__mode__", "") if isinstance(entry, dict) else ""
+    message = entry.get("__message__", "") if isinstance(entry, dict) else ""
+    lessons = entry.get(class_name, CLASS_SCHEDULES.get(class_name, {}).get(weekday, [])) if class_name and isinstance(entry, dict) else []
+    if mode in ("no_class", "special_message"): lessons = []
+    elif mode == "timetable" and class_name: lessons = entry.get(class_name, [])
+    is_special_schedule = bool(mode or (class_name and isinstance(entry, dict) and class_name in entry))
+    return render_template("index.html", day_offset=day_offset, weekday=weekday, today_lessons=lessons,
+        is_special_schedule=is_special_schedule, special_day_mode=mode, special_day_message=message,
+        events=filtered_events(now), today=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日",
+        schedule_date_label=f"{selected_day.month}/{selected_day.day}({'月火水木金土日'[selected_day.weekday()]})",
+        clock_date_label=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日({'月火水木金土日'[selected_day.weekday()]})",
+        class_name=class_name, class_names=CLASS_NAMES, weekday_short="月火水木金土日"[selected_day.weekday()],
+        weather_place=weather_place, weather_label=WEATHER_OPTIONS[weather_place], railway_label=ROUTE_OPTIONS[selected_route()])
 
-    weekday = (
-        WEEKDAYS[selected_day.weekday()]
-        if selected_day.weekday() < 5
-        else ("土曜日" if selected_day.weekday() == 5 else "日曜日")
-    )
-
-    class_name = selected_class()
-    weather_place = selected_weather_place()
-
-    today_lessons = (
-        CLASS_SCHEDULES[class_name].get(weekday, [])
-        if class_name
-        else []
-    )
-
-    return render_template(
-        "index.html",
-        day_offset=day_offset,
-        weekday=weekday,
-        today_lessons=today_lessons,
-        events=filtered_events(now),
-
-        today=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日",
-
-        # 時間割部分の日付（例：10/26(月)）
-        schedule_date_label=(
-            f"{selected_day.month}/{selected_day.day}"
-            f"({'月火水木金土日'[selected_day.weekday()]})"
-        ),
-
-        clock_date_label=(
-            f"{selected_day.year}年{selected_day.month}月{selected_day.day}日"
-            f"({'月火水木金土日'[selected_day.weekday()]})"
-        ),
-
-        class_name=class_name,
-        class_names=CLASS_NAMES,
-        weekday_short="月火水木金土日"[selected_day.weekday()],
-        weather_place=weather_place,
-        weather_label=WEATHER_OPTIONS[weather_place],
-        railway_label=ROUTE_OPTIONS[selected_route()],
-    )
+@app.route("/special-timetable", methods=["GET", "POST"])
+def special_schedule():
+    if not session.get("recording_admin_authenticated"):
+        return redirect(url_for("recording_admin_login", next=url_for("special_schedule")))
+    selected_date = request.values.get("date", datetime.now(JST).strftime("%Y-%m-%d"))
+    try: target_day = datetime.strptime(selected_date, "%Y-%m-%d").date()
+    except ValueError:
+        target_day = datetime.now(JST).date(); selected_date = target_day.strftime("%Y-%m-%d")
+    is_weekday = target_day.weekday() < 5 and not jpholiday.is_holiday(target_day); data = load_special_schedule(); class_name = selected_class()
+    if request.method == "POST":
+        if request.form.get("action") == "reset":
+            data.pop(selected_date, None)
+            save_special_schedule(data)
+            return redirect(url_for("special_schedule", date=selected_date, reset=1))
+        mode = request.form.get("mode", "timetable")
+        if mode not in ("timetable", "no_class", "special_message"): mode = "timetable"
+        class_name = request.form.get("class_name", "")
+        if class_name not in CLASS_SCHEDULES: class_name = selected_class()
+        entry = data.setdefault(selected_date, {}); entry["__mode__"] = mode
+        if mode == "timetable" and class_name:
+            entry[class_name] = [request.form.get(f"period_{i}", "").strip()[:40] for i in range(1, 8)]
+        elif mode == "special_message": entry["__message__"] = request.form.get("message", "").strip()[:120] or "今日は特別な予定です"
+        else: entry.pop("__message__", None)
+        save_special_schedule(data)
+        return redirect(url_for("special_schedule", date=selected_date, saved=1))
+    entry = data.get(selected_date, {})
+    mode = entry.get("__mode__", "timetable") if isinstance(entry, dict) else "timetable"
+    lessons = entry.get(class_name, []) if class_name and isinstance(entry, dict) else []; lessons = (lessons + [""] * 7)[:7]
+    return render_template("special_schedule.html", date=selected_date, class_name=class_name, class_names=CLASS_NAMES,
+        lessons=lessons, mode=mode, message=entry.get("__message__", "") if isinstance(entry, dict) else "",
+        is_weekday=is_weekday, saved=request.args.get("saved") == "1", reset=request.args.get("reset") == "1")
 
 
-# ==================================================
 # 週間時間割
 # ==================================================
 
@@ -1174,6 +1190,17 @@ def _parse_operation_page(soup, route_key):
 
     status, status_index = _find_status(text)
 
+    # 上野東京ライン・湘南新宿ラインの直通運転中止は、
+    # 路線全体の運転中止とは区別して専用ステータスにする。
+    direct_stop_route_keys = {"ueno_tokyo", "shonan_shinjuku"}
+    direct_stop_match = re.search(
+        r"との直通運転を中止(?:しています|しております|しました)?",
+        text,
+    )
+    if route_key in direct_stop_route_keys and direct_stop_match:
+        status = "直通運転中止"
+        status_index = direct_stop_match.start()
+
     if not status:
         raise ValueError(
             f"{route_label}の運行状況を判定できません: {text[:250]}"
@@ -1287,6 +1314,7 @@ def fetch_operation_alerts():
         "運行情報あり",
         "その他",
         "運転再開",
+        "直通運転中止",
     )
 
     for route_key, route_label in ROUTE_OPTIONS.items():
@@ -1337,7 +1365,10 @@ def fetch_operation_alerts():
         ):
             status = "遅延"
 
-        if any(word in status for word in (
+        if status == "直通運転中止":
+            icon = "direct_stop.svg"
+
+        elif any(word in status for word in (
             "運転見合わせ",
             "運転取りやめ",
             "運転中止",
@@ -1798,6 +1829,14 @@ def download_all_recordings():
 # 録音管理（タイトル・人物名・日付・タグの編集）
 # ==================================================
 
+@app.route("/admin", methods=["GET"])
+def admin_dashboard():
+    """管理者用ページ。録音・スタンプ・時間割の管理入口。"""
+    if not session.get("recording_admin_authenticated"):
+        return redirect(url_for("recording_admin_login", next=url_for("admin_dashboard")))
+    return render_template("admin_dashboard.html")
+
+
 @app.route("/recording/admin/login", methods=["GET", "POST"])
 def recording_admin_login():
     configured_password = RECORDING_ADMIN_PASSWORD
@@ -1811,7 +1850,7 @@ def recording_admin_login():
             next_url = request.form.get("next", request.args.get("next", ""))
             if next_url.startswith("/") and not next_url.startswith("//"):
                 return redirect(next_url)
-            return redirect(url_for("recording_admin"))
+            return redirect(url_for("admin_dashboard"))
         error = "管理用パスワードが未設定か、パスワードが違います。"
     return render_template("recording_admin_login.html", error=error, next_url=request.args.get("next", ""))
 
