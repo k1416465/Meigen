@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}管理者用ページ{% endblock %}
+{% block content %}
+<section class="welcome-row">
+  <div><h1>管理者用ページ</h1><p>管理する項目を選択してください。</p></div>
+  <a class="back-link" href="{{ url_for('home') }}">ホームへ戻る</a>
+</section>
+<div class="admin-menu" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
+  <a class="card" href="{{ url_for('special_schedule') }}" style="display:flex; align-items:center; justify-content:center; min-height:130px; padding:24px; text-decoration:none; text-align:center;">
+    <strong style="font-size:1.5rem;">時間割</strong>
+  </a>
+  <a class="card" href="{{ url_for('stamp_admin') }}" style="display:flex; align-items:center; justify-content:center; min-height:130px; padding:24px; text-decoration:none; text-align:center;">
+    <strong style="font-size:1.5rem;">スタンプ</strong>
+  </a>
+  <a class="card" href="{{ url_for('recording_admin') }}" style="display:flex; align-items:center; justify-content:center; min-height:130px; padding:24px; text-decoration:none; text-align:center;">
+    <strong style="font-size:1.5rem;">録音</strong>
+  </a>
+</div>
+<form method="post" action="{{ url_for('recording_admin_logout') }}" style="margin-top:20px;">
+  <button class="secondary-button" type="submit">管理者ログアウト</button>
+</form>
+{% endblock %}

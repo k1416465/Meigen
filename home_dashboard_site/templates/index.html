@@ -558,7 +558,9 @@
       {% if not class_name %}
         <a class="class-not-selected" href="{{ url_for('settings') }}">設定から時間割のクラス選択ができます</a>
       {% else %}
-        {% if today_lessons %}
+        {% if special_day_mode == "special_message" %}
+          <p class="no-lessons-today">{{ special_day_message }}</p>
+        {% elif today_lessons %}
           <div class="lesson-list">
             {% for period in range(7) %}
               <div class="lesson-row">

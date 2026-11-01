@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}迷言｜日付ごとの授業設定{% endblock %}
+{% block content %}
+<section class="welcome-row"><div><h1>日付ごとの授業設定</h1><p>日付ごとに授業やホーム画面の表示を設定できます。</p></div><a class="back-link" href="{{ url_for('admin_dashboard') }}">管理者用ページへ戻る</a></section>
+<section class="card" style="padding:18px;max-width:680px">
+{% if saved %}<p style="color:#16803c;font-weight:700">保存しました。</p>{% endif %}
+{% if reset %}<p style="color:#16803c;font-weight:700">この日の設定をリセットしました。</p>{% endif %}
+<form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px"><label for="date">対象日</label><input id="date" type="date" name="date" value="{{ date }}" required><button class="primary-button">日付を表示</button></form>
+<p><strong>{{ '平日' if is_weekday else '土日祝' }}の設定</strong> ({{ date.replace('-', '/') }})</p>
+<form method="post" id="specialTimetableForm"><input type="hidden" name="date" value="{{ date }}">
+<fieldset style="border:0;padding:8px 0 12px"><legend><strong>この日の表示方法</strong></legend>
+<label style="display:block;margin:10px 0"><input type="radio" name="mode" value="timetable" {% if mode == 'timetable' %}checked{% endif %}> {{ '時間割の変更 (授業交換･午前授業など)' if is_weekday else '授業あり (時間割を設定)' }}</label>
+{% if is_weekday %}<label style="display:block;margin:10px 0"><input type="radio" name="mode" value="no_class" {% if mode == 'no_class' %}checked{% endif %}> 授業なしに変更</label>{% endif %}
+<label style="display:block;margin:10px 0"><input type="radio" name="mode" value="special_message" {% if mode == 'special_message' %}checked{% endif %}> {{ '特別表示に切り替え (学校行事など)' if is_weekday else '特別表示に切り替え (学校行事など)' }}</label>
+</fieldset>
+<div id="timetableFields" style="display:none;margin:12px 0;padding:14px;border:1px solid var(--border-color, #ddd);border-radius:12px">
+<label for="class_name"><strong>クラス</strong></label><select id="class_name" name="class_name">{% for c in class_names %}<option value="{{ c }}" {% if c == class_name %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+<p style="margin:12px 0 6px"><strong>1〜7時間目</strong></p>
+{% for lesson in lessons %}<label style="display:flex;align-items:center;gap:10px;margin:8px 0"><span style="width:70px;flex-shrink:0">{{ loop.index }}時間目</span><input type="text" name="period_{{ loop.index }}" value="{{ lesson }}" maxlength="40" placeholder="教科名" style="flex:1;min-width:0;padding:9px;border:1px solid #bbb;border-radius:8px"></label>{% endfor %}
+</div>
+<div id="messageFields" style="display:none;margin:12px 0;padding:14px;border:1px solid var(--border-color, #ddd);border-radius:12px">
+<label for="message"><strong>特別な表示の文章</strong></label><input id="message" type="text" name="message" value="{{ message }}" maxlength="120" placeholder="例：文化祭準備の日です" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid #bbb;border-radius:8px;margin-top:8px">
+</div>
+</form>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px">
+<button class="primary-button" type="submit" form="specialTimetableForm">設定を保存</button>
+<form method="post" onsubmit="return confirm('この日の設定をリセットして、通常の表示に戻しますか？')" style="margin:0"><input type="hidden" name="date" value="{{ date }}"><button type="submit" name="action" value="reset" class="secondary-button">リセット</button></form>
+</div>
+<p style="font-size:.85rem;opacity:.7;margin-top:14px">リセットすると、この日だけの設定が削除され、通常の時間割・休日表示に戻ります。</p>
+</section>
+<script>
+(() => {
+  const radios = document.querySelectorAll('input[name="mode"]');
+  const timetable = document.getElementById('timetableFields');
+  const message = document.getElementById('messageFields');
+  function updateFields() {
+    const selected = document.querySelector('input[name="mode"]:checked');
+    const mode = selected ? selected.value : '';
+    timetable.style.display = mode === 'timetable' ? 'block' : 'none';
+    message.style.display = mode === 'special_message' ? 'block' : 'none';
+  }
+  radios.forEach(radio => radio.addEventListener('change', updateFields));
+  updateFields();
+})();
+</script>
+{% endblock %}

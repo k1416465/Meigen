@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% block title %}迷言｜設定{% endblock %}
 {% block content %}
-<section class="welcome-row"><div><h1>設定</h1></div><a class="back-link" href="{{ url_for('home') }}">ホームへ戻る</a></section>
+<section class="welcome-row">
+  <div><h1>設定</h1></div>
+  <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+    <a class="back-link" href="{{ url_for('home') }}">ホームに戻る</a>
+    <a class="back-link" href="{{ url_for('admin_dashboard') }}">管理者用ページ</a>
+  </div>
+</section>
 <form method="post" class="settings-form">
   <details class="card settings-card setting-accordion">
     <summary>クラスの選択</summary>
@@ -14,6 +20,13 @@
     <summary>My路線</summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My路線">
       {% for key, label in route_options.items() %}<label class="choice-option"><input type="radio" name="my_route" value="{{ key }}" {% if key == my_route %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
+    </div>
+  </details>
+  <details class="card settings-card setting-accordion">
+    <summary>My駅</summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My駅">
+      <label class="choice-option"><input type="radio" name="my_station" value="" {% if my_station == '' %}checked{% endif %}><span>選択しない</span></label>
+      {% for name in station_options %}<label class="choice-option"><input type="radio" name="my_station" value="{{ name }}" {% if name == my_station %}checked{% endif %}><span>{{ name }}</span></label>{% endfor %}
     </div>
   </details>
   <details class="card settings-card setting-accordion">

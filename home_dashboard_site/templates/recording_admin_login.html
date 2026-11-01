@@ -1,16 +1,15 @@
 {% extends "base.html" %}
-{% block title %}録音管理ログイン｜迷言{% endblock %}
+{% block title %}ログイン｜迷言{% endblock %}
 {% block content %}
 <section class="recording-admin-page">
-  <h1>録音管理ログイン</h1>
+  <h1>ログイン</h1>
   {% if error %}<p class="recording-admin-error">{{ error }}</p>{% endif %}
   <form method="post" class="recording-admin-login">
     {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-    <label>管理用パスワード
+    <label>パスワード
       <input type="password" name="password" required autocomplete="current-password">
     </label>
     <button type="submit">ログイン</button>
   </form>
-  <p class="recording-admin-note">管理用パスワードは app.py の RECORDING_ADMIN_PASSWORD で設定します。</p>
 </section>
 {% endblock %}
