@@ -285,38 +285,52 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // 設定画面で保存したMy駅を開く
-    if (myStationButton) {
-        myStationButton.addEventListener("click", () => {
-            const myStationId = myStationButton.dataset.stationId;
-            if (!myStationId) {
-                showCenteredNotice("My駅が設定されていません。設定画面でMy駅を選択してください。", true);
-                return;
-            }
-            if (!/^[a-z0-9_]+$/i.test(myStationId)) {
-                showCenteredNotice("My駅の設定を確認してください。");
-                return;
-            }
-            const myStationNames = {
-                oyama: "小山",
-                omoigawa: "思川",
-                tochigi: "栃木",
-                ohirashita: "大平下",
-                iwafune: "岩舟",
-                sano: "佐野",
-                tomita: "富田",
-                ashikaga_flower_park: "あしかがフラワーパーク",
-                ashikaga: "足利",
-                yamamae: "山前",
-                omata: "小俣"
-            };
-            const myStationName = myStationNames[myStationId];
-            if (!myStationName) {
-                showCenteredNotice("My駅の設定を確認してください。");
-                return;
-            }
-            window.location.href = `/timetable?station=${encodeURIComponent(myStationName)}`;
-        });
-    }
+if (myStationButton) {
+    myStationButton.addEventListener("click", () => {
+        const stationNames = {
+            oyama: "小山",
+            omoigawa: "思川",
+            tochigi: "栃木",
+            ohirashita: "大平下",
+            iwafune: "岩舟",
+            sano: "佐野",
+            tomita: "富田",
+            ashikaga_flower_park: "あしかがフラワーパーク",
+            ashikaga: "足利",
+            yamamae: "山前",
+            omata: "小俣"
+        };
+
+        const myStationId = myStationButton.dataset.stationId;
+        const myStationName = myStationButton.dataset.stationName;
+
+        // 駅ID・日本語の駅名のどちらで保存されていても対応
+        const stationName =
+            stationNames[myStationId] ||
+            stationNames[myStationName] ||
+            (
+                Object.values(stationNames).includes(myStationId)
+                    ? myStationId
+                    : null
+            ) ||
+            (
+                Object.values(stationNames).includes(myStationName)
+                    ? myStationName
+                    : null
+            );
+
+        if (!stationName) {
+            showCenteredNotice(
+                "My駅が設定されていません。設定画面でMy駅を選択してください。",
+                true
+            );
+            return;
+        }
+
+        window.location.href =
+            `/timetable?station=${encodeURIComponent(stationName)}`;
+    });
+}
 
     const stations = [
         {id: "oyama", name: "小山駅", lat: 36.3133125, lon: 139.806244},
