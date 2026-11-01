@@ -5,10 +5,10 @@
 <section class="welcome-row recording-welcome stamp-welcome">
   <div class="recording-welcome-copy">
     <h1>スタンプ</h1>
-    <p>画像を人物名やタグから検索できます。</p>
+    <p>スタンプを人物名やタグから検索できます。</p>
   </div>
   <button class="recording-search-toggle" type="button" id="stamp-search-toggle"
-          aria-expanded="{{ 'true' if query else 'false' }}" aria-controls="stamp-search-panel"
+          aria-expanded="false" aria-controls="stamp-search-panel"
           aria-label="検索欄を開く／閉じる" title="検索">
     <img class="recording-search-icon recording-search-light" src="{{ url_for('static', filename='icons/light/search.png') }}" alt="">
     <img class="recording-search-icon recording-search-dark" src="{{ url_for('static', filename='icons/dark/search.png') }}" alt="">
@@ -16,7 +16,7 @@
 </section>
 
 <section class="recording-search-section" aria-label="スタンプを検索">
-  <div class="recording-search-panel" id="stamp-search-panel" {% if not query %}hidden{% endif %}>
+  <div class="recording-search-panel" id="stamp-search-panel" hidden>
     <form class="recording-search-form" method="get" action="{{ url_for('stamp_page') }}">
       <input type="search" name="q" value="{{ query }}" placeholder="タイトル・人物・タグで検索" aria-label="スタンプを検索" id="stamp-search-input">
       <input type="hidden" name="scope" value="all">
@@ -39,9 +39,8 @@
 
 <section class="recording-list-section stamp-list-section">
   <div class="section-heading">
-    <div><h2>{% if query %}検索結果{% else %}スタンプ一覧{% endif %} <span class="recording-count">{{ stamps|length }}件</span></h2></div>
+    <div><h2>{% if query %}検索結果{% else %}スタンプ一覧{% endif %} <span class="recording-count">{{ stamps|length }}件</span></h2>{% if query %}<p class="recording-search-status">検索中: {{ query }}</p>{% endif %}</div>
     <div class="recording-list-actions">
-      <a class="recording-download-all" href="{{ url_for('stamp_admin') }}">スタンプ管理</a>
       <div class="recording-sort-wrap stamp-sort-wrap">
         <button type="button" class="recording-sort-button" id="stamp-sort-toggle" aria-expanded="false" aria-controls="stamp-sort-options">並び替え <span aria-hidden="true">▾</span></button>
         <div class="recording-sort-options" id="stamp-sort-options" hidden>
@@ -84,6 +83,8 @@
   var toggle = document.getElementById('stamp-search-toggle');
   var panel = document.getElementById('stamp-search-panel');
   var input = document.getElementById('stamp-search-input');
+  var searchForm = panel ? panel.querySelector('form') : null;
+  if (searchForm) searchForm.addEventListener('submit', function () { panel.hidden = true; if (toggle) toggle.setAttribute('aria-expanded', 'false'); });
   function updateSearchIcon() {
     var dark = document.body.classList.contains('dark');
     document.querySelectorAll('.recording-search-light').forEach(function (img) { img.style.display = dark ? 'none' : 'block'; });

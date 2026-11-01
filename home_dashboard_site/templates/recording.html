@@ -5,10 +5,10 @@
 <section class="welcome-row recording-welcome">
   <div class="recording-welcome-copy">
     <h1>録音</h1>
-    <p>迷言の録音を再生・検索できます。</p>
+    <p>録音の検索･再生ができます。</p>
   </div>
   <button class="recording-search-toggle" type="button" id="recording-search-toggle"
-          aria-expanded="{{ 'true' if query else 'false' }}" aria-controls="recording-search-panel"
+          aria-expanded="false" aria-controls="recording-search-panel"
           aria-label="検索欄を開く／閉じる" title="検索">
     <img class="recording-search-icon recording-search-light" src="{{ url_for('static', filename='icons/light/search.png') }}" alt="">
     <img class="recording-search-icon recording-search-dark" src="{{ url_for('static', filename='icons/dark/search.png') }}" alt="">
@@ -17,7 +17,7 @@
 
 <section class="recording-search-section" aria-label="録音を検索">
 
-  <div class="recording-search-panel" id="recording-search-panel" {% if not query %}hidden{% endif %}>
+  <div class="recording-search-panel" id="recording-search-panel" hidden>
     <form class="recording-search-form" method="get" action="{{ url_for('recording_page') }}">
       <input type="search" name="q" value="{{ query }}" placeholder="検索したい言葉を入力" aria-label="録音を検索" id="recording-search-input">
       <input type="hidden" name="scope" value="all">
@@ -42,6 +42,7 @@
   <div class="section-heading">
     <div>
       <h2>{% if query %}検索結果{% else %}録音一覧{% endif %} <span class="recording-count">{{ recordings|length }}件</span></h2>
+      {% if query %}<p class="recording-search-status">検索中: {{ query }}</p>{% endif %}
     </div>
     <div class="recording-list-actions">
       <a class="recording-download-all" href="{{ url_for('download_all_recordings') }}">すべてダウンロード（ZIP）</a>
@@ -180,6 +181,8 @@
     var toggle = document.getElementById('recording-search-toggle');
     var panel = document.getElementById('recording-search-panel');
     var input = document.getElementById('recording-search-input');
+  var searchForm = panel ? panel.querySelector('form') : null;
+  if (searchForm) searchForm.addEventListener('submit', function () { panel.hidden = true; if (toggle) toggle.setAttribute('aria-expanded', 'false'); });
     function updateSearchIcon() {
       var dark = document.body.classList.contains('dark');
       document.querySelectorAll('.recording-search-light').forEach(function (img) { img.style.display = dark ? 'none' : 'block'; });
