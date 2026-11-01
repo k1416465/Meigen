@@ -20,8 +20,8 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 # 録音管理画面の設定：運用前に必ず自分だけが知る値へ変更してください。
-RECORDING_ADMIN_PASSWORD = ""
-FLASK_SESSION_SECRET = ""
+RECORDING_ADMIN_PASSWORD = "Meigen123"
+FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
 app.secret_key = FLASK_SESSION_SECRET
 
 JST = timezone(timedelta(hours=9))
