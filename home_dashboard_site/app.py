@@ -20,8 +20,8 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 # 録音管理画面の設定：運用前に必ず自分だけが知る値へ変更してください。
-RECORDING_ADMIN_PASSWORD = "Meigen123"
-FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
+RECORDING_ADMIN_PASSWORD = ""
+FLASK_SESSION_SECRET = ""
 app.secret_key = FLASK_SESSION_SECRET
 
 JST = timezone(timedelta(hours=9))
@@ -1430,12 +1430,18 @@ def operation_page():
     operation = fetch_operation_status(route_key)
     operation_alerts = fetch_operation_alerts()
 
+    my_station = request.cookies.get("myHomeStation", "").strip()
+    if my_station not in MY_STATION_OPTIONS:
+        my_station = ""
+
     return render_template(
         "operation.html",
         operation=operation,
         operation_alerts=operation_alerts,
         railway_label=ROUTE_OPTIONS[route_key],
         weather_place=selected_weather_place(),
+        my_station=my_station,
+        my_station_name=my_station,
     )
 
 
