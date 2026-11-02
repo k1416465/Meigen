@@ -5,7 +5,7 @@
 <section class="welcome-row recording-welcome">
   <div class="recording-welcome-copy">
     <h1>録音</h1>
-    <p>録音の検索･再生ができます。</p>
+    <p>迷言の録音を検索･再生できます。</p>
   </div>
   <button class="recording-search-toggle" type="button" id="recording-search-toggle"
           aria-expanded="false" aria-controls="recording-search-panel"
@@ -45,7 +45,7 @@
       {% if query %}<p class="recording-search-status">検索中: {{ query }}</p>{% endif %}
     </div>
     <div class="recording-list-actions">
-      {% if not query %}<a class="recording-download-all" href="{{ url_for('download_all_recordings') }}">すべてダウンロード（ZIP）</a>{% endif %}
+      <a class="recording-download-all" href="{{ url_for('download_all_recordings') }}">すべてダウンロード（ZIP）</a>
       <div class="recording-sort-wrap">
         <button type="button" class="recording-sort-button" id="recording-sort-toggle" aria-expanded="false" aria-controls="recording-sort-options" onclick="toggleRecordingSortOptions()">並び替え <span aria-hidden="true">▾</span></button>
         <div class="recording-sort-options" id="recording-sort-options" hidden>
