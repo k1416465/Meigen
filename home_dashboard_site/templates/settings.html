@@ -13,7 +13,7 @@
   <details class="card settings-card setting-accordion">
     <summary>
       <span class="setting-heading">クラスの選択</span>
-      <span class="setting-description">ホームの時間割表示に反映されます。</span>
+      <span class="setting-description">自分のクラスを選択します。時間割などの表示に反映されます。</span>
     </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="クラスの選択">
       <label class="choice-option"><input type="radio" name="class_name" value="" {% if not class_name %}checked{% endif %}><span>選択しない</span></label>
@@ -24,7 +24,7 @@
   <details class="card settings-card setting-accordion">
     <summary>
       <span class="setting-heading">My路線</span>
-      <span class="setting-description">画面上部に、設定した路線の運行情報が表示されます。</span>
+      <span class="setting-description">普段利用する路線を選択します。ホーム画面にその路線の運行情報を表示します。</span>
     </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My路線">
       {% for key, label in route_options.items() %}<label class="choice-option"><input type="radio" name="my_route" value="{{ key }}" {% if key == my_route %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
@@ -34,7 +34,7 @@
   <details class="card settings-card setting-accordion">
     <summary>
       <span class="setting-heading">My駅</span>
-      <span class="setting-description">時刻表ページでMy駅を開く場合に使います。</span>
+      <span class="setting-description">普段利用する駅を選択します。駅に関する情報の表示に使用します。</span>
     </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My駅">
       <label class="choice-option"><input type="radio" name="my_station" value="" {% if my_station == '' %}checked{% endif %}><span>選択しない</span></label>
@@ -45,7 +45,7 @@
   <details class="card settings-card setting-accordion">
     <summary>
       <span class="setting-heading">天気</span>
-      <span class="setting-description">ホームの天気情報に使用します。</span>
+      <span class="setting-description">天気を確認したい地域を選択します。ホーム画面の天気情報に反映されます。</span>
     </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="天気">
       {% for key, label in weather_options.items() %}<label class="choice-option"><input type="radio" name="weather_place" value="{{ key }}" {% if key == weather_place %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
@@ -55,7 +55,7 @@
   <details class="card settings-card setting-accordion">
     <summary>
       <span class="setting-heading">外観</span>
-      <span class="setting-description">画面全体の配色を変更できます。デバイスの設定を使用することもできます。</span>
+      <span class="setting-description">画面全体の配色を変更できます。デバイスの設定に合わせることもできます。</span>
     </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="外観">
       <label class="choice-option"><input type="radio" name="appearance" value="light" {% if appearance == 'light' %}checked{% endif %}><span>ライトモード</span></label>
