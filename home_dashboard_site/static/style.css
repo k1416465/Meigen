@@ -1004,28 +1004,52 @@ body.dark .operation-status-text[data-state="alert"] {
 }
 
 .setting-accordion summary {
+    position: relative;
     cursor: pointer;
     list-style: none;
-    padding: 14px 20px;
-    min-height: 48px;
-    font-weight: 750;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 10px 48px 10px 20px;
+    min-height: 0;
+    font-weight: 750;
 }
 
 .setting-accordion summary::-webkit-details-marker {
     display: none;
 }
 
+/* ＋・−は従来どおり右端、青色で表示 */
 .setting-accordion summary::after {
     content: "＋";
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
     font-size: 20px;
+    line-height: 1;
     color: var(--purple);
 }
 
 .setting-accordion[open] summary::after {
     content: "−";
+}
+
+.setting-heading {
+    display: block;
+    font-weight: 750;
+    line-height: 1.5;
+}
+
+.setting-description {
+    display: block;
+    margin: 0;
+    padding: 0;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
 }
 
 .setting-options {
@@ -3925,6 +3949,7 @@ body.dark .page-refresh-button {
 .recording-search-options select { min-width: 150px; max-width: 100%; padding: 9px 34px 9px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-size: 13px; cursor: pointer; }
 .recording-hint { margin: 10px 4px 0; color: var(--muted); font-size: 12px; }
 .recording-count { display: inline-block; margin-left: 6px; color: var(--muted); font-size: 13px; font-weight: 500; }
+.recording-search-status { margin: 2px 0 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
 .recording-list { display: grid; gap: 14px; }
 .recording-card { padding: 18px; min-width: 0; }
 .recording-card h3 { margin: 0; font-size: 17px; overflow-wrap: anywhere; }
