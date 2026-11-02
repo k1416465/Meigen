@@ -1,8 +1,13 @@
-
 {% extends "base.html" %}
 {% block title %}名簿｜迷言{% endblock %}
 {% block content %}
-<section class="welcome-row"><div><h1>名簿</h1><p>4桁番号･クラス･名前などで検索できます。</p></div></section>
+<section class="welcome-row">
+  <div>
+    <h1>名簿</h1>
+    <p>4桁番号･クラス･名前などで検索できます。</p>
+  </div>
+</section>
+
 <section class="card roster-card">
   <nav class="roster-class-filters" aria-label="クラスで絞り込み">
     <a class="roster-filter{% if not class_filter %} is-active{% endif %}" href="{{ url_for('roster_page', q=query or None) }}">すべて</a>
@@ -10,13 +15,24 @@
     <a class="roster-filter{% if class_filter == klass|string %} is-active{% endif %}" href="{{ url_for('roster_page', **({'class': klass, 'q': query or None})) }}">{{ klass }}組</a>
     {% endfor %}
   </nav>
+
   <form class="roster-search" method="get" action="{{ url_for('roster_page') }}">
-    {% if class_filter %}<input type="hidden" name="class" value="{{ class_filter }}">{% endif %}
+    {% if class_filter %}
+    <input type="hidden" name="class" value="{{ class_filter }}">
+    {% endif %}
     <input type="search" name="q" value="{{ query }}" placeholder="例:4桁番号 / 年･組 / 名前" aria-label="名簿を検索">
     <button type="submit" class="primary-button">検索</button>
-    {% if query %}<a class="roster-clear" href="{{ url_for('roster_page', **({'class': class_filter} if class_filter else {})) }}">リセット</a>{% endif %}
+    {% if query %}
+    <a class="roster-clear" href="{{ url_for('roster_page', **({'class': class_filter} if class_filter else {})) }}">リセット</a>
+    {% endif %}
   </form>
-  {% if query %}<p class="roster-result-label">「{{ query }}」の検索結果：{{ students|length }}人</p>{% else %}<p class="roster-result-label">{% if class_filter %}{{ class_filter }}組：{% endif %}{{ students|length }}人</p>{% endif %}
+
+  {% if query %}
+  <p class="roster-result-label">「{{ query }}」の検索結果：{{ students|length }}人</p>
+  {% else %}
+  <p class="roster-result-label">{% if class_filter %}{{ class_filter }}組：{% endif %}{{ students|length }}人</p>
+  {% endif %}
+
   {% if students %}
   <div class="roster-table-wrap">
     <table class="roster-table">
@@ -25,47 +41,229 @@
         <col class="roster-col-number">
         <col class="roster-col-name">
       </colgroup>
-      <thead><tr><th>学年･組</th><th>番号</th><th>名前</th></tr></thead>
+      <thead>
+        <tr>
+          <th>学年･組</th>
+          <th>番号</th>
+          <th>名前</th>
+        </tr>
+      </thead>
       <tbody>
-      {% for student in students %}
-      <tr>
-        <td>{{ student.grade }}年{{ student['class'] }}組</td>
-        <td>{{ student.attendance|int }}番</td>
-        <td class="roster-name">{{ student.name }}</td>
-      </tr>
-      {% endfor %}
+        {% for student in students %}
+        <tr>
+          <td>{{ student.grade }}年{{ student['class'] }}組</td>
+          <td>{{ student.attendance|int }}番</td>
+          <td class="roster-name">{{ student.name }}</td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>
-  {% else %}<p class="roster-empty">該当する生徒が見つかりませんでした。</p>{% endif %}
+  {% else %}
+  <p class="roster-empty">該当する生徒が見つかりませんでした。</p>
+  {% endif %}
 </section>
+
 <style>
-.roster-card{padding:18px}
-.roster-class-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
-.roster-filter{display:inline-flex;align-items:center;justify-content:center;min-width:62px;padding:9px 15px;border:1px solid var(--border-color,rgba(127,127,127,.3));border-radius:10px;text-decoration:none;color:inherit;font-weight:700}
-.roster-filter.is-active{background:#2878d0;border-color:#2878d0;color:#fff}
-.roster-search{display:flex;gap:8px;align-items:center;width:100%;margin:0;padding:0}
-.roster-search input{box-sizing:border-box;display:block;align-self:center;flex:1 1 auto;width:100%;height:46px;min-height:46px;max-height:46px;min-width:0;margin:0;padding:0 13px;line-height:normal;border:1px solid var(--border-color,rgba(127,127,127,.3));border-radius:10px;background:var(--card-bg,transparent);color:inherit;font:inherit}
-.roster-search button{box-sizing:border-box;align-self:center;flex:0 0 auto;height:46px;min-height:46px;max-height:46px;display:inline-flex;margin:0;align-items:center;justify-content:center;white-space:nowrap;padding:0 20px;line-height:1;border:0;border-radius:10px;background:#2878d0;color:white;font:inherit;font-weight:700;cursor:pointer}
-.roster-clear{box-sizing:border-box;align-self:center;flex:0 0 auto;height:46px;min-height:46px;max-height:46px;display:inline-flex;margin:0;align-items:center;justify-content:center;white-space:nowrap;padding:0 16px;border:1px solid var(--border-color,rgba(127,127,127,.3));border-radius:10px;text-decoration:none;color:inherit;font:inherit;font-weight:700}
-.roster-result-label{margin:16px 0 10px;color:var(--muted,#777);font-size:.9rem}
-.roster-table-wrap{overflow-x:auto}
-.roster-table{width:100%;table-layout:fixed;border-collapse:collapse}
-.roster-table .roster-col-class{width:32%}
-.roster-table .roster-col-number{width:20%}
-.roster-table .roster-col-name{width:48%}
-.roster-table th,.roster-table td{box-sizing:border-box;padding:11px 9px;text-align:left;border-bottom:1px solid rgba(127,127,127,.2);white-space:nowrap;overflow:hidden}
-.roster-table th{font-size:.88rem;color:var(--muted,#777)}
-.roster-table td.roster-name{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.5}
-.roster-empty{padding:20px 0;text-align:center;color:var(--muted,#777)}
+.roster-card{
+  padding:18px;
+}
+
+.roster-class-filters{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:0 0 14px;
+}
+
+.roster-filter{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:62px;
+  padding:9px 15px;
+  border:1px solid var(--border-color,rgba(127,127,127,.3));
+  border-radius:10px;
+  text-decoration:none;
+  color:inherit;
+  font-weight:700;
+}
+
+.roster-filter.is-active{
+  background:#2878d0;
+  border-color:#2878d0;
+  color:#fff;
+}
+
+.roster-search{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  width:100%;
+  margin:0;
+  padding:0;
+}
+
+.roster-search input{
+  box-sizing:border-box;
+  display:block;
+  align-self:center;
+  flex:1 1 auto;
+  width:100%;
+  height:46px;
+  min-height:46px;
+  max-height:46px;
+  min-width:0;
+  margin:0;
+  padding:0 13px;
+  line-height:normal;
+  border:1px solid var(--border-color,rgba(127,127,127,.3));
+  border-radius:10px;
+  background:var(--card-bg,transparent);
+  color:inherit;
+  font:inherit;
+}
+
+.roster-search button{
+  box-sizing:border-box;
+  align-self:center;
+  flex:0 0 auto;
+  height:46px;
+  min-height:46px;
+  max-height:46px;
+  display:inline-flex;
+  margin:0;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  padding:0 20px;
+  line-height:1;
+  border:0;
+  border-radius:10px;
+  background:#2878d0;
+  color:white;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.roster-clear{
+  box-sizing:border-box;
+  align-self:center;
+  flex:0 0 auto;
+  height:46px;
+  min-height:46px;
+  max-height:46px;
+  display:inline-flex;
+  margin:0;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  padding:0 16px;
+  border:1px solid var(--border-color,rgba(127,127,127,.3));
+  border-radius:10px;
+  text-decoration:none;
+  color:inherit;
+  font:inherit;
+  font-weight:700;
+}
+
+.roster-result-label{
+  margin:16px 0 10px;
+  color:var(--muted,#777);
+  font-size:.9rem;
+}
+
+.roster-table-wrap{
+  overflow-x:auto;
+}
+
+.roster-table{
+  width:100%;
+  table-layout:fixed;
+  border-collapse:collapse;
+}
+
+/* 列幅を固定 */
+.roster-table .roster-col-class{
+  width:30%;
+}
+
+.roster-table .roster-col-number{
+  width:20%;
+}
+
+.roster-table .roster-col-name{
+  width:50%;
+}
+
+/* PC・スマホ共通のセル設定 */
+.roster-table th,
+.roster-table td{
+  box-sizing:border-box;
+  padding:11px 12px;
+  text-align:left;
+  border-bottom:1px solid rgba(127,127,127,.2);
+  white-space:nowrap;
+  overflow:hidden;
+}
+
+.roster-table th{
+  font-size:.88rem;
+  color:var(--muted,#777);
+}
+
+/* 長い名前は名前欄の中で折り返す */
+.roster-table td.roster-name{
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  line-height:1.5;
+}
+
+.roster-empty{
+  padding:20px 0;
+  text-align:center;
+  color:var(--muted,#777);
+}
+
+/* スマホ版 */
 @media(max-width:520px){
-  .roster-card{padding:13px}
-  .roster-class-filters{gap:6px}
-  .roster-filter{flex:1;min-width:0;padding:9px 5px}
-  .roster-search{gap:6px}
-  .roster-search button{height:46px;min-height:46px;padding:0 13px}
-  .roster-clear{height:46px;min-height:46px;padding:0 11px}
-  .roster-table th,.roster-table td{padding:10px 7px;font-size:.9rem}
+  .roster-card{
+    padding:13px;
+  }
+
+  .roster-class-filters{
+    gap:6px;
+  }
+
+  .roster-filter{
+    flex:1;
+    min-width:0;
+    padding:9px 5px;
+  }
+
+  .roster-search{
+    gap:6px;
+  }
+
+  .roster-search button{
+    height:46px;
+    min-height:46px;
+    padding:0 13px;
+  }
+
+  .roster-clear{
+    height:46px;
+    min-height:46px;
+    padding:0 11px;
+  }
+
+  .roster-table th,
+  .roster-table td{
+    padding:10px 7px;
+    font-size:.9rem;
+  }
 }
 </style>
 {% endblock %}
