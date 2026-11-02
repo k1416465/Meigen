@@ -57,9 +57,16 @@
   <div class="stamp-grid">
     {% for item in stamps %}
     <article class="card stamp-card">
-      <a class="stamp-image-link" href="{{ url_for('static', filename='stamps/' ~ item['filename']) }}" target="_blank" rel="noopener" aria-label="{{ item['title'] or item['filename'] }}の画像を開く">
+      <button class="stamp-image-link stamp-open-button" type="button"
+              data-image="{{ url_for('static', filename='stamps/' ~ item['filename']) }}"
+              data-filename="{{ item['filename'] }}"
+              data-title="{{ item['title'] or item['filename'] }}"
+              data-people="{{ item['people'] }}"
+              data-tags="{{ item['tags'] }}"
+              data-tag-search="{{ url_for('stamp_page', q='__STAMP_TAG__', scope='tags', sort=sort_by) }}"
+              aria-label="{{ item['title'] or item['filename'] }}を拡大表示">
         <img class="stamp-image" src="{{ url_for('static', filename='stamps/' ~ item['filename']) }}" alt="{{ item['title'] or item['filename'] }}" loading="lazy">
-      </a>
+      </button>
       <div class="stamp-card-info">
         <h3>{{ item['title'] or item['filename'] }}</h3>
         {% if item['people'] %}<p class="stamp-people">{{ item['people'] }}</p>{% endif %}
@@ -78,6 +85,54 @@
   </div>
   {% endif %}
 </section>
+
+<div class="stamp-viewer" id="stamp-viewer" hidden aria-hidden="true">
+  <div class="stamp-viewer-backdrop" data-stamp-close></div>
+  <section class="stamp-viewer-dialog" role="dialog" aria-modal="true" aria-label="スタンプ画像">
+    <button type="button" class="stamp-viewer-close" id="stamp-viewer-close" aria-label="閉じる">×</button>
+    <div class="stamp-viewer-image-area">
+      <button type="button" class="stamp-viewer-nav stamp-viewer-prev" id="stamp-viewer-prev" aria-label="前の画像">‹</button>
+      <img id="stamp-viewer-image" src="" alt="">
+      <button type="button" class="stamp-viewer-nav stamp-viewer-next" id="stamp-viewer-next" aria-label="次の画像">›</button>
+    </div>
+    <div class="stamp-viewer-info">
+      <h2 id="stamp-viewer-title"></h2>
+      <p id="stamp-viewer-people" class="stamp-viewer-people"></p>
+      <div id="stamp-viewer-tags" class="stamp-viewer-tags" aria-label="タグ"></div>
+    </div>
+    <div class="stamp-viewer-actions">
+      <a class="recording-search-submit stamp-viewer-save" id="stamp-viewer-save" href="#" download>画像を保存</a>
+      <button type="button" class="recording-search-submit stamp-viewer-share" id="stamp-viewer-share">画像を共有</button>
+    </div>
+  </section>
+</div>
+
+<style>
+.stamp-open-button{display:block;width:100%;padding:0;border:0;background:transparent;cursor:zoom-in;text-align:inherit}
+.stamp-viewer[hidden]{display:none!important}
+.stamp-viewer{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;overscroll-behavior:none;touch-action:pan-x}
+.stamp-viewer-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.82)}
+.stamp-viewer-dialog{position:relative;z-index:1;width:min(900px,100%);height:min(860px,90dvh);min-height:420px;display:grid;grid-template-rows:minmax(0,1fr) 132px 58px;gap:0;overflow:hidden;box-sizing:border-box;background:var(--card-bg,#fff);color:var(--text-color,inherit);border-radius:18px;padding:22px;box-shadow:0 16px 60px rgba(0,0,0,.35);overscroll-behavior:contain;touch-action:pan-x}
+.stamp-viewer-close{position:absolute;right:12px;top:8px;z-index:3;width:42px;height:42px;border:0;border-radius:50%;background:rgba(120,120,120,.16);color:inherit;font-size:32px;line-height:1;cursor:pointer}
+.stamp-viewer-image-area{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;padding:14px 58px 8px;overflow:hidden;touch-action:pan-x;overscroll-behavior:contain}
+.stamp-viewer-image-area img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.stamp-viewer-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:46px;height:46px;padding:0 0 3px;box-sizing:border-box;border:0;border-radius:50%;background:rgba(65,130,210,.18);font-family:Arial,sans-serif;font-size:34px;line-height:1;cursor:pointer;color:inherit;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.stamp-viewer-nav:hover{background:rgba(80,130,200,.4)}.stamp-viewer-nav:disabled{opacity:.35;cursor:default}
+.stamp-viewer-prev{left:4px}.stamp-viewer-next{right:4px}
+.stamp-viewer-info{height:132px;box-sizing:border-box;text-align:center;padding:10px 8px 4px;overflow:hidden;overflow-wrap:anywhere;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.stamp-viewer-info h2{margin:2px 0 5px;font-size:1.15rem;max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.stamp-viewer-people{margin:2px 0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stamp-viewer-tags{margin:5px 0 0;max-width:100%;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;overflow:hidden}
+.stamp-viewer-tags a{display:inline-flex;padding:3px 10px;border-radius:999px;background:rgba(70,130,210,.13);color:var(--link-color,#2878c8);text-decoration:none;font-size:.88rem;cursor:pointer}.stamp-viewer-tags a:hover{text-decoration:underline;background:rgba(70,130,210,.24)}
+.stamp-viewer-actions{height:58px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:0}
+.stamp-viewer-actions a,.stamp-viewer-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 18px;text-decoration:none;border:0;border-radius:9px;cursor:pointer;font:inherit}
+body.dark .stamp-viewer-dialog,body[data-theme="dark"] .stamp-viewer-dialog,html.dark .stamp-viewer-dialog{background:#202938;color:#f1f5f9}
+body.dark .stamp-viewer-close,body[data-theme="dark"] .stamp-viewer-close,html.dark .stamp-viewer-close{background:rgba(255,255,255,.14);color:#fff}
+body.dark .stamp-viewer-tags a,body[data-theme="dark"] .stamp-viewer-tags a,html.dark .stamp-viewer-tags a{background:rgba(100,160,235,.2);color:#9bc8ff}
+body.dark .stamp-viewer-nav,body[data-theme="dark"] .stamp-viewer-nav,html.dark .stamp-viewer-nav{background:rgba(255,255,255,.18);color:#fff}
+@media(max-width:600px){.stamp-viewer{padding:10px}.stamp-viewer-dialog{height:calc(100dvh - 20px);min-height:360px;grid-template-rows:minmax(0,1fr) 124px 58px;padding:14px 10px;border-radius:14px}.stamp-viewer-image-area{padding:42px 38px 8px}.stamp-viewer-nav{width:36px;height:36px;padding:0 0 2px;font-size:30px}.stamp-viewer-prev{left:0}.stamp-viewer-next{right:0}.stamp-viewer-info{height:124px}.stamp-viewer-actions a,.stamp-viewer-actions button{padding:8px 14px}}
+</style>
+
 <script>
 (function () {
   var toggle = document.getElementById('stamp-search-toggle');
@@ -109,6 +164,114 @@
       if (event.key === 'Escape') { sortOptions.hidden = true; sortButton.setAttribute('aria-expanded', 'false'); }
     });
   }
+  // スタンプ画像の拡大表示・前後移動・保存・共有
+  var viewer = document.getElementById('stamp-viewer');
+  var viewerImage = document.getElementById('stamp-viewer-image');
+  var viewerTitle = document.getElementById('stamp-viewer-title');
+  var viewerPeople = document.getElementById('stamp-viewer-people');
+  var viewerTags = document.getElementById('stamp-viewer-tags');
+  var viewerSave = document.getElementById('stamp-viewer-save');
+  var viewerShare = document.getElementById('stamp-viewer-share');
+  var cards = Array.from(document.querySelectorAll('.stamp-open-button'));
+  var currentIndex = 0;
+  var previousFocus = null;
+  var savedBodyPosition = null;
+  var savedScrollY = 0;
+  function showStamp(index) {
+    if (!cards.length) return;
+    currentIndex = (index + cards.length) % cards.length;
+    var card = cards[currentIndex];
+    var url = card.dataset.image;
+    viewerImage.src = url;
+    viewerImage.alt = card.dataset.title || '';
+    viewerTitle.textContent = card.dataset.title || '';
+    viewerPeople.textContent = card.dataset.people ? '人物：' + card.dataset.people : '';
+    viewerTags.replaceChildren();
+    var tagValues = (card.dataset.tags || '').replace(/、/g, ',').split(',').map(function (tag) { return tag.trim(); }).filter(Boolean);
+    tagValues.forEach(function (tag) {
+      var link = document.createElement('a');
+      link.textContent = tag;
+      link.href = (card.dataset.tagSearch || '').replace('__STAMP_TAG__', encodeURIComponent(tag));
+      viewerTags.appendChild(link);
+    });
+    viewerSave.href = url;
+    viewerSave.download = card.dataset.filename || 'stamp-image';
+    document.getElementById('stamp-viewer-prev').disabled = cards.length < 2;
+    document.getElementById('stamp-viewer-next').disabled = cards.length < 2;
+  }
+  function openViewer(index) {
+    previousFocus = document.activeElement;
+    showStamp(index);
+    viewer.hidden = false;
+    viewer.setAttribute('aria-hidden', 'false');
+    savedScrollY = window.scrollY || window.pageYOffset;
+    savedBodyPosition = { position: document.body.style.position, top: document.body.style.top, left: document.body.style.left, right: document.body.style.right, width: document.body.style.width, overflow: document.body.style.overflow };
+    document.body.style.position = 'fixed';
+    document.body.style.top = '-' + savedScrollY + 'px';
+    document.body.style.left = '0'; document.body.style.right = '0'; document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    document.getElementById('stamp-viewer-close').focus();
+  }
+  function closeViewer() {
+    viewer.hidden = true;
+    viewer.setAttribute('aria-hidden', 'true');
+    viewerImage.src = '';
+    if (savedBodyPosition) { Object.keys(savedBodyPosition).forEach(function (key) { document.body.style[key] = savedBodyPosition[key]; }); }
+    window.scrollTo(0, savedScrollY);
+    if (previousFocus) previousFocus.focus();
+  }
+  cards.forEach(function (card, index) { card.addEventListener('click', function () { openViewer(index); }); });
+  document.getElementById('stamp-viewer-close').addEventListener('click', closeViewer);
+  viewer.querySelector('[data-stamp-close]').addEventListener('click', closeViewer);
+  document.getElementById('stamp-viewer-prev').addEventListener('click', function () { showStamp(currentIndex - 1); });
+  document.getElementById('stamp-viewer-next').addEventListener('click', function () { showStamp(currentIndex + 1); });
+  document.addEventListener('keydown', function (event) {
+    if (viewer.hidden) return;
+    if (event.key === 'Escape') closeViewer();
+    if (event.key === 'ArrowLeft') showStamp(currentIndex - 1);
+    if (event.key === 'ArrowRight') showStamp(currentIndex + 1);
+  });
+  var touchStartX = 0, touchStartY = 0;
+  viewer.addEventListener('touchstart', function (event) {
+    if (!event.touches || event.touches.length !== 1) return;
+    touchStartX = event.touches[0].clientX; touchStartY = event.touches[0].clientY;
+  }, { passive: true });
+  viewer.addEventListener('touchmove', function (event) {
+    if (!event.touches || event.touches.length !== 1) return;
+    var dx = event.touches[0].clientX - touchStartX;
+    var dy = event.touches[0].clientY - touchStartY;
+    if (Math.abs(dy) > Math.abs(dx)) event.preventDefault();
+  }, { passive: false });
+  viewer.addEventListener('touchend', function (event) {
+    if (!event.changedTouches || !event.changedTouches.length) return;
+    var dx = event.changedTouches[0].clientX - touchStartX;
+    var dy = event.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.25) showStamp(currentIndex + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+  viewerShare.addEventListener('click', async function () {
+    var card = cards[currentIndex];
+    var url = new URL(card.dataset.image, window.location.href).href;
+    try {
+      if (navigator.share) {
+        var response = await fetch(url);
+        var blob = await response.blob();
+        var file = new File([blob], card.dataset.filename || 'stamp-image', { type: blob.type || 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ title: card.dataset.title || 'スタンプ', files: [file] });
+        } else {
+          await navigator.share({ title: card.dataset.title || 'スタンプ', text: card.dataset.title || '', url: url });
+        }
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+        alert('画像のリンクをコピーしました。');
+      } else {
+        window.prompt('画像のリンクをコピーしてください。', url);
+      }
+    } catch (error) {
+      if (error && error.name !== 'AbortError') alert('共有できませんでした。画像を保存してから共有してください。');
+    }
+  });
+
   updateSearchIcon();
   if (window.MutationObserver) new MutationObserver(updateSearchIcon).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 })();
