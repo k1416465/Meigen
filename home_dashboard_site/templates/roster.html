@@ -30,7 +30,7 @@
   {% if query %}
   <p class="roster-result-label">「{{ query }}」の検索結果：{{ students|length }}人</p>
   {% else %}
-  <p class="roster-result-label">{% if class_filter %}{{ class_filter }}組：{% endif %}{{ students|length }}人</p>
+  <p class="roster-result-label">{% if class_filter %}{{ class_filter }}組:{% endif %}{{ students|length }}人</p>
   {% endif %}
 
   {% if students %}
