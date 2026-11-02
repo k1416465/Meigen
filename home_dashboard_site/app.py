@@ -20,8 +20,8 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 # 録音管理画面の設定：運用前に必ず自分だけが知る値へ変更してください。
-RECORDING_ADMIN_PASSWORD = ""
-FLASK_SESSION_SECRET = ""
+RECORDING_ADMIN_PASSWORD = "Meigen123"
+FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
 app.secret_key = FLASK_SESSION_SECRET
 
 JST = timezone(timedelta(hours=9))
@@ -1633,8 +1633,15 @@ def roster_page():
     except (OSError, json.JSONDecodeError):
         raw_students = []
 
+    # JSONの最上位は、生徒データを並べた配列であることを確認します。
+    if not isinstance(raw_students, list):
+        raw_students = []
+
     students = []
     for item in raw_students:
+        # 配列内に辞書以外の値が混ざっていても処理を止めません。
+        if not isinstance(item, dict):
+            continue
         number = str(item.get("number", "")).strip()
         name = str(item.get("name", "")).strip()
         # 4桁の番号以外は名簿データとして扱わない
@@ -2267,18 +2274,21 @@ def stamp_admin():
                 if row is None:
                     flash("削除対象のスタンプが見つかりませんでした。", "error")
                 else:
-                    filename = Path(row["filename"]).name
-                    conn.execute("DELETE FROM stamps WHERE id = ?", (stamp_id,))
-                    conn.commit()
-                    image_path = (STAMP_DIR / filename).resolve()
-                    if image_path.parent == STAMP_DIR.resolve() and image_path.is_file():
+                    # DBに保存されたファイル名だけを使い、スタンプ用フォルダ内の画像を確実に削除します。
+                    stored_name = row["filename"]
+                    filename = Path(stored_name).name
+                    image_path = STAMP_DIR.resolve() / filename
+                    if filename != stored_name or image_path.parent != STAMP_DIR.resolve():
+                        flash("画像の保存先を確認できないため削除を中止しました。", "error")
+                    else:
                         try:
-                            image_path.unlink()
+                            if image_path.is_file():
+                                image_path.unlink()
+                            conn.execute("DELETE FROM stamps WHERE id = ?", (stamp_id,))
+                            conn.commit()
                             flash("スタンプ情報と画像を削除しました。", "success")
                         except OSError:
-                            flash("情報は削除しましたが、画像ファイルを削除できませんでした。", "error")
-                    else:
-                        flash("スタンプ情報を削除しました。画像ファイルは見つかりませんでした。", "success")
+                            flash("画像ファイルを削除できなかったため、スタンプ情報も残しました。", "error")
             return redirect(url_for("stamp_admin", q=query))
         if action == "save_all":
             saved = errors = 0
