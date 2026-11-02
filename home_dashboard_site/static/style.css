@@ -1004,52 +1004,28 @@ body.dark .operation-status-text[data-state="alert"] {
 }
 
 .setting-accordion summary {
-    position: relative;
     cursor: pointer;
     list-style: none;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    padding: 10px 48px 10px 20px;
-    min-height: 0;
+    padding: 14px 20px;
+    min-height: 48px;
     font-weight: 750;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .setting-accordion summary::-webkit-details-marker {
     display: none;
 }
 
-/* ＋・−は従来どおり右端、青色で表示 */
 .setting-accordion summary::after {
     content: "＋";
-    position: absolute;
-    top: 50%;
-    right: 20px;
-    transform: translateY(-50%);
     font-size: 20px;
-    line-height: 1;
     color: var(--purple);
 }
 
 .setting-accordion[open] summary::after {
     content: "−";
-}
-
-.setting-heading {
-    display: block;
-    font-weight: 750;
-    line-height: 1.5;
-}
-
-.setting-description {
-    display: block;
-    margin: 0;
-    padding: 0;
-    color: var(--muted);
-    font-size: 13px;
-    font-weight: 400;
-    line-height: 1.5;
 }
 
 .setting-options {
@@ -5000,4 +4976,94 @@ html body .page-container.operation-page .station-selector .station-grid.station
     line-height: 1.2 !important;
     text-align: center !important;
     overflow: hidden !important;
+}
+
+/* 設定項目のアコーディオン */
+.setting-accordion > summary {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 36px 10px 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+/* 右端の＋・－ボタン */
+.setting-accordion > summary {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 36px 10px 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+/* 右端の＋・－ボタン */
+.setting-accordion > summary::after {
+  content: "+";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.setting-accordion[open] > summary::after {
+  content: "−";
+}
+
+.setting-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.setting-heading {
+  display: block;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.setting-description {
+  display: block;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.5;
+}
+
+/* 録音ページ：スマホでは検索結果の件数を見出しの横に置き、検索語をその下に表示 */
+@media (max-width: 600px) {
+  .recording-list-section > .section-heading {
+    align-items: flex-start;
+  }
+  .recording-list-section > .section-heading > div:first-child {
+    min-width: 0;
+    width: 100%;
+  }
+  .recording-list-section .section-heading h2 {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: nowrap;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .recording-list-section .recording-count {
+    display: inline-block;
+    flex: 0 0 auto;
+    margin-left: 0;
+    white-space: nowrap;
+  }
+  .recording-list-section .recording-search-status {
+    display: block;
+    margin-top: 4px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
