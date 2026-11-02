@@ -20,8 +20,8 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 # 録音管理画面の設定：運用前に必ず自分だけが知る値へ変更してください。
-RECORDING_ADMIN_PASSWORD = "Meigen123"
-FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
+RECORDING_ADMIN_PASSWORD = ""
+FLASK_SESSION_SECRET = ""
 app.secret_key = FLASK_SESSION_SECRET
 
 JST = timezone(timedelta(hours=9))
@@ -1625,12 +1625,64 @@ def more_page():
 
 @app.route("/roster")
 def roster_page():
-    return render_template(
-        "tool_page.html",
-        tool_name="名簿",
-        description="名簿のページです。"
-    )
+    """4桁番号と名前だけで管理し、番号から学年・クラス・出席番号を取得する名簿ページ。"""
+    roster_file = Path(__file__).resolve().parent / "roster_data.json"
+    try:
+        with roster_file.open("r", encoding="utf-8") as f:
+            raw_students = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        raw_students = []
 
+    students = []
+    for item in raw_students:
+        number = str(item.get("number", "")).strip()
+        name = str(item.get("name", "")).strip()
+        # 4桁の番号以外は名簿データとして扱わない
+        if not re.fullmatch(r"\d{4}", number) or not name:
+            continue
+        students.append({
+            "number": number,
+            "grade": number[0],
+            "class": number[1],
+            "attendance": int(number[2:4]),
+            "name": name,
+        })
+
+    query = request.args.get("q", "").strip()
+    class_filter = request.args.get("class", "").strip()
+    results = students
+    if class_filter in {"1", "2", "3", "4"}:
+        results = [s for s in results if s["class"] == class_filter]
+    else:
+        class_filter = ""
+    if query:
+        compact = re.sub(r"\s+", "", query)
+        # 4桁番号（1桁目=学年、2桁目=クラス、下2桁=出席番号）
+        if re.fullmatch(r"\d{4}", compact):
+            results = [s for s in results if s["number"] == compact]
+        else:
+            # 「1年2組」「2組」「01番」「01」などを認識
+            grade_match = re.search(r"(\d)年", compact)
+            class_match = re.search(r"(\d)組", compact)
+            attendance_match = re.fullmatch(r"(\d{1,2})番?", compact)
+            if grade_match or class_match:
+                grade = grade_match.group(1) if grade_match else None
+                klass = class_match.group(1) if class_match else None
+                results = [s for s in students
+                           if (grade is None or s["grade"] == grade)
+                           and (klass is None or s["class"] == klass)]
+            elif attendance_match:
+                attendance = int(attendance_match.group(1))
+                results = [s for s in results if s["attendance"] == attendance]
+            else:
+                results = [s for s in results if query.casefold() in s["name"].casefold()]
+
+    results = sorted(results, key=lambda s: (int(s["number"])))
+    return render_template(
+        "roster.html", students=results, query=query, class_filter=class_filter,
+        weather_place=selected_weather_place(),
+        railway_label=ROUTE_OPTIONS[selected_route()],
+    )
 
 # ==================================================
 # 録音（MP3は static/recording/ に手動で配置）
