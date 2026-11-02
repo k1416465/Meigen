@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}名簿｜迷言{% endblock %}
+{% block content %}
+<section class="welcome-row"><div><h1>名簿</h1><p>番号・クラス・出席番号・名前で検索できます。</p></div></section>
+<section class="card roster-card">
+  <nav class="roster-class-filters" aria-label="クラスで絞り込み">
+    <a class="roster-filter{% if not class_filter %} is-active{% endif %}" href="{{ url_for('roster_page', q=query or None) }}">すべて</a>
+    {% for klass in range(1, 5) %}
+    <a class="roster-filter{% if class_filter == klass|string %} is-active{% endif %}" href="{{ url_for('roster_page', **({'class': klass, 'q': query or None})) }}">{{ klass }}組</a>
+    {% endfor %}
+  </nav>
+  <form class="roster-search" method="get" action="{{ url_for('roster_page') }}">
+    {% if class_filter %}<input type="hidden" name="class" value="{{ class_filter }}">{% endif %}
+    <input type="search" name="q" value="{{ query }}" placeholder="例：1201 / 1年2組 / 2組 / 01 / 山田" aria-label="名簿を検索">
+    <button type="submit" class="primary-button">検索</button>
+    {% if query %}<a class="roster-clear" href="{{ url_for('roster_page', **({'class': class_filter} if class_filter else {})) }}">リセット</a>{% endif %}
+  </form>
+  {% if query %}<p class="roster-result-label">「{{ query }}」の検索結果：{{ students|length }}人</p>{% else %}<p class="roster-result-label">{% if class_filter %}{{ class_filter }}組：{% endif %}{{ students|length }}人</p>{% endif %}
+  {% if students %}
+  <div class="roster-table-wrap"><table class="roster-table"><thead><tr><th>番号</th><th>学年・クラス</th><th>出席番号</th><th>名前</th></tr></thead><tbody>
+  {% for student in students %}<tr><td>{{ student.number }}</td><td>{{ student.grade }}年{{ student['class'] }}組</td><td>{{ '%02d'|format(student.attendance|int) }}</td><td>{{ student.name }}</td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<p class="roster-empty">該当する生徒が見つかりませんでした。</p>{% endif %}
+</section>
+<style>
+.roster-card{padding:18px}.roster-class-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.roster-filter{display:inline-flex;align-items:center;justify-content:center;min-width:62px;padding:9px 15px;border:1px solid var(--border-color,rgba(127,127,127,.3));border-radius:10px;text-decoration:none;color:inherit;font-weight:700}.roster-filter.is-active{background:#2878d0;border-color:#2878d0;color:#fff}.roster-search{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:stretch;width:100%}.roster-search input{box-sizing:border-box;width:100%;min-width:0;padding:11px 13px;border:1px solid var(--border-color,rgba(127,127,127,.3));border-radius:10px;background:var(--card-bg,transparent);color:inherit;font:inherit}.roster-search button{white-space:nowrap;padding:10px 20px;border:0;border-radius:10px;background:#2878d0;color:white;font:inherit;font-weight:700;cursor:pointer}.roster-clear{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;padding:10px 16px;border:1px solid var(--border-color,rgba(127,127,127,.3));border-radius:10px;text-decoration:none;color:inherit;font:inherit;font-weight:700}.roster-result-label{margin:16px 0 10px;color:var(--muted,#777);font-size:.9rem}.roster-table-wrap{overflow-x:auto}.roster-table{width:100%;border-collapse:collapse}.roster-table th,.roster-table td{padding:11px 9px;text-align:left;border-bottom:1px solid rgba(127,127,127,.2);white-space:nowrap}.roster-table th{font-size:.88rem;color:var(--muted,#777)}.roster-empty{padding:20px 0;text-align:center;color:var(--muted,#777)}
+@media(max-width:520px){.roster-card{padding:13px}.roster-class-filters{gap:6px}.roster-filter{flex:1;min-width:0;padding:9px 5px}.roster-search{grid-template-columns:minmax(0,1fr) auto auto;gap:6px}.roster-search button{padding:10px 13px}.roster-clear{padding:10px 11px}.roster-table th,.roster-table td{padding:10px 7px;font-size:.9rem}}
+</style>
+{% endblock %}
