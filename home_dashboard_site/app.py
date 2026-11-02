@@ -442,12 +442,13 @@ def home():
     key = selected_day.strftime("%Y-%m-%d"); entry = load_special_schedule().get(key, {})
     mode = entry.get("__mode__", "") if isinstance(entry, dict) else ""
     message = entry.get("__message__", "") if isinstance(entry, dict) else ""
+    is_holiday = jpholiday.is_holiday(selected_day.date())
     lessons = entry.get(class_name, CLASS_SCHEDULES.get(class_name, {}).get(weekday, [])) if class_name and isinstance(entry, dict) else []
-    if mode in ("no_class", "special_message"): lessons = []
+    if is_holiday or mode in ("no_class", "special_message"): lessons = []
     elif mode == "timetable" and class_name: lessons = entry.get(class_name, [])
     is_special_schedule = bool(mode or (class_name and isinstance(entry, dict) and class_name in entry))
     return render_template("index.html", day_offset=day_offset, weekday=weekday, today_lessons=lessons,
-        is_special_schedule=is_special_schedule, special_day_mode=mode, special_day_message=message,
+        is_holiday=is_holiday, is_special_schedule=is_special_schedule, special_day_mode=mode, special_day_message=message,
         events=filtered_events(now), today=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日",
         schedule_date_label=f"{selected_day.month}/{selected_day.day}({'月火水木金土日'[selected_day.weekday()]})",
         clock_date_label=f"{selected_day.year}年{selected_day.month}月{selected_day.day}日({'月火水木金土日'[selected_day.weekday()]})",
@@ -2274,21 +2275,18 @@ def stamp_admin():
                 if row is None:
                     flash("削除対象のスタンプが見つかりませんでした。", "error")
                 else:
-                    # DBに保存されたファイル名だけを使い、スタンプ用フォルダ内の画像を確実に削除します。
-                    stored_name = row["filename"]
-                    filename = Path(stored_name).name
-                    image_path = STAMP_DIR.resolve() / filename
-                    if filename != stored_name or image_path.parent != STAMP_DIR.resolve():
-                        flash("画像の保存先を確認できないため削除を中止しました。", "error")
-                    else:
+                    filename = Path(row["filename"]).name
+                    conn.execute("DELETE FROM stamps WHERE id = ?", (stamp_id,))
+                    conn.commit()
+                    image_path = (STAMP_DIR / filename).resolve()
+                    if image_path.parent == STAMP_DIR.resolve() and image_path.is_file():
                         try:
-                            if image_path.is_file():
-                                image_path.unlink()
-                            conn.execute("DELETE FROM stamps WHERE id = ?", (stamp_id,))
-                            conn.commit()
+                            image_path.unlink()
                             flash("スタンプ情報と画像を削除しました。", "success")
                         except OSError:
-                            flash("画像ファイルを削除できなかったため、スタンプ情報も残しました。", "error")
+                            flash("情報は削除しましたが、画像ファイルを削除できませんでした。", "error")
+                    else:
+                        flash("スタンプ情報を削除しました。画像ファイルは見つかりませんでした。", "success")
             return redirect(url_for("stamp_admin", q=query))
         if action == "save_all":
             saved = errors = 0
