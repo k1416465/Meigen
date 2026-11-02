@@ -8,41 +8,62 @@
     <a class="back-link" href="{{ url_for('admin_dashboard') }}">管理者用ページ</a>
   </div>
 </section>
+
 <form method="post" class="settings-form">
   <details class="card settings-card setting-accordion">
-    <summary>クラスの選択</summary>
+    <summary>
+      <span class="setting-heading">クラスの選択</span>
+      <span class="setting-description">ホームの時間割表示に反映されます。</span>
+    </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="クラスの選択">
       <label class="choice-option"><input type="radio" name="class_name" value="" {% if not class_name %}checked{% endif %}><span>選択しない</span></label>
       {% for name in class_names %}<label class="choice-option"><input type="radio" name="class_name" value="{{ name }}" {% if name == class_name %}checked{% endif %}><span>{{ name }}</span></label>{% endfor %}
     </div>
   </details>
+
   <details class="card settings-card setting-accordion">
-    <summary>My路線</summary>
+    <summary>
+      <span class="setting-heading">My路線</span>
+      <span class="setting-description">画面上部に、設定した路線の運行情報が表示されます。</span>
+    </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My路線">
       {% for key, label in route_options.items() %}<label class="choice-option"><input type="radio" name="my_route" value="{{ key }}" {% if key == my_route %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
     </div>
   </details>
+
   <details class="card settings-card setting-accordion">
-    <summary>My駅</summary>
+    <summary>
+      <span class="setting-heading">My駅</span>
+      <span class="setting-description">時刻表ページでMy駅を開く場合に使います。</span>
+    </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My駅">
       <label class="choice-option"><input type="radio" name="my_station" value="" {% if my_station == '' %}checked{% endif %}><span>選択しない</span></label>
       {% for name in station_options %}<label class="choice-option"><input type="radio" name="my_station" value="{{ name }}" {% if name == my_station %}checked{% endif %}><span>{{ name }}</span></label>{% endfor %}
     </div>
   </details>
+
   <details class="card settings-card setting-accordion">
-    <summary>天気</summary>
+    <summary>
+      <span class="setting-heading">天気</span>
+      <span class="setting-description">ホームの天気情報に使用します。</span>
+    </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="天気">
       {% for key, label in weather_options.items() %}<label class="choice-option"><input type="radio" name="weather_place" value="{{ key }}" {% if key == weather_place %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
     </div>
   </details>
+
   <details class="card settings-card setting-accordion">
-    <summary>外観</summary>
+    <summary>
+      <span class="setting-heading">外観</span>
+      <span class="setting-description">画面全体の配色を変更できます。デバイスの設定を使用することもできます。</span>
+    </summary>
     <div class="setting-options setting-choice-list" role="radiogroup" aria-label="外観">
       <label class="choice-option"><input type="radio" name="appearance" value="light" {% if appearance == 'light' %}checked{% endif %}><span>ライトモード</span></label>
       <label class="choice-option"><input type="radio" name="appearance" value="dark" {% if appearance == 'dark' %}checked{% endif %}><span>ダークモード</span></label>
       <label class="choice-option"><input type="radio" name="appearance" value="system" {% if appearance == 'system' %}checked{% endif %}><span>デバイスの設定に従う</span></label>
     </div>
   </details>
+
   <button class="primary-button" type="submit">設定を保存</button>
 </form>
 {% endblock %}

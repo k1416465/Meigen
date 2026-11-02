@@ -22,20 +22,15 @@
       <div class="stamp-admin-preview"><img src="{{ url_for('static', filename='stamps/' ~ item['filename']) }}" alt="{{ item['title'] or item['filename'] }}" loading="lazy"><div><strong>{{ item['filename'] }}</strong><small>表示番号: {{ item['number'] }} / ID: {{ item['id'] }}</small></div></div>
       <input type="hidden" name="stamp_ids" value="{{ item['id'] }}">
       <div class="recording-admin-edit"><label>番号（1以上）<input type="number" name="number_{{ item['id'] }}" value="{{ item['number'] }}" min="1" step="1" required></label><label>タイトル<input name="title_{{ item['id'] }}" value="{{ item['title'] }}" required maxlength="200"></label><label>人物名<input name="people_{{ item['id'] }}" value="{{ item['people'] }}" maxlength="200" placeholder="例：先生、友人"></label><label>タグ（カンマ区切り）<input name="tags_{{ item['id'] }}" value="{{ item['tags'] }}" placeholder="例：挨拶, 日常, リアクション"></label></div>
-      <div class="recording-admin-card-actions"><button type="button" class="recording-admin-delete" onclick="deleteStamp({{ item['id'] }}, {{ (item['title'] or item['filename'])|tojson }})">この画像を削除</button></div>
+      <div class="recording-admin-card-actions"><button type="submit" form="stampDeleteForm" name="id" value="{{ item['id'] }}" class="recording-admin-delete" onclick="return confirm({{ ('「' ~ (item['title'] or item['filename']) ~ '」の情報と画像ファイルを削除します。この操作は元に戻せません。削除しますか？')|tojson }})">この画像を削除</button></div>
     </article>
     {% else %}<p class="recording-admin-note">管理する画像がありません。画像を <code>static/stamps/</code> に追加してください。</p>{% endfor %}
     {% if stamps %}<div class="recording-admin-savebar"><span>編集内容を確認して保存してください。</span><button type="submit" class="recording-admin-save-all">すべて保存</button></div>{% endif %}
   </form>
-  <form method="post" id="stampDeleteForm" hidden><input type="hidden" name="action" value="delete"><input type="hidden" name="q" value="{{ query }}"><input type="hidden" name="id" id="stampDeleteId"></form>
+  <form method="post" id="stampDeleteForm"><input type="hidden" name="action" value="delete"><input type="hidden" name="q" value="{{ query }}"></form>
   <p class="recording-admin-note">タグはカンマ（,）で区切ってください。削除すると管理情報と画像ファイルの両方が削除されます。必要な画像は事前にバックアップしてください。</p>
 </section>
 <script>
-function deleteStamp(id, title) {
-  if (!confirm('「' + title + '」の情報と画像ファイルを削除します。この操作は元に戻せません。削除しますか？')) return;
-  document.getElementById('stampDeleteId').value = id;
-  document.getElementById('stampDeleteForm').submit();
-}
 document.querySelectorAll('[data-order-list]').forEach(function (list) {
   function refresh() {
     Array.from(list.children).forEach(function (item, index, items) {
