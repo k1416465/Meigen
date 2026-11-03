@@ -1,0 +1,610 @@
+[
+  {
+    "number": 1,
+    "page": 28,
+    "words": [
+      "驚く"
+    ],
+    "readings": {
+      "驚く": "おどろく"
+    },
+    "translations": [
+      "気づく"
+    ]
+  },
+  {
+    "number": 2,
+    "page": 28,
+    "words": [
+      "ののしる"
+    ],
+    "readings": {},
+    "translations": [
+      "大騒ぎする"
+    ]
+  },
+  {
+    "number": 3,
+    "page": 29,
+    "words": [
+      "念ず"
+    ],
+    "readings": {
+      "念ず": "ねんず"
+    },
+    "translations": [
+      "祈る"
+    ]
+  },
+  {
+    "number": 4,
+    "page": 30,
+    "words": [
+      "覚ゆ"
+    ],
+    "readings": {
+      "覚ゆ": "おぼゆ"
+    },
+    "translations": [
+      "思われる"
+    ]
+  },
+  {
+    "number": 5,
+    "page": 31,
+    "words": [
+      "忍ぶ"
+    ],
+    "readings": {
+      "忍ぶ": "しのぶ"
+    },
+    "translations": [
+      "がまんする"
+    ]
+  },
+  {
+    "number": 6,
+    "page": 32,
+    "words": [
+      "眺む"
+    ],
+    "readings": {
+      "眺む": "ながむ"
+    },
+    "translations": [
+      "もの思いに沈む"
+    ]
+  },
+  {
+    "number": 7,
+    "page": 32,
+    "words": [
+      "見ゆ"
+    ],
+    "readings": {
+      "見ゆ": "みゆ"
+    },
+    "translations": [
+      "見える"
+    ]
+  },
+  {
+    "number": 8,
+    "page": 33,
+    "words": [
+      "あふ"
+    ],
+    "readings": {},
+    "translations": [
+      "結婚する"
+    ]
+  },
+  {
+    "number": 9,
+    "page": 34,
+    "words": [
+      "居る"
+    ],
+    "readings": {
+      "居る": "ゐる"
+    },
+    "translations": [
+      "座る"
+    ]
+  },
+  {
+    "number": 10,
+    "page": 34,
+    "words": [
+      "歩く"
+    ],
+    "readings": {
+      "歩く": "ありく"
+    },
+    "translations": [
+      "動き回る"
+    ]
+  },
+  {
+    "number": 11,
+    "page": 35,
+    "words": [
+      "飽く"
+    ],
+    "readings": {
+      "飽く": "あく"
+    },
+    "translations": [
+      "満足する"
+    ]
+  },
+  {
+    "number": 12,
+    "page": 36,
+    "words": [
+      "うつくし"
+    ],
+    "readings": {},
+    "translations": [
+      "かわいらしい"
+    ]
+  },
+  {
+    "number": 13,
+    "page": 36,
+    "words": [
+      "かなし"
+    ],
+    "readings": {},
+    "translations": [
+      "いとしい"
+    ]
+  },
+  {
+    "number": 14,
+    "page": 37,
+    "words": [
+      "いみじ"
+    ],
+    "readings": {},
+    "translations": [
+      "とてもすばらしい"
+    ]
+  },
+  {
+    "number": 15,
+    "page": 38,
+    "words": [
+      "をかし"
+    ],
+    "readings": {},
+    "translations": [
+      "趣がある"
+    ]
+  },
+  {
+    "number": 16,
+    "page": 39,
+    "words": [
+      "よし"
+    ],
+    "readings": {},
+    "translations": [
+      "よい"
+    ]
+  },
+  {
+    "number": 17,
+    "page": 40,
+    "words": [
+      "奇し･怪し"
+    ],
+    "readings": {
+      "奇し･怪し": "あやし"
+    },
+    "translations": [
+      "不思議だ"
+    ]
+  },
+  {
+    "number": 18,
+    "page": 41,
+    "words": [
+      "大人し"
+    ],
+    "readings": {
+      "大人し": "おとなし"
+    },
+    "translations": [
+      "大人らしい"
+    ]
+  },
+  {
+    "number": 19,
+    "page": 42,
+    "words": [
+      "ゆかし"
+    ],
+    "readings": {},
+    "translations": [
+      "見たい"
+    ]
+  },
+  {
+    "number": 20,
+    "page": 43,
+    "words": [
+      "おぼつかなし"
+    ],
+    "readings": {},
+    "translations": [
+      "ぼんやりしている"
+    ]
+  },
+  {
+    "number": 21,
+    "page": 44,
+    "words": [
+      "有り難し"
+    ],
+    "readings": {
+      "有り難し": "ありがたし"
+    },
+    "translations": [
+      "めったにない"
+    ]
+  },
+  {
+    "number": 22,
+    "page": 44,
+    "words": [
+      "めでたし"
+    ],
+    "readings": {},
+    "translations": [
+      "すばらしい"
+    ]
+  },
+  {
+    "number": 23,
+    "page": 45,
+    "words": [
+      "口惜し"
+    ],
+    "readings": {
+      "口惜し": "くちをし"
+    },
+    "translations": [
+      "残念だ"
+    ]
+  },
+  {
+    "number": 24,
+    "page": 46,
+    "words": [
+      "憂し"
+    ],
+    "readings": {
+      "憂し": "うし"
+    },
+    "translations": [
+      "つらい"
+    ]
+  },
+  {
+    "number": 25,
+    "page": 47,
+    "words": [
+      "侘びし"
+    ],
+    "readings": {
+      "侘びし": "わびし"
+    },
+    "translations": [
+      "つらい"
+    ]
+  },
+  {
+    "number": 26,
+    "page": 50,
+    "words": [
+      "あはれなり"
+    ],
+    "readings": {},
+    "translations": [
+      "心底しみじみと感じられる"
+    ]
+  },
+  {
+    "number": 27,
+    "page": 51,
+    "words": [
+      "疎かなり"
+    ],
+    "readings": {
+      "疎かなり": "おろかなり"
+    },
+    "translations": [
+      "おろそかだ"
+    ]
+  },
+  {
+    "number": 28,
+    "page": 52,
+    "words": [
+      "懇ろなり"
+    ],
+    "readings": {
+      "懇ろなり": "ねんごろなり"
+    },
+    "translations": [
+      "熱心だ"
+    ]
+  },
+  {
+    "number": 29,
+    "page": 52,
+    "words": [
+      "徒然なり"
+    ],
+    "readings": {
+      "徒然なり": "つれづれなり"
+    },
+    "translations": [
+      "(することもなく)退屈だ"
+    ]
+  },
+  {
+    "number": 30,
+    "page": 53,
+    "words": [
+      "徒らなり"
+    ],
+    "readings": {
+      "徒らなり": "いたづらなり"
+    },
+    "translations": [
+      "むだだ"
+    ]
+  },
+  {
+    "number": 31,
+    "page": 54,
+    "words": [
+      "年ごろ"
+    ],
+    "readings": {
+      "年ごろ": "としごろ"
+    },
+    "translations": [
+      "長年"
+    ]
+  },
+  {
+    "number": 32,
+    "page": 54,
+    "words": [
+      "形･容貌"
+    ],
+    "readings": {
+      "形･容貌": "かたち"
+    },
+    "translations": [
+      "容貌"
+    ]
+  },
+  {
+    "number": 33,
+    "page": 55,
+    "words": [
+      "影"
+    ],
+    "readings": {
+      "影": "かげ"
+    },
+    "translations": [
+      "光"
+    ]
+  },
+  {
+    "number": 34,
+    "page": 56,
+    "words": [
+      "本意"
+    ],
+    "readings": {
+      "本意": "ほい"
+    },
+    "translations": [
+      "かねてからの願い"
+    ]
+  },
+  {
+    "number": 35,
+    "page": 56,
+    "words": [
+      "物語"
+    ],
+    "readings": {
+      "物語": "ものがたり"
+    },
+    "translations": [
+      "話"
+    ]
+  },
+  {
+    "number": 36,
+    "page": 57,
+    "words": [
+      "文･書"
+    ],
+    "readings": {
+      "文･書": "ふみ"
+    },
+    "translations": [
+      "手紙"
+    ]
+  },
+  {
+    "number": 37,
+    "page": 58,
+    "words": [
+      "程"
+    ],
+    "readings": {
+      "程": "ほど"
+    },
+    "translations": [
+      "時"
+    ]
+  },
+  {
+    "number": 38,
+    "page": 59,
+    "words": [
+      "情け"
+    ],
+    "readings": {
+      "情け": "なさけ"
+    },
+    "translations": [
+      "思いやり"
+    ]
+  },
+  {
+    "number": 39,
+    "page": 60,
+    "words": [
+      "契り"
+    ],
+    "readings": {
+      "契り": "ちぎり"
+    },
+    "translations": [
+      "約束"
+    ]
+  },
+  {
+    "number": 40,
+    "page": 61,
+    "words": [
+      "気色"
+    ],
+    "readings": {
+      "気色": "けしき"
+    },
+    "translations": [
+      "様子"
+    ]
+  },
+  {
+    "number": 41,
+    "page": 62,
+    "words": [
+      "いと"
+    ],
+    "readings": {},
+    "translations": [
+      "とても"
+    ]
+  },
+  {
+    "number": 42,
+    "page": 62,
+    "words": [
+      "あまた"
+    ],
+    "readings": {},
+    "translations": [
+      "たくさん"
+    ]
+  },
+  {
+    "number": 43,
+    "page": 63,
+    "words": [
+      "げに"
+    ],
+    "readings": {},
+    "translations": [
+      "なるほど"
+    ]
+  },
+  {
+    "number": 44,
+    "page": 64,
+    "words": [
+      "なほ"
+    ],
+    "readings": {},
+    "translations": [
+      "やはり"
+    ]
+  },
+  {
+    "number": 45,
+    "page": 64,
+    "words": [
+      "やがて"
+    ],
+    "readings": {},
+    "translations": [
+      "そのまま"
+    ]
+  },
+  {
+    "number": 46,
+    "page": 65,
+    "words": [
+      "やうやう"
+    ],
+    "readings": {},
+    "translations": [
+      "だんだん"
+    ]
+  },
+  {
+    "number": 47,
+    "page": 66,
+    "words": [
+      "え～打消"
+    ],
+    "readings": {},
+    "translations": [
+      "～できない"
+    ]
+  },
+  {
+    "number": 48,
+    "page": 66,
+    "words": [
+      "な～そ"
+    ],
+    "readings": {},
+    "translations": [
+      "～(する)な"
+    ]
+  },
+  {
+    "number": 49,
+    "page": 67,
+    "words": [
+      "さらに～打消"
+    ],
+    "readings": {},
+    "translations": [
+      "まったく～ない"
+    ]
+  },
+  {
+    "number": 50,
+    "page": 68,
+    "words": [
+      "いかで･いかでか"
+    ],
+    "readings": {},
+    "translations": [
+      "どうして(～か)"
+    ]
+  }
+]
