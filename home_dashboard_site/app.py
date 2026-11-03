@@ -2178,6 +2178,23 @@ def stamp_metadata_options(rows):
     return tags, people
 
 
+
+@app.route("/quiz")
+def quiz_page():
+    quiz_path = Path(app.root_path) / "static" / "quiz_data.json"
+    try:
+        with open(quiz_path, encoding="utf-8") as f:
+            quiz_data = json.load(f)
+    except (OSError, ValueError):
+        quiz_data = []
+    return render_template(
+        "quiz.html",
+        quiz_data=quiz_data,
+        weather_place=selected_weather_place(),
+        railway_label=ROUTE_OPTIONS[selected_route()],
+    )
+
+
 @app.route("/stamp", methods=["GET"])
 def stamp_page():
     init_stamp_db()
