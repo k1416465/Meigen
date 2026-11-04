@@ -138,14 +138,30 @@ html[data-theme="dark"] .quiz-settings-error {
  const select=$('quiz-select'), game=$('quiz-game'), result=$('quiz-result');
  let questions=[], index=0, score=0, selectedChoice=null, answered=false, selectedQuiz=null;
  const shuffle=a=>{const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
+ // 出題範囲内に含まれる「訳語」の総数を問題数の上限にする
+ function getValidGroups(rangeStart,rangeEnd){
+   return groups.filter(g=>Array.isArray(g.words)&&g.words.length&&Array.isArray(g.translations)&&g.translations.length&&Number(g.number)>=rangeStart&&Number(g.number)<=rangeEnd);
+ }
+ function getTranslationCount(rangeStart,rangeEnd){
+   return getValidGroups(rangeStart,rangeEnd).reduce((total,g)=>total+g.translations.length,0);
+ }
+ function updateQuestionCountLimit(){
+   const first=Number($('range-start').value), last=Number($('range-end').value);
+   const max=Number.isInteger(first)&&Number.isInteger(last)&&first>=1&&last>=first?getTranslationCount(first,last):0;
+   $('question-count').max=String(Math.max(1,max));
+   if(max>0&&Number($('question-count').value)>max)$('question-count').value=String(max);
+ }
  function makeQuestions(count,rangeStart,rangeEnd){
-   const valid=groups.filter(g=>g.words.length&&g.translations.length&&Number(g.number)>=rangeStart&&Number(g.number)<=rangeEnd);
-   const chosen=shuffle(valid).slice(0,Math.min(count,valid.length));
-   return chosen.map(g=>{
-     const correct=shuffle(g.translations)[0], pool=[];
-     valid.filter(other=>other.number!==g.number).forEach(other=>other.translations.forEach(t=>pool.push({translation:t,number:other.number})));
+   const valid=getValidGroups(rangeStart,rangeEnd);
+   // 1つの単語に訳語が複数ある場合、それぞれを独立した出題候補にする
+   const candidates=valid.flatMap(g=>g.translations.map(correct=>({group:g,correct})));
+   const pool=valid.flatMap(g=>g.translations.map(translation=>({translation,number:g.number})));
+   const chosen=shuffle(candidates).slice(0,Math.min(count,candidates.length));
+   return chosen.map(({group:g,correct})=>{
      const distractors=[];
-     shuffle(pool).forEach(item=>{if(distractors.length<3&&item.translation!==correct&&!distractors.some(x=>x.translation===item.translation))distractors.push(item);});
+     shuffle(pool).forEach(item=>{
+       if(distractors.length<3&&item.translation!==correct&&!distractors.some(x=>x.translation===item.translation))distractors.push(item);
+     });
      if(distractors.length<3)return null;
      const word=shuffle(g.words)[0];
      return {word,number:g.number,reading:(g.readings||{})[word]||'',page:g.page,correct,options:shuffle([correct,...distractors.map(x=>x.translation)])};
@@ -169,12 +185,16 @@ html[data-theme="dark"] .quiz-settings-error {
    const count=Number($('question-count').value), first=Number($('range-start').value), last=Number($('range-end').value);
    const error=$('quiz-settings-error');error.hidden=true;
    if(!Number.isInteger(count)||count<1||!Number.isInteger(first)||!Number.isInteger(last)||first<1||last<first){error.textContent='問題数と出題範囲を正しく入力してください。';error.hidden=false;return;}
+   const translationCount=getTranslationCount(first,last);
+   if(count>translationCount){error.textContent=`問題数は、指定範囲内の訳語数（${translationCount}）以下にしてください。`;error.hidden=false;return;}
    questions=makeQuestions(count,first,last);if(!questions.length){error.textContent='指定した範囲に出題できる問題がありません。';error.hidden=false;return;}
    index=0;score=0;select.hidden=true;result.hidden=true;game.hidden=false;showQuestion();
  }
  function showResult(){game.hidden=true;result.hidden=false;$('quiz-score').textContent=`${questions.length}問中 ${score}問正解（${Math.round(score/questions.length*100)}%）`;}
  function back(){game.hidden=true;result.hidden=true;select.hidden=false;$('quiz-settings').hidden=true;}
- $('start-kobun').addEventListener('click',()=>{const opened=$('start-kobun').getAttribute('aria-expanded')==='true';$('start-kobun').setAttribute('aria-expanded',String(!opened));$('quiz-settings').hidden=opened;});$('begin-quiz').addEventListener('click',start);$('retry-quiz').addEventListener('click',start);$('return-select').addEventListener('click',back);$('quit-quiz').addEventListener('click',back);$('quiz-answer').addEventListener('click',answer);$('quiz-next').addEventListener('click',()=>{index++;showQuestion();});
+ $('range-start').addEventListener('input',updateQuestionCountLimit);
+ $('range-end').addEventListener('input',updateQuestionCountLimit);
+ $('start-kobun').addEventListener('click',()=>{const opened=$('start-kobun').getAttribute('aria-expanded')==='true';$('start-kobun').setAttribute('aria-expanded',String(!opened));$('quiz-settings').hidden=opened;if(!opened)updateQuestionCountLimit();});$('begin-quiz').addEventListener('click',start);$('retry-quiz').addEventListener('click',start);$('return-select').addEventListener('click',back);$('quit-quiz').addEventListener('click',back);$('quiz-answer').addEventListener('click',answer);$('quiz-next').addEventListener('click',()=>{index++;showQuestion();});
 })();
 </script>
 {% endblock %}
