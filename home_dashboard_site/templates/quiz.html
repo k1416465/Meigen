@@ -155,12 +155,13 @@ html[data-theme="dark"] .quiz-settings-error {
    const valid=getValidGroups(rangeStart,rangeEnd);
    // 1つの単語に訳語が複数ある場合、それぞれを独立した出題候補にする
    const candidates=valid.flatMap(g=>g.translations.map(correct=>({group:g,correct})));
-   const pool=valid.flatMap(g=>g.translations.map(translation=>({translation,number:g.number})));
+   // 選択肢の誤答候補には、出題中の単語自身の別訳語を含めない
+   const pool=valid.flatMap(group=>group.translations.map(translation=>({translation,group})));
    const chosen=shuffle(candidates).slice(0,Math.min(count,candidates.length));
    return chosen.map(({group:g,correct})=>{
      const distractors=[];
      shuffle(pool).forEach(item=>{
-       if(distractors.length<3&&item.translation!==correct&&!distractors.some(x=>x.translation===item.translation))distractors.push(item);
+       if(item.group!==g&&distractors.length<3&&item.translation!==correct&&!distractors.some(x=>x.translation===item.translation))distractors.push(item);
      });
      if(distractors.length<3)return null;
      const word=shuffle(g.words)[0];
