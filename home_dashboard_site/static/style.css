@@ -5420,16 +5420,18 @@ body.dark .operation-loading-overlay {
         box-sizing: border-box;
     }
 
+    /* 表示欄が余白を取りすぎないようにし、キー側へ高さを配分 */
     html.calculator-page-mode .calculator-display {
-        flex: 1 1 0;
-        min-height: 54px;
+        flex: 0 0 clamp(86px, 16dvh, 138px);
+        min-height: 86px;
         padding: 6px 8px 10px;
+        box-sizing: border-box;
     }
 
     html.calculator-page-mode .calculator-keys {
-        flex: 0 0 auto;
+        flex: 1 1 auto;
         grid-template-rows: repeat(5, minmax(0, 1fr));
-        gap: clamp(5px, 1.5vw, 9px);
+        gap: clamp(6px, 1.5vw, 10px);
         min-height: 0;
     }
 
@@ -5461,7 +5463,8 @@ body.dark .operation-loading-overlay {
     }
 
     html.calculator-page-mode .calculator-display {
-        min-height: 42px;
+        flex-basis: 76px;
+        min-height: 76px;
         padding-bottom: 5px;
     }
 
