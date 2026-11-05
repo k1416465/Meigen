@@ -2362,9 +2362,18 @@ def video_page():
 @app.route("/calculator")
 def calculator_page():
     return render_template(
-        "tool_page.html",
-        tool_name="電卓",
-        description="電卓のページです。"
+        "calculator.html",
+        weather_place=selected_weather_place(),
+        railway_label=ROUTE_OPTIONS[selected_route()],
+    )
+
+
+@app.route("/unit-converter")
+def unit_converter_page():
+    return render_template(
+        "unit_converter.html",
+        weather_place=selected_weather_place(),
+        railway_label=ROUTE_OPTIONS[selected_route()],
     )
 
 # ==================================================
