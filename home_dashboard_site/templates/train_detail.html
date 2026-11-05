@@ -90,7 +90,8 @@
   width:3px;
   background:#eab308;
   border-radius:3px;
-  z-index:0;
+  /* 駅間の横線より前面、駅の丸より背面に表示 */
+  z-index:2;
 }
 
 .td-stop{
@@ -113,7 +114,7 @@
   border:3px solid #eab308;
   background:var(--card-bg,#fff);
   border-radius:50%;
-  z-index:1;
+  z-index:3;
   position:relative;
 }
 
