@@ -5476,3 +5476,57 @@ body.dark .operation-loading-overlay {
         gap: 5px;
     }
 }
+
+
+
+/* 設定画面：スマートフォンの見出し・説明文・開閉ボタンを調整 */
+@media (max-width: 600px) {
+    .setting-accordion > summary {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 6px !important;
+        min-height: 0 !important;
+        padding: 13px 62px 13px 14px !important;
+        line-height: 1.45 !important;
+    }
+
+    /* 各設定項目のタイトル */
+    .setting-accordion > summary .setting-heading {
+        display: block !important;
+        width: 100% !important;
+        font-size: 17px !important;
+        line-height: 1.45 !important;
+        font-weight: 700 !important;
+        overflow-wrap: anywhere;
+    }
+
+    /* 説明文は＋ボタンの領域を避けて折り返す */
+    .setting-accordion > summary .setting-description {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.6 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+        word-break: normal !important;
+    }
+
+    /* ＋／－ボタンを大きくし、右側に独立して配置 */
+    .setting-accordion > summary::after {
+        right: 13px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 29px !important;
+        line-height: 1 !important;
+        font-weight: 400 !important;
+    }
+}
