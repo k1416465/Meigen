@@ -5768,7 +5768,7 @@ body.dark .operation-loading-overlay {
         min-width: 48px !important;
         box-sizing: border-box !important;
         color: #2563eb !important;
-        font-size: 42px !important;
+        font-size: 34px !important;
         font-weight: 400 !important;
         line-height: 1 !important;
         pointer-events: none !important;
@@ -5781,4 +5781,11 @@ body.dark .operation-loading-overlay {
     .settings-form .setting-accordion[open] > summary .setting-toggle-icon::before {
         content: "−" !important;
     }
+}
+
+
+/* 設定画面：各項目を囲むカードの角をより丸くする */
+.settings-form > .setting-accordion {
+    border-radius: 22px !important;
+    overflow: hidden !important;
 }
