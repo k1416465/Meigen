@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}単位変換｜迷言{% endblock %}
+
+{% block content %}
+<section class="welcome-row calculator-heading">
+  <div>
+    <h1>単位変換</h1>
+    <p class="calculator-subtitle">数値と単位を選ぶと、自動で変換します。</p>
+  </div>
+</section>
+
+<section class="unit-converter-panel">
+  <label class="unit-field-label" for="unitCategory">変換する種類</label>
+  <select id="unitCategory" class="unit-select">
+    <option value="length">長さ</option>
+    <option value="mass">重さ</option>
+    <option value="area">面積</option>
+    <option value="volume">体積</option>
+    <option value="time">時間</option>
+    <option value="speed">速さ</option>
+    <option value="temperature">温度</option>
+    <option value="money_fun">円・うまい棒・ジンバブエドル</option>
+  </select>
+
+  <div class="unit-conversion-grid">
+    <div class="unit-field">
+      <label class="unit-field-label" for="unitInput">変換元</label>
+      <input id="unitInput" class="unit-number-input" type="number" inputmode="decimal" value="1" step="any">
+      <select id="unitFrom" class="unit-select" aria-label="変換元の単位"></select>
+    </div>
+    <button id="unitSwap" class="unit-swap-button" type="button" aria-label="単位を入れ替える">⇄</button>
+    <div class="unit-field">
+      <label class="unit-field-label" for="unitOutput">変換先</label>
+      <output id="unitOutput" class="unit-output">100</output>
+      <select id="unitTo" class="unit-select" aria-label="変換先の単位"></select>
+    </div>
+  </div>
+  <p id="unitFormula" class="unit-formula" aria-live="polite">1 m = 100 cm</p>
+  <p id="unitReference" class="unit-formula" aria-live="polite"></p>
+</section>
+
+<a class="calculator-fab" href="{{ url_for('calculator_page') }}" aria-label="電卓へ">
+  <img id="calculatorIcon" src="{{ url_for('static', filename='icons/light/calculator.png') }}" alt="">
+  <span>電卓</span>
+</a>
+
+<script>
+(() => {
+  const definitions = {
+    length: { units: [['mm','ミリメートル',0.001],['cm','センチメートル',0.01],['m','メートル',1],['km','キロメートル',1000],['in','インチ',0.0254],['ft','フィート',0.3048],['yd','ヤード',0.9144],['mi','マイル',1609.344]] },
+    mass: { units: [['mg','ミリグラム',0.000001],['g','グラム',0.001],['kg','キログラム',1],['t','トン',1000],['oz','オンス',0.028349523125],['lb','ポンド',0.45359237]] },
+    area: { units: [['mm2','平方ミリメートル',0.000001],['cm2','平方センチメートル',0.0001],['m2','平方メートル',1],['a','アール',100],['ha','ヘクタール',10000],['km2','平方キロメートル',1000000],['tsubo','坪',3.305785],['tokyo_dome','東京ドーム',46755],['tdr','東京ディズニーリゾート',2000000],['imperial_palace','皇居',1150000]] },
+    volume: { units: [['mL','ミリリットル',0.001],['L','リットル',1],['m3','立方メートル',1000],['cm3','立方センチメートル',0.001],['tsp','小さじ',0.005],['tbsp','大さじ',0.015],['cup','カップ',0.2],['gal','米ガロン',3.785411784]] },
+    time: { units: [['s','秒',1],['min','分',60],['h','時間',3600],['day','日',86400],['week','週間',604800]] },
+    speed: { units: [['m/s','メートル毎秒',1],['km/h','キロメートル毎時',1/3.6],['mph','マイル毎時',0.44704],['knot','ノット',0.5144444444]] },
+    temperature: { units: [['C','摂氏 (°C)'],['F','華氏 (°F)'],['K','ケルビン']] },
+    money_fun: { units: [['JPY','円',1],['umaibo','うまい棒（本）',16],['ZWD','ジンバブエドル',116279069767.44186]] }
+  };
+  const category = document.getElementById('unitCategory');
+  const input = document.getElementById('unitInput');
+  const output = document.getElementById('unitOutput');
+  const from = document.getElementById('unitFrom');
+  const to = document.getElementById('unitTo');
+  const formula = document.getElementById('unitFormula');
+  const fmt = (n) => {
+    if (!Number.isFinite(n)) return '—';
+    if (n !== 0 && (Math.abs(n) < 0.000001 || Math.abs(n) >= 1e12)) return n.toExponential(8);
+    return Number(n.toPrecision(10)).toLocaleString('ja-JP', {maximumFractionDigits: 8});
+  };
+  function populate(select, units) {
+    select.innerHTML = '';
+    units.forEach(([symbol, name]) => {
+      const option = document.createElement('option');
+      option.value = symbol;
+      option.textContent = `${name} (${symbol})`;
+      select.appendChild(option);
+    });
+  }
+  function convertTemperature(value, source, target) {
+    let celsius = value;
+    if (source === 'F') celsius = (value - 32) * 5 / 9;
+    if (source === 'K') celsius = value - 273.15;
+    if (target === 'F') return celsius * 9 / 5 + 32;
+    if (target === 'K') return celsius + 273.15;
+    return celsius;
+  }
+  function update() {
+    const data = definitions[category.value].units;
+    const value = Number(input.value);
+    const source = data.find(unit => unit[0] === from.value);
+    const target = data.find(unit => unit[0] === to.value);
+    if (!Number.isFinite(value) || !source || !target) { output.textContent = '—'; formula.textContent = '数値を入力してください。'; return; }
+    const result = category.value === 'temperature'
+      ? convertTemperature(value, source[0], target[0])
+      : value * source[2] / target[2];
+    output.textContent = fmt(result);
+    formula.textContent = `${fmt(value)} ${source[0]} = ${fmt(result)} ${target[0]}`;
+    const reference = document.getElementById('unitReference');
+    reference.textContent = category.value === 'money_fun'
+      ? '基準：うまい棒1本＝16円 ／ 1円＝0.0000000000086ジンバブエドル'
+      : category.value === 'area'
+        ? '基準：東京ドーム＝46,755㎡ ／ 東京ディズニーリゾート＝2,000,000㎡ ／ 皇居＝1,150,000㎡'
+        : '';
+  }
+  function resetCategory() {
+    const units = definitions[category.value].units;
+    populate(from, units);
+    populate(to, units);
+    if (category.value === 'length') { from.value = 'm'; to.value = 'cm'; }
+    else if (category.value === 'mass') { from.value = 'kg'; to.value = 'g'; }
+    else if (category.value === 'area') { from.value = 'm2'; to.value = 'cm2'; }
+    else if (category.value === 'volume') { from.value = 'L'; to.value = 'mL'; }
+    else if (category.value === 'time') { from.value = 'h'; to.value = 'min'; }
+    else if (category.value === 'speed') { from.value = 'km/h'; to.value = 'm/s'; }
+    else if (category.value === 'money_fun') { from.value = 'JPY'; to.value = 'umaibo'; }
+    else { from.value = 'C'; to.value = 'F'; }
+    update();
+  }
+  category.addEventListener('change', resetCategory);
+  [input, from, to].forEach(el => el.addEventListener('input', update));
+  [from, to].forEach(el => el.addEventListener('change', update));
+  document.getElementById('unitSwap').addEventListener('click', () => {
+    const previous = from.value;
+    from.value = to.value;
+    to.value = previous;
+    update();
+  });
+  resetCategory();
+
+  const calculatorIcon = document.getElementById('calculatorIcon');
+  function syncCalculatorIcon() {
+    calculatorIcon.src = document.body.classList.contains('dark')
+      ? "{{ url_for('static', filename='icons/dark/calculator.png') }}"
+      : "{{ url_for('static', filename='icons/light/calculator.png') }}";
+  }
+  syncCalculatorIcon();
+  new MutationObserver(syncCalculatorIcon).observe(document.body, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
+})();
+</script>
+{% endblock %}

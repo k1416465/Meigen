@@ -176,6 +176,50 @@
       }
     })();
   </script>
+  <!-- 運行情報ページ読み込み中のオーバーレイ -->
+  <div id="operationLoadingOverlay" class="operation-loading-overlay" aria-hidden="true" role="status" aria-live="polite">
+    <div class="operation-loading-content">
+      <span class="operation-loading-spinner" aria-hidden="true"></span>
+      <p class="operation-loading-title">運行情報を読み込んでいます</p>
+      <p class="operation-loading-caption">しばらくお待ちください…</p>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const overlay = document.getElementById('operationLoadingOverlay');
+      if (!overlay) return;
+
+      const operationPath = new URL("{{ url_for('operation_page') }}", location.href).pathname;
+      let showing = false;
+
+      function showOperationLoading() {
+        if (showing) return;
+        showing = true;
+        overlay.classList.add('is-visible');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('operation-loading-active');
+      }
+
+      document.addEventListener('click', (event) => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link = event.target.closest('a[href]');
+        if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+        let destination;
+        try { destination = new URL(link.href, location.href); } catch (_) { return; }
+        if (destination.origin !== location.origin || destination.pathname !== operationPath) return;
+        showOperationLoading();
+      }, true);
+
+      // ブラウザの戻る操作でページが復元された場合に表示を解除
+      window.addEventListener('pageshow', () => {
+        showing = false;
+        overlay.classList.remove('is-visible');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('operation-loading-active');
+      });
+    })();
+  </script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

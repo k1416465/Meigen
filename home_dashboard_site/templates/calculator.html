@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}電卓｜迷言{% endblock %}
+
+{% block content %}
+<section class="welcome-row calculator-heading">
+  <div>
+    <h1>電卓</h1>
+    <p class="calculator-subtitle">シンプルな計算電卓</p>
+  </div>
+</section>
+
+<section class="calculator-shell" aria-label="電卓">
+  <div class="calculator-display" aria-live="polite">
+    <div id="calculatorExpression" class="calculator-expression"></div>
+    <output id="calculatorResult" class="calculator-result">0</output>
+  </div>
+  <div class="calculator-keys" id="calculatorKeys">
+    <button type="button" class="calc-key calc-function" data-action="clear">AC</button>
+    <button type="button" class="calc-key calc-function" data-action="backspace" aria-label="1文字削除">⌫</button>
+    <button type="button" class="calc-key calc-function" data-value="%">%</button>
+    <button type="button" class="calc-key calc-operator" data-value="÷">÷</button>
+
+    <button type="button" class="calc-key" data-value="7">7</button>
+    <button type="button" class="calc-key" data-value="8">8</button>
+    <button type="button" class="calc-key" data-value="9">9</button>
+    <button type="button" class="calc-key calc-operator" data-value="×">×</button>
+
+    <button type="button" class="calc-key" data-value="4">4</button>
+    <button type="button" class="calc-key" data-value="5">5</button>
+    <button type="button" class="calc-key" data-value="6">6</button>
+    <button type="button" class="calc-key calc-operator" data-value="−">−</button>
+
+    <button type="button" class="calc-key" data-value="1">1</button>
+    <button type="button" class="calc-key" data-value="2">2</button>
+    <button type="button" class="calc-key" data-value="3">3</button>
+    <button type="button" class="calc-key calc-operator" data-value="+">+</button>
+
+    <button type="button" class="calc-key calc-function" data-action="sign">+/−</button>
+    <button type="button" class="calc-key" data-value="0">0</button>
+    <button type="button" class="calc-key" data-value=".">.</button>
+    <button type="button" class="calc-key calc-equals" data-action="equals">=</button>
+  </div>
+</section>
+
+<a class="unit-converter-fab" href="{{ url_for('unit_converter_page') }}" aria-label="単位変換へ">
+  <img id="unitConverterIcon" src="{{ url_for('static', filename='icons/light/unit-converter.png') }}" alt="">
+  <span>単位変換</span>
+</a>
+
+<script>
+(() => {
+  const expressionEl = document.getElementById('calculatorExpression');
+  const resultEl = document.getElementById('calculatorResult');
+  const keys = document.getElementById('calculatorKeys');
+  let expression = '';
+  let justCalculated = false;
+
+  function tokenize(source) {
+    const normalized = source.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+    const tokens = normalized.match(/(?:\d+\.?\d*|\.\d+)|[+\-*/()%]/g) || [];
+    if (tokens.join('') !== normalized.replace(/\s/g, '')) throw new Error('invalid');
+    return tokens;
+  }
+  function calculate(source) {
+    const tokens = tokenize(source);
+    let pos = 0;
+    function primary() {
+      const token = tokens[pos++];
+      if (token === '+' || token === '-') {
+        const value = primary();
+        return token === '-' ? -value : value;
+      }
+      if (token === '(') {
+        const value = addSub();
+        if (tokens[pos++] !== ')') throw new Error('括弧');
+        return value;
+      }
+      if (token === undefined || !/^\d*\.?\d+$/.test(token)) throw new Error('数値');
+      return Number(token);
+    }
+    function percent() {
+      let value = primary();
+      while (tokens[pos] === '%') { pos++; value /= 100; }
+      return value;
+    }
+    function mulDiv() {
+      let value = percent();
+      while (tokens[pos] === '*' || tokens[pos] === '/') {
+        const op = tokens[pos++];
+        const right = percent();
+        value = op === '*' ? value * right : value / right;
+      }
+      return value;
+    }
+    function addSub() {
+      let value = mulDiv();
+      while (tokens[pos] === '+' || tokens[pos] === '-') {
+        const op = tokens[pos++];
+        const right = mulDiv();
+        value = op === '+' ? value + right : value - right;
+      }
+      return value;
+    }
+    if (!tokens.length) return 0;
+    const value = addSub();
+    if (pos !== tokens.length || !Number.isFinite(value)) throw new Error('計算できません');
+    return value;
+  }
+  function format(value) {
+    if (!Number.isFinite(value)) return 'エラー';
+    return Number(value.toPrecision(12)).toLocaleString('ja-JP', {maximumFractionDigits: 10});
+  }
+  function update() {
+    expressionEl.textContent = expression;
+    if (!expression) { resultEl.textContent = '0'; return; }
+    try { resultEl.textContent = format(calculate(expression)); }
+    catch (_) { resultEl.textContent = ' '; }
+  }
+  function append(value) {
+    if (justCalculated && /[0-9.]/.test(value)) expression = '';
+    justCalculated = false;
+    if (/[+−×÷]/.test(value) && /[+−×÷]$/.test(expression)) expression = expression.slice(0, -1);
+    expression += value;
+    update();
+  }
+  function equals() {
+    try {
+      const value = calculate(expression);
+      expressionEl.textContent = expression + ' =';
+      resultEl.textContent = format(value);
+      expression = String(Number(value.toPrecision(12)));
+      justCalculated = true;
+    } catch (_) { resultEl.textContent = 'エラー'; }
+  }
+  keys.addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    const action = button.dataset.action;
+    if (action === 'clear') { expression = ''; justCalculated = false; update(); }
+    else if (action === 'backspace') { expression = expression.slice(0, -1); justCalculated = false; update(); }
+    else if (action === 'sign') {
+      if (!expression) expression = '-';
+      else if (/\d+(?:\.\d*)?$/.test(expression)) {
+        const match = expression.match(/\d+(?:\.\d*)?$/)[0];
+        const start = expression.length - match.length;
+        expression = expression.slice(0, start) + (expression[start - 1] === '-' && (start === 1 || /[+−×÷(]/.test(expression[start - 2])) ? match : '-' + match);
+      }
+      update();
+    }
+    else if (action === 'equals') equals();
+    else if (button.dataset.value) append(button.dataset.value);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (/^[0-9.]$/.test(event.key)) append(event.key);
+    else if (event.key === '+') append('+');
+    else if (event.key === '-') append('−');
+    else if (event.key === '*') append('×');
+    else if (event.key === '/') { event.preventDefault(); append('÷'); }
+    else if (event.key === 'Enter' || event.key === '=') { event.preventDefault(); equals(); }
+    else if (event.key === 'Backspace') { expression = expression.slice(0, -1); update(); }
+    else if (event.key === 'Escape') { expression = ''; update(); }
+    else if (event.key === '%') append('%');
+  });
+  const icon = document.getElementById('unitConverterIcon');
+  function syncIcon() {
+    icon.src = document.body.classList.contains('dark')
+      ? "{{ url_for('static', filename='icons/dark/unit-converter.png') }}"
+      : "{{ url_for('static', filename='icons/light/unit-converter.png') }}";
+  }
+  syncIcon();
+  new MutationObserver(syncIcon).observe(document.body, {attributes: true, attributeFilter: ['class']});
+})();
+</script>
+{% endblock %}
