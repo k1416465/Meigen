@@ -5582,3 +5582,63 @@ body.dark .operation-loading-overlay {
         font-weight: 400 !important;
     }
 }
+
+
+/* 設定画面：説明文の横幅を＋／－ボタンの直前で止める最終調整 */
+@media (max-width: 600px) {
+    .setting-accordion > summary {
+        position: relative !important;
+        display: block !important;
+        box-sizing: border-box !important;
+        padding: 13px 68px 13px 14px !important;
+        min-height: 0 !important;
+    }
+
+    .setting-accordion > summary .setting-heading {
+        display: block !important;
+        box-sizing: border-box !important;
+        width: calc(100% - 0px) !important;
+        max-width: 100% !important;
+        margin: 0 0 6px 0 !important;
+        font-size: 17px !important;
+        line-height: 1.45 !important;
+        font-weight: 700 !important;
+    }
+
+    .setting-accordion > summary .setting-description {
+        display: block !important;
+        box-sizing: border-box !important;
+        /* summary右側のボタン領域と重ならないよう、説明文自体の幅を制限 */
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.6 !important;
+        white-space: normal !important;
+        overflow-wrap: break-word !important;
+        word-break: normal !important;
+    }
+
+    .setting-accordion > summary::after {
+        content: "+" !important;
+        position: absolute !important;
+        top: 50% !important;
+        right: 12px !important;
+        transform: translateY(-50%) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        width: 46px !important;
+        height: 46px !important;
+        font-size: 38px !important;
+        line-height: 1 !important;
+        font-weight: 400 !important;
+        z-index: 2 !important;
+    }
+
+    .setting-accordion[open] > summary::after {
+        content: "−" !important;
+    }
+}
