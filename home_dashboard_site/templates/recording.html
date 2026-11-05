@@ -38,6 +38,42 @@
   </div>
 </section>
 
+
+<style>
+@media (max-width: 600px) {
+  .recording-list-section .section-heading {
+    align-items: flex-start;
+  }
+
+  .recording-list-section .section-heading > div:first-child {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .recording-list-section .section-heading h2 {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .recording-list-section .recording-count {
+    display: inline-block;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .recording-list-section .recording-search-status {
+    display: block;
+    margin: 6px 0 0;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+}
+</style>
+
 <section class="recording-list-section">
   <div class="section-heading">
     <div>
@@ -45,7 +81,9 @@
       {% if query %}<p class="recording-search-status">検索中: {{ query }}</p>{% endif %}
     </div>
     <div class="recording-list-actions">
+      {% if not query %}
       <a class="recording-download-all" href="{{ url_for('download_all_recordings') }}">すべてダウンロード（ZIP）</a>
+      {% endif %}
       <div class="recording-sort-wrap">
         <button type="button" class="recording-sort-button" id="recording-sort-toggle" aria-expanded="false" aria-controls="recording-sort-options" onclick="toggleRecordingSortOptions()">並び替え <span aria-hidden="true">▾</span></button>
         <div class="recording-sort-options" id="recording-sort-options" hidden>
