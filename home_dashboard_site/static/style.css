@@ -5345,3 +5345,131 @@ body.dark .operation-loading-overlay {
     .operation-loading-overlay { transition: none; }
     .operation-loading-spinner { animation-duration: 1.8s; }
 }
+
+
+/* ==================================
+   電卓・単位変換：スマートフォン配置調整
+================================== */
+
+/* 両ページの見出し位置・左揃えを統一 */
+@media (max-width: 600px) {
+    .page:has(.calculator-heading) .calculator-heading {
+        width: 100%;
+        align-items: flex-start;
+        justify-content: flex-start;
+        text-align: left;
+        margin: 0 0 22px;
+        flex: 0 0 auto;
+    }
+
+    .page:has(.calculator-heading) .calculator-heading > div {
+        width: 100%;
+        text-align: left;
+    }
+
+    .page:has(.calculator-heading) .calculator-heading h1 {
+        width: 100%;
+        margin: 0;
+        text-align: left;
+    }
+
+    .page:has(.calculator-heading) .calculator-subtitle {
+        text-align: left;
+    }
+}
+
+/* 電卓ページのみ、スマートフォンでは画面内に固定してスクロールを禁止 */
+@media (max-width: 600px) {
+    html.calculator-page-mode,
+    html.calculator-page-mode body {
+        height: 100%;
+        min-height: 0;
+        overflow: hidden !important;
+        overscroll-behavior: none;
+    }
+
+    html.calculator-page-mode body {
+        box-sizing: border-box;
+        padding-bottom: 0 !important;
+    }
+
+    html.calculator-page-mode body .page:has(.calculator-heading) {
+        height: calc(100dvh - 62px - 82px - env(safe-area-inset-bottom, 0px));
+        min-height: 0;
+        max-height: calc(100dvh - 62px - 82px - env(safe-area-inset-bottom, 0px));
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        padding: 14px 15px 10px;
+    }
+
+    html.calculator-page-mode .calculator-heading {
+        margin-bottom: 12px !important;
+    }
+
+    html.calculator-page-mode .calculator-shell {
+        width: 100%;
+        max-width: 460px;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        padding: clamp(9px, 2.5vw, 13px);
+        box-sizing: border-box;
+    }
+
+    html.calculator-page-mode .calculator-display {
+        flex: 1 1 0;
+        min-height: 54px;
+        padding: 6px 8px 10px;
+    }
+
+    html.calculator-page-mode .calculator-keys {
+        flex: 0 0 auto;
+        grid-template-rows: repeat(5, minmax(0, 1fr));
+        gap: clamp(5px, 1.5vw, 9px);
+        min-height: 0;
+    }
+
+    html.calculator-page-mode .calc-key {
+        height: 100%;
+        min-height: 0;
+        padding: 0;
+        font-size: clamp(18px, 5.8vw, 23px);
+    }
+
+    html.calculator-page-mode .unit-converter-fab {
+        right: 16px;
+        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+/* 画面高が小さい端末ではキーをさらにコンパクトに */
+@media (max-width: 600px) and (max-height: 740px) {
+    html.calculator-page-mode body .page:has(.calculator-heading) {
+        padding-top: 8px;
+    }
+
+    html.calculator-page-mode .calculator-heading {
+        margin-bottom: 7px !important;
+    }
+
+    html.calculator-page-mode .calculator-subtitle {
+        font-size: 11px;
+    }
+
+    html.calculator-page-mode .calculator-display {
+        min-height: 42px;
+        padding-bottom: 5px;
+    }
+
+    html.calculator-page-mode .calculator-shell {
+        padding: 8px;
+    }
+
+    html.calculator-page-mode .calculator-keys {
+        gap: 5px;
+    }
+}
