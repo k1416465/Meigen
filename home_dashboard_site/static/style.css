@@ -5281,7 +5281,10 @@ html body .page-container.operation-page .station-selector .station-grid.station
 @media (max-width: 600px) {
     .calculator-shell { margin-top: 18px; padding: 13px; }
     .calc-key { min-height: 62px; border-radius: 14px; }
-    .unit-converter-fab, .calculator-fab { right: 16px; bottom: calc(98px + env(safe-area-inset-bottom, 0px)); }
+    .unit-converter-fab, .calculator-fab {
+        right: 16px;
+        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    }
     .unit-converter-panel { padding: 16px; }
     .unit-conversion-grid { grid-template-columns: minmax(0, 1fr) 38px minmax(0, 1fr); gap: 7px; }
     .unit-swap-button { width: 36px; height: 36px; font-size: 19px; }
@@ -5401,7 +5404,8 @@ body.dark .operation-loading-overlay {
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
-        padding: 14px 15px 10px;
+        /* 右下の単位変換ボタンと重ならないよう、下部に操作ボタン分の空白を確保 */
+        padding: 14px 15px 76px;
     }
 
     html.calculator-page-mode .calculator-heading {
@@ -5442,10 +5446,6 @@ body.dark .operation-loading-overlay {
         font-size: clamp(18px, 5.8vw, 23px);
     }
 
-    html.calculator-page-mode .unit-converter-fab {
-        right: 16px;
-        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
-    }
 }
 
 /* 画面高が小さい端末ではキーをさらにコンパクトに */
