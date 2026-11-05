@@ -5530,3 +5530,55 @@ body.dark .operation-loading-overlay {
         font-weight: 400 !important;
     }
 }
+
+
+/* 設定画面：説明文を＋／－の手前で折り返し、記号をカードの縦中央に配置 */
+@media (max-width: 600px) {
+    .settings-form .setting-accordion > summary {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 6px !important;
+        min-height: 0 !important;
+        /* 右側を記号専用の余白にすることで、説明文がその手前で折り返す */
+        padding: 13px 62px 13px 14px !important;
+        line-height: 1.45 !important;
+    }
+
+    .settings-form .setting-accordion > summary .setting-heading {
+        display: block !important;
+        width: 100% !important;
+        font-size: 17px !important;
+        line-height: 1.45 !important;
+        font-weight: 700 !important;
+    }
+
+    .settings-form .setting-accordion > summary .setting-description {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.6 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+        word-break: normal !important;
+    }
+
+    .settings-form .setting-accordion > summary::after {
+        position: absolute !important;
+        top: 50% !important;
+        right: 13px !important;
+        transform: translateY(-50%) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 30px !important;
+        line-height: 1 !important;
+        font-weight: 400 !important;
+    }
+}
