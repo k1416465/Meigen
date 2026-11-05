@@ -5043,7 +5043,7 @@ html body .page-container.operation-page .station-selector .station-grid.station
 }
 .setting-accordion > summary::after {
   right: 16px;
-  color: #2563eb;
+  color: #077AE3;
 }
 @media (min-width: 601px) {
   .settings-form .setting-accordion > summary {
@@ -5079,7 +5079,7 @@ html body .page-container.operation-page .station-selector .station-grid.station
     font-size: 30px;
     line-height: 1;
     font-weight: 400;
-    color: #2563eb;
+    color: #077AE3;
   }
 
   .settings-form .setting-accordion[open] > summary::after {
@@ -5767,7 +5767,7 @@ body.dark .operation-loading-overlay {
         height: 48px !important;
         min-width: 48px !important;
         box-sizing: border-box !important;
-        color: #2563eb !important;
+        color: #077AE3 !important;
         font-size: 34px !important;
         font-weight: 400 !important;
         line-height: 1 !important;
@@ -5786,6 +5786,6 @@ body.dark .operation-loading-overlay {
 
 /* 設定画面：各項目を囲むカードの角をより丸くする */
 .settings-form > .setting-accordion {
-    border-radius: 22px !important;
+    border-radius: 18px !important;
     overflow: hidden !important;
 }
