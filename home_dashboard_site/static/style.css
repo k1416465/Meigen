@@ -5642,3 +5642,59 @@ body.dark .operation-loading-overlay {
         content: "−" !important;
     }
 }
+
+
+/* スマホ版設定画面：説明文を＋／－記号の手前で折り返し、記号を拡大 */
+@media (max-width: 600px) {
+    .settings-form .setting-accordion > summary {
+        position: relative !important;
+        display: block !important;
+        box-sizing: border-box !important;
+        padding: 13px 82px 13px 14px !important;
+        min-height: 0 !important;
+    }
+
+    .settings-form .setting-accordion > summary .setting-heading {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 0 6px !important;
+        line-height: 1.45 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* 記号側に十分な空間を残し、説明文をその手前で自動改行 */
+    .settings-form .setting-accordion > summary .setting-description {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+        word-break: normal !important;
+        line-height: 1.65 !important;
+    }
+
+    /* ＋／－記号を大きくし、説明文と重ならない右側の専用領域に配置 */
+    .settings-form .setting-accordion > summary::after {
+        position: absolute !important;
+        top: 50% !important;
+        right: 12px !important;
+        transform: translateY(-50%) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 46px !important;
+        line-height: 1 !important;
+        font-weight: 400 !important;
+        z-index: 2 !important;
+    }
+
+    .settings-form .setting-accordion[open] > summary::after {
+        content: "−" !important;
+    }
+}
