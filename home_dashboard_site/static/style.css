@@ -5786,6 +5786,6 @@ body.dark .operation-loading-overlay {
 
 /* 設定画面：各項目を囲むカードの角をより丸くする */
 .settings-form > .setting-accordion {
-    border-radius: 18px !important;
+    border-radius: 12px !important;
     overflow: hidden !important;
 }
