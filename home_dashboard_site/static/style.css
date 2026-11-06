@@ -4808,16 +4808,6 @@ html body.dark .operation-page .station-selector .station-grid.station-grid-larg
 
 /* スタンプ一覧：スマートフォンは3列、見出しは改行しない */
 @media (max-width: 620px) {
-  .stamp-list-section .section-heading {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 9px;
-  }
-  .stamp-list-section .section-heading > div:first-child {
-    min-width: 0;
-    width: 100%;
-  }
   .stamp-list-section .section-heading h2 {
     white-space: nowrap;
     font-size: 18px;
