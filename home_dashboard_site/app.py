@@ -2368,15 +2368,6 @@ def calculator_page():
     )
 
 
-@app.route("/calculator/history")
-def calculator_history_page():
-    return render_template(
-        "calculator_history.html",
-        weather_place=selected_weather_place(),
-        railway_label=ROUTE_OPTIONS[selected_route()],
-    )
-
-
 @app.route("/unit-converter")
 def unit_converter_page():
     return render_template(
