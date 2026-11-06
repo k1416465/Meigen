@@ -1,119 +1,52 @@
 {% extends "base.html" %}
 {% block title %}迷言｜その他{% endblock %}
-
 {% block content %}
 <section class="welcome-row">
-  <div>
-    <h1>その他</h1>
-  </div>
+  <div><h1>その他</h1></div>
 </section>
-
-
-<!-- ==================================
-     5つのツール
-================================== -->
-
 <section class="more-tools-section">
-
   <div class="more-tools-grid">
-
-    <!-- 名簿 -->
-    <a
-      class="card more-tool-card"
-      href="{{ url_for('roster_page') }}"
-    >
-      <img
-        class="more-tool-icon custom-icon"
-        src="{{ url_for('static', filename='icons/dark/roster.png') }}"
-        alt=""
-      >
-      <strong>名簿</strong>
-      <span class="more-tool-description">
-        2学年の名簿
-      </span>
+    {% set icon_theme = 'light' if appearance == 'light' else 'dark' %}
+    <a class="card more-tool-card" href="{{ url_for('roster_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/roster.png') }}" alt="">
+      <strong>名簿</strong><span class="more-tool-description">2学年の名簿</span>
     </a>
-
-
-    <!-- 録音 -->
-    <a
-      class="card more-tool-card"
-      href="{{ url_for('recording_page') }}"
-    >
-      <img
-        class="more-tool-icon custom-icon"
-        src="{{ url_for('static', filename='icons/dark/recording.png') }}"
-        alt=""
-      >
-      <strong>録音</strong>
-      <span class="more-tool-description">
-        迷言の録音
-      </span>
+    <a class="card more-tool-card" href="{{ url_for('recording_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/recording.png') }}" alt="">
+      <strong>録音</strong><span class="more-tool-description">迷言の録音</span>
     </a>
-
-
-    <!-- スタンプ -->
-    <a
-      class="card more-tool-card"
-      href="{{ url_for('stamp_page') }}"
-    >
-      <img
-        class="more-tool-icon custom-icon"
-        src="{{ url_for('static', filename='icons/dark/stamp.png') }}"
-        alt=""
-      >
-      <strong>スタンプ</strong>
-      <span class="more-tool-description">
-        迷言集スタンプ
-      </span>
+    <a class="card more-tool-card" href="{{ url_for('stamp_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/stamp.png') }}" alt="">
+      <strong>スタンプ</strong><span class="more-tool-description">迷言集スタンプ</span>
     </a>
-
-
-    <!-- 動画 -->
-    <a
-      class="card more-tool-card"
-      href="{{ url_for('video_page') }}"
-    >
-      <img
-        class="more-tool-icon custom-icon"
-        src="{{ url_for('static', filename='icons/dark/video.png') }}"
-        alt=""
-      >
-      <strong>動画</strong>
-      <span class="more-tool-description">
-        迷言公式YouTube
-      </span>
+    <a class="card more-tool-card" href="{{ url_for('video_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/video.png') }}" alt="">
+      <strong>動画</strong><span class="more-tool-description">迷言公式YouTube</span>
     </a>
-
-
-    <!-- クイズ -->
     <a class="card more-tool-card" href="{{ url_for('quiz_page') }}">
-      <img
-        class="more-tool-icon custom-icon"
-        src="{{ url_for('static', filename='icons/dark/quiz.png') }}"
-        alt=""
-      >
-      <strong>クイズ</strong>
-      <span class="more-tool-description">古文単語クイズ</span>
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/quiz.png') }}" alt="">
+      <strong>クイズ</strong><span class="more-tool-description">古文単語クイズ</span>
     </a>
-
-
-    <!-- 電卓 -->
-    <a
-      class="card more-tool-card"
-      href="{{ url_for('calculator_page') }}"
-    >
-      <img
-        class="more-tool-icon custom-icon"
-        src="{{ url_for('static', filename='icons/dark/calculator.png') }}"
-        alt=""
-      >
-      <strong>電卓</strong>
-      <span class="more-tool-description">
-        電卓・単位変換
-      </span>
+    <a class="card more-tool-card" href="{{ url_for('calculator_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/calculator.png') }}" alt="">
+      <strong>電卓</strong><span class="more-tool-description">電卓・単位変換</span>
     </a>
-
+    <a class="card more-tool-card" href="{{ url_for('map_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/map.png') }}" alt="">
+      <strong>地図</strong><span class="more-tool-description">地図</span>
+    </a>
+    <a class="card more-tool-card" href="{{ url_for('database_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/database.png') }}" alt="">
+      <strong>データベース</strong><span class="more-tool-description">データベース</span>
+    </a>
+    <a class="card more-tool-card" href="{{ url_for('range_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/range.png') }}" alt="">
+      <strong>範囲表</strong><span class="more-tool-description">範囲表</span>
+    </a>
+    <a class="card more-tool-card" href="{{ url_for('line_page') }}">
+      <img class="more-tool-icon custom-icon" src="{{ url_for('static', filename='icons/' ~ icon_theme ~ '/line.png') }}" alt="">
+      <strong>LINE</strong><span class="more-tool-description">LINE</span>
+    </a>
   </div>
 </section>
-
 {% endblock %}
