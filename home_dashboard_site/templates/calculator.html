@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block title %}電卓｜迷言{% endblock %}
 
@@ -5,21 +6,18 @@
 <script>document.documentElement.classList.add("calculator-page-mode");</script>
 
 <style>
-/* 電卓ページのタッチ操作 */
 .calculator-page-mode .calculator-shell,
 .calculator-page-mode .calculator-keys,
 .calculator-page-mode .calc-key {
   touch-action: manipulation;
 }
 
-/* ボタンの連続タップ時の誤操作を防止 */
 .calculator-page-mode .calc-key {
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
 }
 
-/* 削除アイコン */
 .calc-key svg {
   width: 25px;
   height: 25px;
@@ -31,12 +29,162 @@
   pointer-events: none;
   vertical-align: middle;
 }
+
+/* タイトル行 */
+.calculator-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calculator-heading > div:first-child {
+  min-width: 0;
+}
+
+.calculator-history-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  color: var(--text-color, inherit);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.calculator-history-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* 履歴一覧 */
+.calculator-history-panel {
+  margin: 0 0 18px;
+  padding: 16px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 14px;
+  background: var(--card-bg, #fff);
+}
+
+.calculator-history-panel[hidden] {
+  display: none;
+}
+
+.calculator-history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.calculator-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.calculator-history-item {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.calculator-history-item:active {
+  opacity: 0.7;
+}
+
+.calculator-history-date {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: var(--muted-color, #888);
+}
+
+.calculator-history-expression {
+  display: block;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.calculator-history-result {
+  display: block;
+  margin-top: 5px;
+  font-size: 20px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.calculator-history-empty {
+  padding: 20px 8px;
+  color: var(--muted-color, #888);
+  text-align: center;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .calculator-history-button {
+    padding: 9px 12px;
+  }
+
+  .calculator-history-panel {
+    padding: 12px;
+  }
+}
 </style>
 
 <section class="welcome-row calculator-heading">
   <div>
     <h1>電卓</h1>
     <p class="calculator-subtitle">シンプルな計算電卓</p>
+  </div>
+
+  <button
+    type="button"
+    class="calculator-history-button"
+    id="calculatorHistoryToggle"
+    aria-expanded="false"
+    aria-controls="calculatorHistoryPanel"
+  >
+    <svg viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round"
+         aria-hidden="true">
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+      <path d="M3 3v5h5"/>
+      <path d="M12 7v5l3 2"/>
+    </svg>
+    履歴
+  </button>
+</section>
+
+<!-- 計算履歴 -->
+<section
+  class="calculator-history-panel"
+  id="calculatorHistoryPanel"
+  hidden
+>
+  <div class="calculator-history-heading">
+    <span>計算履歴</span>
+  </div>
+
+  <div class="calculator-history-list" id="calculatorHistoryList">
   </div>
 </section>
 
@@ -47,7 +195,9 @@
   </div>
 
   <div class="calculator-keys" id="calculatorKeys">
-    <button type="button" class="calc-key calc-function" data-action="clear">AC</button>
+
+    <button type="button" class="calc-key calc-function"
+            data-action="clear">AC</button>
 
     <button type="button" class="calc-key calc-function"
             data-action="backspace" aria-label="1文字削除">
@@ -57,32 +207,41 @@
       </svg>
     </button>
 
-    <button type="button" class="calc-key calc-function" data-value="%">%</button>
-    <button type="button" class="calc-key calc-operator" data-value="÷">÷</button>
+    <button type="button" class="calc-key calc-function"
+            data-value="%">%</button>
+    <button type="button" class="calc-key calc-operator"
+            data-value="÷">÷</button>
 
     <button type="button" class="calc-key" data-value="7">7</button>
     <button type="button" class="calc-key" data-value="8">8</button>
     <button type="button" class="calc-key" data-value="9">9</button>
-    <button type="button" class="calc-key calc-operator" data-value="×">×</button>
+    <button type="button" class="calc-key calc-operator"
+            data-value="×">×</button>
 
     <button type="button" class="calc-key" data-value="4">4</button>
     <button type="button" class="calc-key" data-value="5">5</button>
     <button type="button" class="calc-key" data-value="6">6</button>
-    <button type="button" class="calc-key calc-operator" data-value="−">−</button>
+    <button type="button" class="calc-key calc-operator"
+            data-value="−">−</button>
 
     <button type="button" class="calc-key" data-value="1">1</button>
     <button type="button" class="calc-key" data-value="2">2</button>
     <button type="button" class="calc-key" data-value="3">3</button>
-    <button type="button" class="calc-key calc-operator" data-value="+">+</button>
+    <button type="button" class="calc-key calc-operator"
+            data-value="+">+</button>
 
-    <button type="button" class="calc-key calc-function" data-action="sign">+/−</button>
+    <button type="button" class="calc-key calc-function"
+            data-action="sign">+/−</button>
     <button type="button" class="calc-key" data-value="0">0</button>
     <button type="button" class="calc-key" data-value=".">.</button>
-    <button type="button" class="calc-key calc-equals" data-action="equals">=</button>
+    <button type="button" class="calc-key calc-equals"
+            data-action="equals">=</button>
   </div>
 </section>
 
-<a class="unit-converter-fab" href="{{ url_for('unit_converter_page') }}" aria-label="単位変換へ">
+<a class="unit-converter-fab"
+   href="{{ url_for('unit_converter_page') }}"
+   aria-label="単位変換へ">
   <img id="unitConverterIcon"
        src="{{ url_for('static', filename='icons/light/unit-converter.png') }}"
        alt="">
@@ -95,8 +254,145 @@
   const resultEl = document.getElementById('calculatorResult');
   const keys = document.getElementById('calculatorKeys');
 
+  const historyToggle = document.getElementById('calculatorHistoryToggle');
+  const historyPanel = document.getElementById('calculatorHistoryPanel');
+  const historyList = document.getElementById('calculatorHistoryList');
+
+  const HISTORY_KEY = 'myHomeCalculatorHistory';
+  const MAX_HISTORY = 100;
+
   let expression = '';
   let justCalculated = false;
+
+  // -------------------------
+  // 履歴の読み込み・保存
+  // -------------------------
+
+  function loadHistory() {
+    try {
+      const data = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      return Array.isArray(data) ? data : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveHistory(history) {
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch (error) {
+      console.error('履歴を保存できませんでした', error);
+    }
+  }
+
+  // 日付を YYYY/MM/DD HH:mm 形式にする
+  function formatDate(timestamp) {
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+
+    return `${year}/${month}/${day} ${hour}:${minute}`;
+  }
+
+  // 履歴に追加
+  function addHistory(originalExpression, value) {
+    const history = loadHistory();
+
+    history.unshift({
+      expression: originalExpression,
+      result: String(Number(value.toPrecision(12))),
+      date: Date.now()
+    });
+
+    saveHistory(history.slice(0, MAX_HISTORY));
+
+    renderHistory();
+  }
+
+  // 履歴を画面に表示
+  function renderHistory() {
+    const history = loadHistory();
+
+    historyList.replaceChildren();
+
+    if (history.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'calculator-history-empty';
+      empty.textContent = 'まだ計算履歴がありません';
+      historyList.appendChild(empty);
+      return;
+    }
+
+    // 新しい履歴から順番に表示
+    history.forEach((item, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'calculator-history-item';
+      button.dataset.historyIndex = index;
+
+      const date = document.createElement('span');
+      date.className = 'calculator-history-date';
+      date.textContent = formatDate(item.date);
+
+      const formula = document.createElement('span');
+      formula.className = 'calculator-history-expression';
+      formula.textContent = item.expression + ' =';
+
+      const result = document.createElement('span');
+      result.className = 'calculator-history-result';
+      result.textContent = format(Number(item.result));
+
+      button.append(date, formula, result);
+
+      historyList.appendChild(button);
+    });
+  }
+
+  // 履歴ボタン
+  historyToggle.addEventListener('click', () => {
+    const opening = historyPanel.hidden;
+
+    historyPanel.hidden = !opening;
+    historyToggle.setAttribute('aria-expanded', String(opening));
+
+    if (opening) {
+      renderHistory();
+    }
+  });
+
+  // 履歴を選択して結果を電卓に戻す
+  historyList.addEventListener('click', (event) => {
+    const button = event.target.closest('.calculator-history-item');
+    if (!button) return;
+
+    const index = Number(button.dataset.historyIndex);
+    const history = loadHistory();
+    const item = history[index];
+
+    if (!item) return;
+
+    expression = item.result;
+    justCalculated = false;
+
+    update();
+
+    historyPanel.hidden = true;
+    historyToggle.setAttribute('aria-expanded', 'false');
+
+    // 電卓の表示位置へ戻す
+    expressionEl.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest'
+    });
+  });
+
+  // -------------------------
+  // 計算処理
+  // -------------------------
 
   function tokenize(source) {
     const normalized = source
@@ -127,7 +423,11 @@
 
       if (token === '(') {
         const value = addSub();
-        if (tokens[pos++] !== ')') throw new Error('括弧');
+
+        if (tokens[pos++] !== ')') {
+          throw new Error('括弧');
+        }
+
         return value;
       }
 
@@ -221,16 +521,24 @@
     update();
   }
 
-  // ＝ボタン
+  // -------------------------
+  // イコール
+  // -------------------------
+
   function equals() {
-    if (!expression) return;
+    if (!expression || justCalculated) return;
 
     try {
+      const originalExpression = expression;
       const value = calculate(expression);
 
-      expressionEl.textContent = expression + ' =';
+      expressionEl.textContent = originalExpression + ' =';
       resultEl.textContent = format(value);
 
+      // 履歴に保存
+      addHistory(originalExpression, value);
+
+      // 次の計算に使えるようにする
       expression = String(Number(value.toPrecision(12)));
       justCalculated = true;
 
@@ -239,7 +547,10 @@
     }
   }
 
+  // -------------------------
   // 電卓ボタン
+  // -------------------------
+
   keys.addEventListener('click', (event) => {
     const button = event.target.closest('button');
     if (!button) return;
@@ -293,7 +604,10 @@
     }
   });
 
+  // -------------------------
   // キーボード操作
+  // -------------------------
+
   document.addEventListener('keydown', (event) => {
     if (/^[0-9.]$/.test(event.key)) {
       append(event.key);
@@ -338,7 +652,10 @@
     }
   });
 
-  // 単位変換アイコンのダークモード切り替え
+  // -------------------------
+  // ダークモード対応
+  // -------------------------
+
   const icon = document.getElementById('unitConverterIcon');
 
   function syncIcon() {
@@ -353,6 +670,9 @@
     attributes: true,
     attributeFilter: ['class']
   });
+
+  // 初期表示
+  renderHistory();
 
 })();
 </script>
