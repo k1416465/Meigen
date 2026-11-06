@@ -7,10 +7,39 @@
     <h1>計算履歴</h1>
     <p class="calculator-subtitle">これまでの計算を確認できます</p>
   </div>
-  <a class="calculator-history-button" href="{{ url_for('calculator_page') }}">電卓に戻る</a>
+  <a class="calculator-history-button" href="{{ url_for('calculator_page') }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         aria-hidden="true">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+    電卓に戻る
+  </a>
 </section>
 
 <style>
+.calculator-history-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 10px 16px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  color: var(--text-color, inherit);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.calculator-history-button svg {
+  width: 18px;
+  height: 18px;
+}
 .calculator-history-page {
   margin-bottom: 24px;
   padding: 16px;
