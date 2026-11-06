@@ -281,14 +281,16 @@ SCHOOL_EVENTS = [
     {"date": "2026-11-02", "title": "いじめ・教育相談アンケート", "detail": ""},
     {"date": "2026-11-04", "title": "⑤⑥講演会", "detail": ""},
     {"date": "2026-11-11", "title": "職員会議", "detail": ""},
-    {"date": "2026-11-13", "title": "駅伝大会", "detail": ""},
-    {"date": "2026-11-17", "title": "駅伝大会 予備日", "detail": ""},
+    {"date": "2026-11-13", "title": "旭城駅伝大会", "detail": ""},
+    {"date": "2026-11-17", "title": "旭城駅伝大会 予備日", "detail": ""},
     {"date": "2026-11-24", "title": "2学期期末試験 1日目", "detail": ""},
     {"date": "2026-11-25", "title": "2学期期末試験 2日目", "detail": ""},
     {"date": "2026-11-26", "title": "2学期期末試験 3日目", "detail": ""},
     {"date": "2026-11-27", "title": "2学期期末試験 4日目", "detail": ""},
     {"date": "2026-11-28", "title": "第6回教科主任会", "detail": ""},
+    {"date": "2026-12-01", "title": "いじめ・教育相談アンケート", "detail": ""},
     {"date": "2026-12-04", "title": "第2回授業評価アンケート", "detail": ""},
+    {"date": "2026-12-11", "title": "芸術鑑賞会(大平文化会館)", "detail": ""},
     {"date": "2026-12-12", "title": "土曜講座❹", "detail": ""},
     {"date": "2026-12-16", "title": "第7回教科主任会", "detail": ""},
     {"date": "2026-12-16", "title": "職員会議", "detail": ""},
@@ -2387,6 +2389,15 @@ def video_page():
 def calculator_page():
     return render_template(
         "calculator.html",
+        weather_place=selected_weather_place(),
+        railway_label=ROUTE_OPTIONS[selected_route()],
+    )
+
+
+@app.route("/calculator/history")
+def calculator_history_page():
+    return render_template(
+        "calculator_history.html",
         weather_place=selected_weather_place(),
         railway_label=ROUTE_OPTIONS[selected_route()],
     )
