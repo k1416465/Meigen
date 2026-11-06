@@ -64,34 +64,19 @@
   height: 18px;
 }
 
-/* 履歴一覧 */
-.calculator-history-panel {
-  margin: 0 0 18px;
+/* 履歴一覧ページ */
+.calculator-history-page {
+  margin-bottom: 24px;
   padding: 16px;
   border: 1px solid var(--border-color, #ddd);
   border-radius: 14px;
   background: var(--card-bg, #fff);
 }
 
-.calculator-history-panel[hidden] {
-  display: none;
-}
-
-.calculator-history-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
-  font-weight: 700;
-}
-
-.calculator-history-list {
+.calculator-history-page .calculator-history-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 350px;
-  overflow-y: auto;
 }
 
 .calculator-history-item {
@@ -132,18 +117,44 @@
 }
 
 .calculator-history-empty {
-  padding: 20px 8px;
+  padding: 24px 8px;
   color: var(--muted-color, #888);
   text-align: center;
   font-size: 14px;
 }
 
-@media (max-width: 480px) {
-  .calculator-history-button {
-    padding: 9px 12px;
-  }
+.calculator-history-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
 
-  .calculator-history-panel {
+.calculator-history-actions a,
+.calculator-history-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 13px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 10px;
+  background: var(--card-bg, #fff);
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.calculator-history-clear {
+  color: #d9534f;
+}
+
+@media (max-width: 480px) {
+  .calculator-history-page {
     padding: 12px;
   }
 }
@@ -155,12 +166,9 @@
     <p class="calculator-subtitle">シンプルな計算電卓</p>
   </div>
 
-  <button
-    type="button"
+  <a
     class="calculator-history-button"
-    id="calculatorHistoryToggle"
-    aria-expanded="false"
-    aria-controls="calculatorHistoryPanel"
+    href="{{ url_for('calculator_history_page') }}"
   >
     <svg viewBox="0 0 24 24" fill="none"
          stroke="currentColor" stroke-width="2"
@@ -171,21 +179,7 @@
       <path d="M12 7v5l3 2"/>
     </svg>
     履歴
-  </button>
-</section>
-
-<!-- 計算履歴 -->
-<section
-  class="calculator-history-panel"
-  id="calculatorHistoryPanel"
-  hidden
->
-  <div class="calculator-history-heading">
-    <span>計算履歴</span>
-  </div>
-
-  <div class="calculator-history-list" id="calculatorHistoryList">
-  </div>
+  </a>
 </section>
 
 <section class="calculator-shell" aria-label="電卓">
@@ -254,10 +248,6 @@
   const resultEl = document.getElementById('calculatorResult');
   const keys = document.getElementById('calculatorKeys');
 
-  const historyToggle = document.getElementById('calculatorHistoryToggle');
-  const historyPanel = document.getElementById('calculatorHistoryPanel');
-  const historyList = document.getElementById('calculatorHistoryList');
-
   const HISTORY_KEY = 'myHomeCalculatorHistory';
   const MAX_HISTORY = 100;
 
@@ -309,86 +299,7 @@
     });
 
     saveHistory(history.slice(0, MAX_HISTORY));
-
-    renderHistory();
   }
-
-  // 履歴を画面に表示
-  function renderHistory() {
-    const history = loadHistory();
-
-    historyList.replaceChildren();
-
-    if (history.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'calculator-history-empty';
-      empty.textContent = 'まだ計算履歴がありません';
-      historyList.appendChild(empty);
-      return;
-    }
-
-    // 新しい履歴から順番に表示
-    history.forEach((item, index) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'calculator-history-item';
-      button.dataset.historyIndex = index;
-
-      const date = document.createElement('span');
-      date.className = 'calculator-history-date';
-      date.textContent = formatDate(item.date);
-
-      const formula = document.createElement('span');
-      formula.className = 'calculator-history-expression';
-      formula.textContent = item.expression + ' =';
-
-      const result = document.createElement('span');
-      result.className = 'calculator-history-result';
-      result.textContent = format(Number(item.result));
-
-      button.append(date, formula, result);
-
-      historyList.appendChild(button);
-    });
-  }
-
-  // 履歴ボタン
-  historyToggle.addEventListener('click', () => {
-    const opening = historyPanel.hidden;
-
-    historyPanel.hidden = !opening;
-    historyToggle.setAttribute('aria-expanded', String(opening));
-
-    if (opening) {
-      renderHistory();
-    }
-  });
-
-  // 履歴を選択して結果を電卓に戻す
-  historyList.addEventListener('click', (event) => {
-    const button = event.target.closest('.calculator-history-item');
-    if (!button) return;
-
-    const index = Number(button.dataset.historyIndex);
-    const history = loadHistory();
-    const item = history[index];
-
-    if (!item) return;
-
-    expression = item.result;
-    justCalculated = false;
-
-    update();
-
-    historyPanel.hidden = true;
-    historyToggle.setAttribute('aria-expanded', 'false');
-
-    // 電卓の表示位置へ戻す
-    expressionEl.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest'
-    });
-  });
 
   // -------------------------
   // 計算処理
@@ -671,8 +582,18 @@
     attributeFilter: ['class']
   });
 
-  // 初期表示
-  renderHistory();
+  // 履歴ページから戻ってきた場合、選択した計算結果を電卓に再入力
+  try {
+    const restored = localStorage.getItem('myHomeCalculatorRestore');
+    if (restored !== null) {
+      localStorage.removeItem('myHomeCalculatorRestore');
+      expression = restored;
+      justCalculated = false;
+      update();
+    }
+  } catch (_) {
+    // localStorage が利用できない場合は通常どおり起動
+  }
 
 })();
 </script>

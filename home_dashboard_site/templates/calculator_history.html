@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}計算履歴｜電卓{% endblock %}
+
+{% block content %}
+<section class="welcome-row calculator-heading">
+  <div>
+    <h1>計算履歴</h1>
+    <p class="calculator-subtitle">これまでの計算を確認できます</p>
+  </div>
+  <a class="calculator-history-button" href="{{ url_for('calculator_page') }}">電卓に戻る</a>
+</section>
+
+<style>
+.calculator-history-page {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 14px;
+  background: var(--card-bg, #fff);
+}
+.calculator-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.calculator-history-item {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.calculator-history-item:active { opacity: .7; }
+.calculator-history-date {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted-color, #888);
+  font-size: 12px;
+}
+.calculator-history-expression {
+  display: block;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.calculator-history-result {
+  display: block;
+  margin-top: 5px;
+  font-size: 20px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.calculator-history-empty {
+  padding: 24px 8px;
+  color: var(--muted-color, #888);
+  text-align: center;
+  font-size: 14px;
+}
+.calculator-history-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.calculator-history-clear {
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 10px;
+  background: var(--card-bg, #fff);
+  color: #d9534f;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+@media (max-width: 480px) {
+  .calculator-history-page { padding: 12px; }
+}
+</style>
+
+<section class="calculator-history-page">
+  <div class="calculator-history-actions">
+    <button type="button" class="calculator-history-clear" id="clearCalculatorHistory">履歴をすべて削除</button>
+  </div>
+  <div class="calculator-history-list" id="calculatorHistoryList"></div>
+</section>
+
+<script>
+(() => {
+  const HISTORY_KEY = 'myHomeCalculatorHistory';
+  const RESTORE_KEY = 'myHomeCalculatorRestore';
+  const list = document.getElementById('calculatorHistoryList');
+  const clearButton = document.getElementById('clearCalculatorHistory');
+
+  function loadHistory() {
+    try {
+      const data = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      return Array.isArray(data) ? data : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    return `${year}/${month}/${day} ${hour}:${minute}`;
+  }
+
+  function format(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return String(value);
+    return Number(number.toPrecision(12)).toLocaleString('ja-JP', {
+      maximumFractionDigits: 10
+    });
+  }
+
+  function renderHistory() {
+    const history = loadHistory();
+    list.replaceChildren();
+
+    if (history.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'calculator-history-empty';
+      empty.textContent = 'まだ計算履歴がありません';
+      list.appendChild(empty);
+      return;
+    }
+
+    // 配列は新しい履歴が先頭。上から新しい順に表示する。
+    history.forEach((item) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'calculator-history-item';
+
+      const date = document.createElement('span');
+      date.className = 'calculator-history-date';
+      date.textContent = formatDate(item.date);
+
+      const expression = document.createElement('span');
+      expression.className = 'calculator-history-expression';
+      expression.textContent = `${item.expression} =`;
+
+      const result = document.createElement('span');
+      result.className = 'calculator-history-result';
+      result.textContent = format(item.result);
+
+      button.append(date, expression, result);
+      button.addEventListener('click', () => {
+        try {
+          localStorage.setItem(RESTORE_KEY, String(item.result));
+          location.href = "{{ url_for('calculator_page') }}";
+        } catch (_) {
+          alert('履歴を電卓に戻せませんでした。');
+        }
+      });
+      list.appendChild(button);
+    });
+  }
+
+  clearButton.addEventListener('click', () => {
+    if (!confirm('計算履歴をすべて削除しますか？')) return;
+    localStorage.removeItem(HISTORY_KEY);
+    renderHistory();
+  });
+
+  renderHistory();
+})();
+</script>
+{% endblock %}
