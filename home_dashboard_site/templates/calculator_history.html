@@ -26,10 +26,10 @@
   flex-shrink: 0;
   min-height: 40px;
   padding: 10px 16px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--card-bg, #fff);
-  color: var(--text-color, inherit);
+  background: var(--surface);
+  color: var(--text);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -43,9 +43,9 @@
 .calculator-history-page {
   margin-bottom: 24px;
   padding: 16px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border);
   border-radius: 14px;
-  background: var(--card-bg, #fff);
+  background: var(--surface);
 }
 .calculator-history-list {
   display: flex;
@@ -56,10 +56,10 @@
   display: block;
   width: 100%;
   padding: 12px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: transparent;
-  color: inherit;
+  background: var(--surface-2);
+  color: var(--text);
   text-align: left;
   cursor: pointer;
 }
@@ -67,7 +67,7 @@
 .calculator-history-date {
   display: block;
   margin-bottom: 7px;
-  color: var(--muted-color, #888);
+  color: var(--muted);
   font-size: 12px;
 }
 .calculator-history-expression {
@@ -84,7 +84,7 @@
 }
 .calculator-history-empty {
   padding: 24px 8px;
-  color: var(--muted-color, #888);
+  color: var(--muted);
   text-align: center;
   font-size: 14px;
 }
@@ -96,10 +96,10 @@
 .calculator-history-clear {
   min-height: 38px;
   padding: 7px 12px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: var(--card-bg, #fff);
-  color: #d9534f;
+  background: var(--surface);
+  color: #e36b68;
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -107,6 +107,26 @@
 }
 @media (max-width: 480px) {
   .calculator-history-page { padding: 12px; }
+}
+
+body.dark .calculator-history-button,
+body.dark .calculator-history-page,
+body.dark .calculator-history-clear {
+  border-color: var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+}
+body.dark .calculator-history-item {
+  border-color: var(--border);
+  background-color: var(--surface-2);
+  color: var(--text);
+}
+body.dark .calculator-history-date,
+body.dark .calculator-history-empty {
+  color: var(--muted);
+}
+body.dark .calculator-history-clear {
+  color: #ff8580;
 }
 </style>
 

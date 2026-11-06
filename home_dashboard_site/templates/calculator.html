@@ -49,10 +49,10 @@
   gap: 7px;
   flex-shrink: 0;
   padding: 10px 16px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--card-bg, #fff);
-  color: var(--text-color, inherit);
+  background: var(--surface);
+  color: var(--text);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -68,9 +68,9 @@
 .calculator-history-page {
   margin-bottom: 24px;
   padding: 16px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border);
   border-radius: 14px;
-  background: var(--card-bg, #fff);
+  background: var(--surface);
 }
 
 .calculator-history-page .calculator-history-list {
@@ -99,7 +99,7 @@
   display: block;
   margin-bottom: 7px;
   font-size: 12px;
-  color: var(--muted-color, #888);
+  color: var(--muted);
 }
 
 .calculator-history-expression {
@@ -118,7 +118,7 @@
 
 .calculator-history-empty {
   padding: 24px 8px;
-  color: var(--muted-color, #888);
+  color: var(--muted);
   text-align: center;
   font-size: 14px;
 }
@@ -138,10 +138,10 @@
   justify-content: center;
   min-height: 40px;
   padding: 8px 13px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: var(--card-bg, #fff);
-  color: inherit;
+  background: var(--surface-2);
+  color: var(--text);
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -157,6 +157,26 @@
   .calculator-history-page {
     padding: 12px;
   }
+}
+
+body.dark .calculator-history-button,
+body.dark .calculator-history-page,
+body.dark .calculator-history-clear {
+  border-color: var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+}
+body.dark .calculator-history-item {
+  border-color: var(--border);
+  background-color: var(--surface-2);
+  color: var(--text);
+}
+body.dark .calculator-history-date,
+body.dark .calculator-history-empty {
+  color: var(--muted);
+}
+body.dark .calculator-history-clear {
+  color: #ff8580;
 }
 </style>
 
