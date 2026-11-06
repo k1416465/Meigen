@@ -1624,6 +1624,30 @@ def more_page():
 # その他：各ツールのページ
 # ==================================================
 
+# ==================================================
+# 追加ツール：仮ページ
+# ==================================================
+
+@app.route("/map")
+def map_page():
+    return render_template("tool_placeholder.html", page_title="地図")
+
+
+@app.route("/database")
+def database_page():
+    return render_template("tool_placeholder.html", page_title="データベース")
+
+
+@app.route("/range")
+def range_page():
+    return render_template("tool_placeholder.html", page_title="範囲表")
+
+
+@app.route("/line")
+def line_page():
+    return render_template("tool_placeholder.html", page_title="LINE")
+
+
 @app.route("/roster")
 def roster_page():
     """4桁番号と名前だけで管理し、番号から学年・クラス・出席番号を取得する名簿ページ。"""
