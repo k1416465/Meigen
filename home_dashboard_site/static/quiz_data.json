@@ -2,12 +2,8 @@
   {
     "number": 1,
     "page": 28,
-    "words": [
-      "驚く"
-    ],
-    "readings": {
-      "驚く": "おどろく"
-    },
+    "word": "驚く",
+    "reading": "おどろく",
     "translations": [
       "気づく",
       "目を覚ます"
@@ -16,10 +12,8 @@
   {
     "number": 2,
     "page": 28,
-    "words": [
-      "ののしる"
-    ],
-    "readings": {},
+    "word": "ののしる",
+    "reading": "",
     "translations": [
       "大騒ぎする",
       "評判になる"
@@ -28,12 +22,8 @@
   {
     "number": 3,
     "page": 29,
-    "words": [
-      "念ず"
-    ],
-    "readings": {
-      "念ず": "ねんず"
-    },
+    "word": "念ず",
+    "reading": "ねんず",
     "translations": [
       "祈る",
       "がまんする"
@@ -42,12 +32,8 @@
   {
     "number": 4,
     "page": 30,
-    "words": [
-      "覚ゆ"
-    ],
-    "readings": {
-      "覚ゆ": "おぼゆ"
-    },
+    "word": "覚ゆ",
+    "reading": "おぼゆ",
     "translations": [
       "思われる",
       "似る",
@@ -58,12 +44,8 @@
   {
     "number": 5,
     "page": 31,
-    "words": [
-      "忍ぶ"
-    ],
-    "readings": {
-      "忍ぶ": "しのぶ"
-    },
+    "word": "忍ぶ",
+    "reading": "しのぶ",
     "translations": [
       "がまんする",
       "人目を避ける"
@@ -72,12 +54,8 @@
   {
     "number": 6,
     "page": 32,
-    "words": [
-      "眺む"
-    ],
-    "readings": {
-      "眺む": "ながむ"
-    },
+    "word": "眺む",
+    "reading": "ながむ",
     "translations": [
       "もの思いに沈む"
     ]
@@ -85,12 +63,8 @@
   {
     "number": 7,
     "page": 32,
-    "words": [
-      "見ゆ"
-    ],
-    "readings": {
-      "見ゆ": "みゆ"
-    },
+    "word": "見ゆ",
+    "reading": "みゆ",
     "translations": [
       "見える",
       "姿を見せる",
@@ -100,10 +74,8 @@
   {
     "number": 8,
     "page": 33,
-    "words": [
-      "あふ"
-    ],
-    "readings": {},
+    "word": "あふ",
+    "reading": "",
     "translations": [
       "結婚する"
     ]
@@ -111,12 +83,8 @@
   {
     "number": 9,
     "page": 34,
-    "words": [
-      "居る"
-    ],
-    "readings": {
-      "居る": "ゐる"
-    },
+    "word": "居る",
+    "reading": "ゐる",
     "translations": [
       "座る",
       "～ている"
@@ -125,12 +93,8 @@
   {
     "number": 10,
     "page": 34,
-    "words": [
-      "歩く"
-    ],
-    "readings": {
-      "歩く": "ありく"
-    },
+    "word": "歩く",
+    "reading": "ありく",
     "translations": [
       "動き回る",
       "～(して)まわる",
@@ -140,12 +104,8 @@
   {
     "number": 11,
     "page": 35,
-    "words": [
-      "飽く"
-    ],
-    "readings": {
-      "飽く": "あく"
-    },
+    "word": "飽く",
+    "reading": "あく",
     "translations": [
       "満足する",
       "満ち足りない"
@@ -154,10 +114,8 @@
   {
     "number": 12,
     "page": 36,
-    "words": [
-      "うつくし"
-    ],
-    "readings": {},
+    "word": "うつくし",
+    "reading": "",
     "translations": [
       "かわいらしい",
       "立派だ"
@@ -166,10 +124,8 @@
   {
     "number": 13,
     "page": 36,
-    "words": [
-      "かなし"
-    ],
-    "readings": {},
+    "word": "かなし",
+    "reading": "",
     "translations": [
       "いとしい",
       "かわいい"
@@ -178,23 +134,27 @@
   {
     "number": 14,
     "page": 37,
-    "words": [
-      "いみじ"
-    ],
-    "readings": {},
+    "word": "いみじ",
+    "reading": "",
     "translations": [
       "とてもすばらしい",
-      "とてもかなしい",
+      "とてもかなしい"
+    ]
+  },
+  {
+    "number": 14,
+    "page": 37,
+    "word": "いみじく･いみじう",
+    "reading": "",
+    "translations": [
       "とても"
     ]
   },
   {
     "number": 15,
     "page": 38,
-    "words": [
-      "をかし"
-    ],
-    "readings": {},
+    "word": "をかし",
+    "reading": "",
     "translations": [
       "趣がある",
       "美しい",
@@ -204,27 +164,37 @@
   {
     "number": 16,
     "page": 39,
-    "words": [
-      "よし"
-    ],
-    "readings": {},
+    "word": "よし",
+    "reading": "",
     "translations": [
-      "よい",
+      "よい"
+    ]
+  },
+  {
+    "number": 16,
+    "page": 39,
+    "word": "よき人",
+    "reading": "",
+    "translations": [
       "身分が高く教養がある"
     ]
   },
   {
     "number": 17,
     "page": 40,
-    "words": [
-      "奇し･怪し"
-    ],
-    "readings": {
-      "奇し･怪し": "あやし"
-    },
+    "word": "奇し･怪し",
+    "reading": "あやし",
     "translations": [
       "不思議だ",
-      "けしからん",
+      "けしからん"
+    ]
+  },
+  {
+    "number": 17,
+    "page": 40,
+    "word": "賤し",
+    "reading": "あやし",
+    "translations": [
       "身分が低い",
       "粗末だ"
     ]
@@ -232,12 +202,8 @@
   {
     "number": 18,
     "page": 41,
-    "words": [
-      "大人し"
-    ],
-    "readings": {
-      "大人し": "おとなし"
-    },
+    "word": "大人し",
+    "reading": "おとなし",
     "translations": [
       "大人らしい",
       "年配だ",
@@ -247,10 +213,8 @@
   {
     "number": 19,
     "page": 42,
-    "words": [
-      "ゆかし"
-    ],
-    "readings": {},
+    "word": "ゆかし",
+    "reading": "",
     "translations": [
       "見たい",
       "聞きたい",
@@ -260,10 +224,8 @@
   {
     "number": 20,
     "page": 43,
-    "words": [
-      "おぼつかなし"
-    ],
-    "readings": {},
+    "word": "おぼつかなし",
+    "reading": "",
     "translations": [
       "ぼんやりしている",
       "気がかりだ",
@@ -273,12 +235,8 @@
   {
     "number": 21,
     "page": 44,
-    "words": [
-      "有り難し"
-    ],
-    "readings": {
-      "有り難し": "ありがたし"
-    },
+    "word": "有り難し",
+    "reading": "ありがたし",
     "translations": [
       "めったにない",
       "(めったいにないほど)立派だ"
@@ -287,10 +245,8 @@
   {
     "number": 22,
     "page": 44,
-    "words": [
-      "めでたし"
-    ],
-    "readings": {},
+    "word": "めでたし",
+    "reading": "",
     "translations": [
       "すばらしい"
     ]
@@ -298,12 +254,8 @@
   {
     "number": 23,
     "page": 45,
-    "words": [
-      "口惜し"
-    ],
-    "readings": {
-      "口惜し": "くちをし"
-    },
+    "word": "口惜し",
+    "reading": "くちをし",
     "translations": [
       "残念だ"
     ]
@@ -311,12 +263,8 @@
   {
     "number": 24,
     "page": 46,
-    "words": [
-      "憂し"
-    ],
-    "readings": {
-      "憂し": "うし"
-    },
+    "word": "憂し",
+    "reading": "うし",
     "translations": [
       "つらい"
     ]
@@ -324,12 +272,8 @@
   {
     "number": 25,
     "page": 47,
-    "words": [
-      "侘びし"
-    ],
-    "readings": {
-      "侘びし": "わびし"
-    },
+    "word": "侘びし",
+    "reading": "わびし",
     "translations": [
       "つらい",
       "興ざめだ"
@@ -338,10 +282,8 @@
   {
     "number": 26,
     "page": 50,
-    "words": [
-      "あはれなり"
-    ],
-    "readings": {},
+    "word": "あはれなり",
+    "reading": "",
     "translations": [
       "心底しみじみと感じられる"
     ]
@@ -349,12 +291,8 @@
   {
     "number": 27,
     "page": 51,
-    "words": [
-      "疎かなり"
-    ],
-    "readings": {
-      "疎かなり": "おろかなり"
-    },
+    "word": "疎かなり",
+    "reading": "おろかなり",
     "translations": [
       "おろそかだ",
       "(～という)言葉では言い尽くせない"
@@ -363,12 +301,8 @@
   {
     "number": 28,
     "page": 52,
-    "words": [
-      "懇ろなり"
-    ],
-    "readings": {
-      "懇ろなり": "ねんごろなり"
-    },
+    "word": "懇ろなり",
+    "reading": "ねんごろなり",
     "translations": [
       "熱心だ",
       "親しい"
@@ -377,12 +311,8 @@
   {
     "number": 29,
     "page": 52,
-    "words": [
-      "徒然なり"
-    ],
-    "readings": {
-      "徒然なり": "つれづれなり"
-    },
+    "word": "徒然なり",
+    "reading": "つれづれなり",
     "translations": [
       "(することもなく)退屈だ",
       "しんみりともの寂しい"
@@ -391,12 +321,8 @@
   {
     "number": 30,
     "page": 53,
-    "words": [
-      "徒らなり"
-    ],
-    "readings": {
-      "徒らなり": "いたづらなり"
-    },
+    "word": "徒らなり",
+    "reading": "いたづらなり",
     "translations": [
       "むだだ",
       "手持ちぶさたで暇だ"
@@ -405,12 +331,8 @@
   {
     "number": 31,
     "page": 54,
-    "words": [
-      "年ごろ"
-    ],
-    "readings": {
-      "年ごろ": "としごろ"
-    },
+    "word": "年ごろ",
+    "reading": "としごろ",
     "translations": [
       "長年"
     ]
@@ -418,12 +340,8 @@
   {
     "number": 32,
     "page": 54,
-    "words": [
-      "形･容貌"
-    ],
-    "readings": {
-      "形･容貌": "かたち"
-    },
+    "word": "形･容貌",
+    "reading": "かたち",
     "translations": [
       "容貌"
     ]
@@ -431,12 +349,8 @@
   {
     "number": 33,
     "page": 55,
-    "words": [
-      "影"
-    ],
-    "readings": {
-      "影": "かげ"
-    },
+    "word": "影",
+    "reading": "かげ",
     "translations": [
       "光",
       "姿"
@@ -445,12 +359,8 @@
   {
     "number": 34,
     "page": 56,
-    "words": [
-      "本意"
-    ],
-    "readings": {
-      "本意": "ほい"
-    },
+    "word": "本意",
+    "reading": "ほい",
     "translations": [
       "かねてからの願い"
     ]
@@ -458,12 +368,8 @@
   {
     "number": 35,
     "page": 56,
-    "words": [
-      "物語"
-    ],
-    "readings": {
-      "物語": "ものがたり"
-    },
+    "word": "物語",
+    "reading": "ものがたり",
     "translations": [
       "話",
       "物語"
@@ -472,12 +378,8 @@
   {
     "number": 36,
     "page": 57,
-    "words": [
-      "文･書"
-    ],
-    "readings": {
-      "文･書": "ふみ"
-    },
+    "word": "文･書",
+    "reading": "ふみ",
     "translations": [
       "手紙",
       "漢詩",
@@ -487,12 +389,8 @@
   {
     "number": 37,
     "page": 58,
-    "words": [
-      "程"
-    ],
-    "readings": {
-      "程": "ほど"
-    },
+    "word": "程",
+    "reading": "ほど",
     "translations": [
       "時",
       "あたり",
@@ -503,12 +401,8 @@
   {
     "number": 38,
     "page": 59,
-    "words": [
-      "情け"
-    ],
-    "readings": {
-      "情け": "なさけ"
-    },
+    "word": "情け",
+    "reading": "なさけ",
     "translations": [
       "思いやり",
       "男女間の情愛",
@@ -518,12 +412,8 @@
   {
     "number": 39,
     "page": 60,
-    "words": [
-      "契り"
-    ],
-    "readings": {
-      "契り": "ちぎり"
-    },
+    "word": "契り",
+    "reading": "ちぎり",
     "translations": [
       "約束",
       "宿縁",
@@ -533,12 +423,8 @@
   {
     "number": 40,
     "page": 61,
-    "words": [
-      "気色"
-    ],
-    "readings": {
-      "気色": "けしき"
-    },
+    "word": "気色",
+    "reading": "けしき",
     "translations": [
       "様子",
       "機嫌",
@@ -548,10 +434,8 @@
   {
     "number": 41,
     "page": 62,
-    "words": [
-      "いと"
-    ],
-    "readings": {},
+    "word": "いと",
+    "reading": "",
     "translations": [
       "とても",
       "たいして(～ない)"
@@ -560,10 +444,8 @@
   {
     "number": 42,
     "page": 62,
-    "words": [
-      "あまた"
-    ],
-    "readings": {},
+    "word": "あまた",
+    "reading": "",
     "translations": [
       "たくさん"
     ]
@@ -571,10 +453,8 @@
   {
     "number": 43,
     "page": 63,
-    "words": [
-      "げに"
-    ],
-    "readings": {},
+    "word": "げに",
+    "reading": "",
     "translations": [
       "なるほど"
     ]
@@ -582,10 +462,8 @@
   {
     "number": 44,
     "page": 64,
-    "words": [
-      "なほ"
-    ],
-    "readings": {},
+    "word": "なほ",
+    "reading": "",
     "translations": [
       "やはり"
     ]
@@ -593,10 +471,8 @@
   {
     "number": 45,
     "page": 64,
-    "words": [
-      "やがて"
-    ],
-    "readings": {},
+    "word": "やがて",
+    "reading": "",
     "translations": [
       "そのまま",
       "すぐに"
@@ -605,10 +481,8 @@
   {
     "number": 46,
     "page": 65,
-    "words": [
-      "やうやう"
-    ],
-    "readings": {},
+    "word": "やうやう",
+    "reading": "",
     "translations": [
       "だんだん"
     ]
@@ -616,10 +490,8 @@
   {
     "number": 47,
     "page": 66,
-    "words": [
-      "え～打消"
-    ],
-    "readings": {},
+    "word": "え～打消",
+    "reading": "",
     "translations": [
       "～できない"
     ]
@@ -627,10 +499,8 @@
   {
     "number": 48,
     "page": 66,
-    "words": [
-      "な～そ"
-    ],
-    "readings": {},
+    "word": "な～そ",
+    "reading": "",
     "translations": [
       "～(する)な"
     ]
@@ -638,10 +508,8 @@
   {
     "number": 49,
     "page": 67,
-    "words": [
-      "さらに～打消"
-    ],
-    "readings": {},
+    "word": "さらに～打消",
+    "reading": "",
     "translations": [
       "まったく～ない"
     ]
@@ -649,10 +517,8 @@
   {
     "number": 50,
     "page": 68,
-    "words": [
-      "いかで･いかでか"
-    ],
-    "readings": {},
+    "word": "いかで･いかでか",
+    "reading": "",
     "translations": [
       "どうして(～か)",
       "どうして(～か、いや～ない)",
