@@ -133,17 +133,18 @@ html[data-theme="dark"] .quiz-settings-error {
 </style>
 <script>
 (() => {
- const groups = {{ quiz_data|tojson }};
+ const entries = {{ quiz_data|tojson }};
  const $ = id => document.getElementById(id);
  const select=$('quiz-select'), game=$('quiz-game'), result=$('quiz-result');
- let questions=[], index=0, score=0, selectedChoice=null, answered=false, selectedQuiz=null;
+ let questions=[], index=0, score=0, selectedChoice=null, answered=false;
  const shuffle=a=>{const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
- // 出題範囲内に含まれる「訳語」の総数を問題数の上限にする
- function getValidGroups(rangeStart,rangeEnd){
-   return groups.filter(g=>Array.isArray(g.words)&&g.words.length&&Array.isArray(g.translations)&&g.translations.length&&Number(g.number)>=rangeStart&&Number(g.number)<=rangeEnd);
+ // 問題番号の範囲に含まれる「単語」を対象にする。同じ番号の別単語も別レコード。
+ function getValidEntries(rangeStart,rangeEnd){
+   return entries.filter(e=>e&&typeof e.word==='string'&&e.word.trim()&&Array.isArray(e.translations)&&e.translations.length&&Number(e.number)>=rangeStart&&Number(e.number)<=rangeEnd);
  }
+ // 問題数の上限は、対象単語に登録された訳語の総数。
  function getTranslationCount(rangeStart,rangeEnd){
-   return getValidGroups(rangeStart,rangeEnd).reduce((total,g)=>total+g.translations.length,0);
+   return getValidEntries(rangeStart,rangeEnd).reduce((total,e)=>total+e.translations.length,0);
  }
  function updateQuestionCountLimit(){
    const first=Number($('range-start').value), last=Number($('range-end').value);
@@ -152,27 +153,26 @@ html[data-theme="dark"] .quiz-settings-error {
    if(max>0&&Number($('question-count').value)>max)$('question-count').value=String(max);
  }
  function makeQuestions(count,rangeStart,rangeEnd){
-   const valid=getValidGroups(rangeStart,rangeEnd);
-   // 1つの単語に訳語が複数ある場合、それぞれを独立した出題候補にする
-   const candidates=valid.flatMap(g=>g.translations.map(correct=>({group:g,correct})));
-   // 選択肢の誤答候補には、出題中の単語自身の別訳語を含めない
-   const pool=valid.flatMap(group=>group.translations.map(translation=>({translation,group})));
+   const valid=getValidEntries(rangeStart,rangeEnd);
+   // 1訳語につき1問。問題番号が同じでも単語レコードは統合しない。
+   const candidates=valid.flatMap(entry=>entry.translations.map(correct=>({entry,correct})));
+   const pool=valid.flatMap(entry=>entry.translations.map(translation=>({entry,translation})));
    const chosen=shuffle(candidates).slice(0,Math.min(count,candidates.length));
-   return chosen.map(({group:g,correct})=>{
+   return chosen.map(({entry,correct})=>{
      const distractors=[];
      shuffle(pool).forEach(item=>{
-       if(item.group!==g&&distractors.length<3&&item.translation!==correct&&!distractors.some(x=>x.translation===item.translation))distractors.push(item);
+       // 同じ単語に属する別訳語は誤答候補にしない。
+       if(item.entry!==entry&&item.translation!==correct&&distractors.length<3&&!distractors.some(x=>x.translation===item.translation))distractors.push(item);
      });
      if(distractors.length<3)return null;
-     const word=shuffle(g.words)[0];
-     return {word,number:g.number,reading:(g.readings||{})[word]||'',page:g.page,correct,options:shuffle([correct,...distractors.map(x=>x.translation)])};
+     return {word:entry.word,number:entry.number,reading:entry.reading||'',page:entry.page,correct,options:shuffle([correct,...distractors.map(x=>x.translation)])};
    }).filter(Boolean);
  }
  function showQuestion(){
    if(index>=questions.length){showResult();return;}
    answered=false;selectedChoice=null;$('quiz-answer').hidden=false;$('quiz-answer').disabled=true;$('quiz-next').hidden=true;
    const q=questions[index];$('quiz-progress').textContent=`第${index+1}問 / 全${questions.length}問`;$('quiz-word').textContent=q.word;
-   $('quiz-reading').textContent=q.reading||'';$('quiz-page').textContent=q.page!==null&&q.page!==undefined?`P${q.page}`:'';$('quiz-number').textContent=`問題番号:${questions[index].number||q.number||''}`;
+   $('quiz-reading').textContent=q.reading||'';$('quiz-page').textContent=q.page!==null&&q.page!==undefined?`P${q.page}`:'';$('quiz-number').textContent=`問題番号:${q.number||''}`;
    const box=$('quiz-options');box.innerHTML='';
    q.options.forEach((choice,i)=>{const b=document.createElement('button');b.type='button';b.className='quiz-option';b.textContent=`${['①','②','③','④'][i]} ${choice}`;b.addEventListener('click',()=>selectOption(choice,b));box.appendChild(b);});
  }
@@ -189,6 +189,7 @@ html[data-theme="dark"] .quiz-settings-error {
    const translationCount=getTranslationCount(first,last);
    if(count>translationCount){error.textContent=`問題数は、指定範囲内の訳語数（${translationCount}）以下にしてください。`;error.hidden=false;return;}
    questions=makeQuestions(count,first,last);if(!questions.length){error.textContent='指定した範囲に出題できる問題がありません。';error.hidden=false;return;}
+   if(questions.length<count){error.textContent=`選択肢を4つ用意できる訳語が少ないため、${questions.length}問で出題します。`;error.hidden=false;}
    index=0;score=0;select.hidden=true;result.hidden=true;game.hidden=false;showQuestion();
  }
  function showResult(){game.hidden=true;result.hidden=false;$('quiz-score').textContent=`${questions.length}問中 ${score}問正解（${Math.round(score/questions.length*100)}%）`;}
