@@ -433,6 +433,13 @@ if (myStationButton) {
     padding: 0 !important;
 }
 
+/* スマホ版：時刻表タイトルと駅選択肢の間隔を縮小 */
+@media (max-width: 600px) {
+    .operation-page > .page-header {
+        margin-bottom: 6px !important;
+    }
+}
+
 .operation-page > .page-header h1 {
     margin: 0 !important;
     font-size: clamp(28px, 3vw, 36px) !important;
