@@ -5798,4 +5798,9 @@ body.dark .operation-loading-overlay {
     .operation-page .operation-alert-section {
         margin-top: 24px !important;
     }
+
+    /* 「運行情報」と「路線の設定」のセクション間隔を広げる */
+    .operation-page .route-settings-section {
+        margin-top: 32px !important;
+    }
 }
