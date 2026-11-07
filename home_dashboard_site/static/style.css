@@ -5796,7 +5796,7 @@ body.dark .operation-loading-overlay {
 /* スマホ版：時刻表（駅選択）と運行情報の間隔を広げる */
 @media (max-width: 600px) {
     .operation-page .operation-alert-section {
-        margin-top: 24px !important;
+        margin-top: 30px !important;
     }
 
     /* 「運行情報」と「路線の設定」のセクション間隔を広げる */
