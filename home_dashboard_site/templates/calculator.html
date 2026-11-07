@@ -64,6 +64,33 @@
   height: 18px;
 }
 
+/* スマートフォンでは「電卓」タイトルと履歴ボタンを左右に配置 */
+@media (max-width: 600px) {
+  html.calculator-page-mode body .page:has(.calculator-heading) .calculator-heading {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    text-align: left !important;
+  }
+
+  html.calculator-page-mode body .page:has(.calculator-heading) .calculator-heading > div:first-child {
+    width: auto !important;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  html.calculator-page-mode body .page:has(.calculator-heading) .calculator-heading h1 {
+    width: auto !important;
+  }
+
+  html.calculator-page-mode .calculator-history-button {
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+}
+
 /* 履歴一覧ページ */
 .calculator-history-page {
   margin-bottom: 24px;
