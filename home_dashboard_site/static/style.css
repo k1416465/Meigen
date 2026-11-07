@@ -5779,3 +5779,16 @@ body.dark .operation-loading-overlay {
     border-radius: 12px !important;
     overflow: hidden !important;
 }
+
+
+/* 運行情報ページ：見出しと直下のカードの間隔を統一 */
+.operation-page .operation-alert-section > .operation-section-heading,
+.operation-page .route-settings-section > .operation-section-heading {
+    margin-bottom: 12px !important;
+}
+
+.operation-page .operation-alert-list,
+.operation-page .operation-no-alert,
+.operation-page .route-settings-card {
+    margin-top: 0 !important;
+}
