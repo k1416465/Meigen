@@ -198,7 +198,6 @@ body.dark .stamp-viewer-nav,body[data-theme="dark"] .stamp-viewer-nav,html.dark 
   if (toggle && panel) toggle.addEventListener('click', function () {
     var opening = panel.hidden; panel.hidden = !opening;
     toggle.setAttribute('aria-expanded', String(opening));
-    if (opening && input) input.focus();
   });
   var sortButton = document.getElementById('stamp-sort-toggle');
   var sortOptions = document.getElementById('stamp-sort-options');

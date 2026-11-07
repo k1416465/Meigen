@@ -32,47 +32,17 @@
     <form method="post" class="recording-tag-order-form" id="recordingTagOrderForm">
       <input type="hidden" name="action" value="save_tag_order">
       <input type="hidden" name="q" value="{{ query }}">
-      <ol class="recording-tag-order-list" id="recordingTagOrderList">
+      <ol class="recording-tag-order-list drag-order-list" id="recordingTagOrderList" data-drag-order-list>
         {% for tag in tag_order %}
-        <li class="recording-tag-order-item">
+        <li class="recording-tag-order-item drag-order-item">
           <input type="hidden" name="tag_order" value="{{ tag }}">
           <span class="recording-tag-order-name">{{ tag }}</span>
-          <div class="recording-tag-order-actions">
-            <button type="button" class="recording-tag-move" data-move="up" aria-label="{{ tag }}を上へ" {% if loop.first %}disabled{% endif %}>↑</button>
-            <button type="button" class="recording-tag-move" data-move="down" aria-label="{{ tag }}を下へ" {% if loop.last %}disabled{% endif %}>↓</button>
-          </div>
+          <button type="button" class="drag-order-handle" aria-label="{{ tag }}をドラッグして並び替え" title="ドラッグして並び替え">⠿</button>
         </li>
         {% endfor %}
       </ol>
       <button type="submit" class="recording-admin-save-all">タグの並び順を保存</button>
     </form>
-    <script>
-      (function () {
-        const list = document.getElementById('recordingTagOrderList');
-        if (!list) return;
-        function refreshButtons() {
-          const items = Array.from(list.children);
-          items.forEach((item, index) => {
-            const up = item.querySelector('[data-move="up"]');
-            const down = item.querySelector('[data-move="down"]');
-            up.disabled = index === 0;
-            down.disabled = index === items.length - 1;
-          });
-        }
-        list.addEventListener('click', function (event) {
-          const button = event.target.closest('button[data-move]');
-          if (!button) return;
-          const item = button.closest('li');
-          if (button.dataset.move === 'up' && item.previousElementSibling) {
-            list.insertBefore(item, item.previousElementSibling);
-          } else if (button.dataset.move === 'down' && item.nextElementSibling) {
-            list.insertBefore(item.nextElementSibling, item);
-          }
-          refreshButtons();
-        });
-        refreshButtons();
-      })();
-    </script>
     {% else %}
     <p class="recording-admin-note">タグが登録されると、ここで並び順を編集できます。</p>
     {% endif %}
@@ -85,47 +55,17 @@
     <form method="post" class="recording-people-order-form" id="recordingPeopleOrderForm">
       <input type="hidden" name="action" value="save_people_order">
       <input type="hidden" name="q" value="{{ query }}">
-      <ol class="recording-tag-order-list" id="recordingPeopleOrderList">
+      <ol class="recording-tag-order-list drag-order-list" id="recordingPeopleOrderList" data-drag-order-list>
         {% for person in people_order %}
         <li class="recording-tag-order-item">
           <input type="hidden" name="people_order" value="{{ person }}">
           <span class="recording-tag-order-name">{{ person }}</span>
-          <div class="recording-tag-order-actions">
-            <button type="button" class="recording-tag-move" data-move="up" aria-label="{{ person }}を上へ" {% if loop.first %}disabled{% endif %}>↑</button>
-            <button type="button" class="recording-tag-move" data-move="down" aria-label="{{ person }}を下へ" {% if loop.last %}disabled{% endif %}>↓</button>
-          </div>
+          <button type="button" class="drag-order-handle" aria-label="{{ person }}をドラッグして並び替え" title="ドラッグして並び替え">⠿</button>
         </li>
         {% endfor %}
       </ol>
       <button type="submit" class="recording-admin-save-all">人物の並び順を保存</button>
     </form>
-    <script>
-      (function () {
-        const list = document.getElementById('recordingPeopleOrderList');
-        if (!list) return;
-        function refreshButtons() {
-          const items = Array.from(list.children);
-          items.forEach((item, index) => {
-            const up = item.querySelector('[data-move="up"]');
-            const down = item.querySelector('[data-move="down"]');
-            up.disabled = index === 0;
-            down.disabled = index === items.length - 1;
-          });
-        }
-        list.addEventListener('click', function (event) {
-          const button = event.target.closest('button[data-move]');
-          if (!button) return;
-          const item = button.closest('li');
-          if (button.dataset.move === 'up' && item.previousElementSibling) {
-            list.insertBefore(item, item.previousElementSibling);
-          } else if (button.dataset.move === 'down' && item.nextElementSibling) {
-            list.insertBefore(item.nextElementSibling, item);
-          }
-          refreshButtons();
-        });
-        refreshButtons();
-      })();
-    </script>
     {% else %}
     <p class="recording-admin-note">人物名が登録されると、ここで並び順を編集できます。</p>
     {% endif %}
@@ -163,4 +103,22 @@
   <p class="recording-admin-note">タグはカンマ（,）で区切って入力してください。削除すると録音情報と音声ファイルが削除されます。必要な音声は事前にバックアップしてください。</p>
 </section>
 
+
+<style>
+.drag-order-list{list-style:none;padding:0;margin:12px 0;display:flex;flex-direction:column;gap:7px}
+.drag-order-item{display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 8px;border:1px solid var(--border);border-radius:9px;background:var(--surface)}
+.drag-order-item>span,.drag-order-item .recording-tag-order-name{flex:1;min-width:0}
+.drag-order-handle{order:10;margin-left:auto;flex:0 0 42px;width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:25px;line-height:1;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.drag-order-handle:active{cursor:grabbing;background:var(--border)}
+.drag-order-item.is-dragging{opacity:.45;border-style:dashed}
+.drag-order-list.is-dragging{user-select:none;-webkit-user-select:none}
+</style>
+<script>
+(function(){document.querySelectorAll('[data-drag-order-list]').forEach(function(list){var dragged=null,pointerId=null;
+ list.addEventListener('pointerdown',function(e){var h=e.target.closest('.drag-order-handle');if(!h||(e.pointerType==='mouse'&&e.button!==0))return;dragged=h.closest('li');pointerId=e.pointerId;dragged.classList.add('is-dragging');list.classList.add('is-dragging');e.preventDefault();});
+ document.addEventListener('pointermove',function(e){if(!dragged||e.pointerId!==pointerId)return;e.preventDefault();var t=document.elementFromPoint(e.clientX,e.clientY),item=t&&t.closest('li');if(!item||item===dragged||item.parentElement!==list)return;var r=item.getBoundingClientRect();list.insertBefore(dragged,e.clientY<r.top+r.height/2?item:item.nextElementSibling);},{passive:false});
+ function finish(e){if(!dragged||(e&&e.pointerId!==pointerId))return;dragged.classList.remove('is-dragging');list.classList.remove('is-dragging');dragged=null;pointerId=null;}
+ document.addEventListener('pointerup',finish);document.addEventListener('pointercancel',finish);
+});})();
+</script>
 {% endblock %}

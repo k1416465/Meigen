@@ -82,7 +82,7 @@
     </div>
     <div class="recording-list-actions">
       {% if not query %}
-      <a class="recording-download-all" href="{{ url_for('download_all_recordings') }}">すべてダウンロード（ZIP）</a>
+      <a class="recording-download-all" href="{{ url_for('download_all_recordings') }}">全てダウンロード</a>
       {% endif %}
       <div class="recording-sort-wrap">
         <button type="button" class="recording-sort-button" id="recording-sort-toggle" aria-expanded="false" aria-controls="recording-sort-options" onclick="toggleRecordingSortOptions()">並び替え <span aria-hidden="true">▾</span></button>
@@ -230,7 +230,6 @@
       var opening = panel.hidden;
       panel.hidden = !opening;
       toggle.setAttribute('aria-expanded', String(opening));
-      if (opening && input) input.focus();
     });
     updateSearchIcon();
     var observer = new MutationObserver(updateSearchIcon);
