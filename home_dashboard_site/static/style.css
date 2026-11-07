@@ -5784,7 +5784,7 @@ body.dark .operation-loading-overlay {
 /* 運行情報ページ：見出しと直下のカードの間隔を統一 */
 .operation-page .operation-alert-section > .operation-section-heading,
 .operation-page .route-settings-section > .operation-section-heading {
-    margin-bottom: 12px !important;
+    margin-bottom: 6px !important;
 }
 
 .operation-page .operation-alert-list,
