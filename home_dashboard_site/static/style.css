@@ -5801,6 +5801,6 @@ body.dark .operation-loading-overlay {
 
     /* 「運行情報」と「路線の設定」のセクション間隔を広げる */
     .operation-page .route-settings-section {
-        margin-top: 25px !important;
+        margin-top: 20px !important;
     }
 }
