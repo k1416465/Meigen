@@ -1118,6 +1118,14 @@ def _extract_detail(text, status, status_index):
     # 詳細欄に混入する操作案内・状態ラベルを除去
     text = re.sub(r"路線を登録", "", text)
     text = re.sub(r"列車遅延", "", text)
+
+    # 路線内の区間を示す補足表記は詳細文に表示しない
+    text = re.sub(
+        r"\[(?:東京～宇都宮|宇都宮～黒磯|南栗橋～東武日光|久喜～伊勢崎)\]\s*",
+        "",
+        text,
+    )
+
     text = re.sub(r"[ \t　]{2,}", " ", text).strip(" \t　・|｜-—")
 
     # 先頭に路線名が残っている場合は除去
