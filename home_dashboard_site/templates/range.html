@@ -18,25 +18,54 @@
 {% if range_group %}
   <div class="range-group-label">{{ '1・2組 共通' if range_group == '12' else '3・4組 共通' }}</div>
 
-  <section class="range-schedule-section" aria-labelledby="range-schedule-title">
-    <h2 id="range-schedule-title" class="range-section-title">日程</h2>
-    <div class="card range-schedule-card">
-      <table class="range-schedule-table" aria-label="日程表">
-        <tbody>
-          {% for row in range(5) %}
-            <tr>
-              {% for col in range(4) %}
-                {% set day_number = row * 4 + col + 1 %}
-                <td>
-                  <span class="range-schedule-day">{{ day_number }}日目</span>
-                  <span class="range-schedule-date">〇月〇日（〇）</span>
-                </td>
+  {% if range_group == '12' %}
+    {% set schedule_rows = [
+      ('〇月〇日（〇）', '国語', '数学', '英語'),
+      ('〇月〇日（〇）', '理科', '社会', '保健'),
+      ('〇月〇日（〇）', '数学', '英語', '国語'),
+      ('〇月〇日（〇）', '社会', '理科', '情報'),
+      ('〇月〇日（〇）', '英語', '国語', '数学')
+    ] %}
+  {% else %}
+    {% set schedule_rows = [
+      ('〇月〇日（〇）', '数学', '国語', '英語'),
+      ('〇月〇日（〇）', '社会', '理科', '数学'),
+      ('〇月〇日（〇）', '英語', '情報', '国語'),
+      ('〇月〇日（〇）', '理科', '数学', '社会'),
+      ('〇月〇日（〇）', '国語', '英語', '理科')
+    ] %}
+  {% endif %}
+
+  <section class="range-schedule-section" aria-label="日程表">
+    <details class="card range-schedule-accordion">
+      <summary class="range-schedule-summary">
+        <span>日程</span>
+      </summary>
+      <div class="range-schedule-content">
+        <div class="range-schedule-card">
+          <table class="range-schedule-table">
+            <thead>
+              <tr>
+                <th scope="col">日付</th>
+                <th scope="col">1時間目</th>
+                <th scope="col">2時間目</th>
+                <th scope="col">3時間目</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for date, first, second, third in schedule_rows %}
+                <tr>
+                  <th scope="row">{{ date }}</th>
+                  <td>{{ first }}</td>
+                  <td>{{ second }}</td>
+                  <td>{{ third }}</td>
+                </tr>
               {% endfor %}
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
   </section>
 
   <div class="range-accordion-list">
