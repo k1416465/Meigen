@@ -6138,3 +6138,84 @@ body.dark .operation-loading-overlay {
         padding: 12px 14px 15px !important;
     }
 }
+
+
+/* 設定ページ：範囲表と同じ矢印を常時表示し、カードを横幅いっぱいにする */
+.settings-form {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.settings-form > .setting-accordion {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    justify-self: stretch !important;
+}
+
+.settings-form > .setting-accordion > summary {
+    position: relative !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding-right: 48px !important;
+}
+
+.settings-form > .setting-accordion > summary::-webkit-details-marker {
+    display: none !important;
+}
+
+/* 旧＋／－用の専用要素は使わず、範囲表と同じCSS矢印に統一 */
+.settings-form > .setting-accordion > summary .setting-toggle-icon {
+    display: none !important;
+}
+
+.settings-form > .setting-accordion > summary::after {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    right: 20px !important;
+    width: 9px !important;
+    height: 9px !important;
+    border: 0 !important;
+    border-right: 2px solid var(--muted) !important;
+    border-bottom: 2px solid var(--muted) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    transform: translateY(-70%) rotate(45deg) !important;
+    transition: transform .18s ease !important;
+}
+
+.settings-form > .setting-accordion[open] > summary::after {
+    content: "" !important;
+    display: block !important;
+    transform: translateY(-25%) rotate(225deg) !important;
+}
+
+@media (max-width: 640px) {
+    .settings-form > .setting-accordion {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .settings-form > .setting-accordion > summary {
+        padding-right: 48px !important;
+    }
+
+    .settings-form > .setting-accordion > summary::after {
+        display: block !important;
+        top: 50% !important;
+        right: 20px !important;
+        width: 9px !important;
+        height: 9px !important;
+        transform: translateY(-70%) rotate(45deg) !important;
+    }
+
+    .settings-form > .setting-accordion[open] > summary::after {
+        transform: translateY(-25%) rotate(225deg) !important;
+    }
+}
