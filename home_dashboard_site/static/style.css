@@ -6220,33 +6220,40 @@ body.dark .operation-loading-overlay {
     }
 }
 
-
-/* 設定画面：説明文が右側の矢印に重ならないよう幅を確保 */
+/* 設定ページ：説明文が矢印の下まで伸びてしまう問題の修正
+   flexアイテムが内容幅にならないよう、summaryの内側幅に合わせて固定する */
 .settings-form > .setting-accordion > summary {
+    display: flex !important;
+    flex-direction: column !important;
     align-items: stretch !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    padding-right: 60px !important;
 }
 
-.settings-form > .setting-accordion > summary .setting-heading,
-.settings-form > .setting-accordion > summary .setting-description {
+.settings-form > .setting-accordion > summary > .setting-heading,
+.settings-form > .setting-accordion > summary > .setting-description {
     display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
     box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     white-space: normal !important;
+}
+
+.settings-form > .setting-accordion > summary > .setting-description {
     overflow-wrap: anywhere !important;
     word-break: normal !important;
 }
 
 @media (max-width: 640px) {
     .settings-form > .setting-accordion > summary {
-        align-items: stretch !important;
-        padding-right: 48px !important;
+        padding-right: 60px !important;
     }
 
-    .settings-form > .setting-accordion > summary .setting-description {
+    .settings-form > .setting-accordion > summary > .setting-description {
         width: 100% !important;
         max-width: 100% !important;
-        min-width: 0 !important;
+        overflow-wrap: anywhere !important;
     }
 }
