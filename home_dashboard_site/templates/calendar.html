@@ -1024,38 +1024,31 @@
     /* 時刻欄：開始時刻と終了時刻を同じ行に配置 */
     #addTimeFields,
     #editTimeFields {
-      display:grid !important;
-      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-      grid-column:1 / -1 !important;
-      gap:10px !important;
-      width:100% !important;
-      min-width:0 !important;
-      max-width:100% !important;
-      box-sizing:border-box !important;
-      overflow:visible !important;
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 8px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
     }
 
-    /* 時刻欄のラベル */
-    #addTimeFields > label,
-    #editTimeFields > label {
-      display:flex !important;
-      flex-direction:column !important;
-      width:100% !important;
-      min-width:0 !important;
-      max-width:100% !important;
-      box-sizing:border-box !important;
+    #addTimeFields label,
+    #editTimeFields label {
+      min-width: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
     }
 
-    /* 開始・終了時刻の入力欄 */
     #addTimeFields input[type="time"],
     #editTimeFields input[type="time"] {
-      display:block !important;
-      width:100% !important;
-      min-width:0 !important;
-      max-width:100% !important;
-      box-sizing:border-box !important;
-      margin:0 !important;
-      font-size:16px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      padding: 8px 4px !important;
+      font-size: 14px !important;
+      box-sizing: border-box !important;
     }
 
     /* 日付・予定名などの入力欄 */
