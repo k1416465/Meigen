@@ -65,9 +65,30 @@
     </div>
   </details>
 
-  <div class="settings-actions">
+  <div class="settings-actions" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
     <button class="primary-button settings-action-button" type="submit">設定を保存</button>
-    <a class="back-link settings-action-button" href="{{ url_for('admin_dashboard') }}">管理者用ページ</a>
+    <a class="primary-button settings-action-button" href="{{ url_for('admin_dashboard') }}">管理者用ページ</a>
   </div>
 </form>
+
+<style>
+  .settings-actions .settings-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 180px;
+    min-width: 180px;
+    height: 46px;
+    min-height: 46px;
+    padding: 0 16px;
+    margin: 0;
+    font: inherit;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+</style>
 {% endblock %}
