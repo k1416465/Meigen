@@ -6219,3 +6219,34 @@ body.dark .operation-loading-overlay {
         transform: translateY(-25%) rotate(225deg) !important;
     }
 }
+
+
+/* 設定画面：説明文が右側の矢印に重ならないよう幅を確保 */
+.settings-form > .setting-accordion > summary {
+    align-items: stretch !important;
+}
+
+.settings-form > .setting-accordion > summary .setting-heading,
+.settings-form > .setting-accordion > summary .setting-description {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+}
+
+@media (max-width: 640px) {
+    .settings-form > .setting-accordion > summary {
+        align-items: stretch !important;
+        padding-right: 48px !important;
+    }
+
+    .settings-form > .setting-accordion > summary .setting-description {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+}
