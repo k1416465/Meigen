@@ -6040,3 +6040,101 @@ body.dark .operation-loading-overlay {
         font-size: 10px;
     }
 }
+
+/* 設定ページのアコーディオンを範囲表ページと同じデザインに統一 */
+.settings-form > .setting-accordion {
+    padding: 0 !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+}
+
+.settings-form > .setting-accordion > summary {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    min-height: 62px !important;
+    padding: 15px 48px 15px 18px !important;
+    cursor: pointer;
+    list-style: none;
+}
+
+.settings-form > .setting-accordion > summary::-webkit-details-marker {
+    display: none !important;
+}
+
+.settings-form > .setting-accordion > summary::after {
+    content: "" !important;
+    position: absolute !important;
+    right: 20px !important;
+    top: 50% !important;
+    width: 9px !important;
+    height: 9px !important;
+    border: 0 !important;
+    border-right: 2px solid var(--muted) !important;
+    border-bottom: 2px solid var(--muted) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+    font-size: 0 !important;
+    transform: translateY(-70%) rotate(45deg) !important;
+    transition: transform .18s ease !important;
+}
+
+.settings-form > .setting-accordion[open] > summary::after {
+    content: "" !important;
+    transform: translateY(-25%) rotate(225deg) !important;
+}
+
+.settings-form > .setting-accordion > summary .setting-heading {
+    display: block;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 800;
+}
+
+.settings-form > .setting-accordion > summary .setting-description {
+    display: block;
+    margin: 0;
+    padding: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.55;
+    font-weight: 400;
+}
+
+.settings-form > .setting-accordion > summary .setting-toggle-icon {
+    display: none !important;
+}
+
+.settings-form > .setting-accordion > .setting-options {
+    padding: 13px 18px 17px !important;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+    .settings-form > .setting-accordion > summary {
+        min-height: 62px !important;
+        padding: 14px 48px 14px 18px !important;
+        gap: 3px !important;
+    }
+
+    .settings-form > .setting-accordion > summary::after {
+        right: 20px !important;
+        top: 50% !important;
+        width: 9px !important;
+        height: 9px !important;
+        transform: translateY(-70%) rotate(45deg) !important;
+    }
+
+    .settings-form > .setting-accordion[open] > summary::after {
+        transform: translateY(-25%) rotate(225deg) !important;
+    }
+
+    .settings-form > .setting-accordion > .setting-options {
+        padding: 12px 14px 15px !important;
+    }
+}
