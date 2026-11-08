@@ -767,232 +767,303 @@
     color:#fff !important;
   }
 
+  /* ========================================
+     予定追加・編集モーダルの表示領域調整
+  ======================================== */
 
-/* ========================================
-   予定追加・編集モーダルの表示領域調整
-   PC・スマートフォン共通
-======================================== */
-
-/* モーダルの背景 */
-.calendar-modal-backdrop {
-  box-sizing: border-box;
-  align-items: center;
-  justify-content: center;
-
-  /* 下部メニューと重ならないための余白 */
-  padding:
-    max(12px, env(safe-area-inset-top, 0px))
-    16px
-    calc(96px + env(safe-area-inset-bottom, 0px));
-
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* モーダル共通 */
-.calendar-modal {
-  box-sizing: border-box;
-  width: min(520px, 100%);
-
-  max-height: calc(
-    100dvh
-    - 124px
-    - env(safe-area-inset-top, 0px)
-    - env(safe-area-inset-bottom, 0px)
-  );
-
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* 追加・編集画面はヘッダーを固定し、入力部分をスクロール */
-.calendar-add-modal,
-#calendarEditBackdrop .calendar-modal {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* タイトルと閉じるボタン */
-.calendar-add-modal .calendar-modal-header,
-#calendarEditBackdrop .calendar-modal-header {
-  flex: 0 0 auto;
-}
-
-/* 追加フォーム */
-.calendar-add-modal #calendarAddForm {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  padding: 2px 3px 8px 0;
-}
-
-/* 編集フォーム */
-#calendarEditBackdrop #calendarEditForm {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  padding: 2px 3px 8px 0;
-}
-
-/* 入力欄がモーダルからはみ出さないようにする */
-.calendar-add-modal *,
-#calendarEditBackdrop .calendar-modal * {
-  box-sizing: border-box;
-}
-
-/* スマートフォン */
-@media (max-width: 600px) {
   .calendar-modal-backdrop {
-    align-items: center;
+    box-sizing:border-box;
+    align-items:center;
+    justify-content:center;
     padding:
-      max(8px, env(safe-area-inset-top, 0px))
-      10px
+      max(12px, env(safe-area-inset-top, 0px))
+      16px
       calc(96px + env(safe-area-inset-bottom, 0px));
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
   }
 
   .calendar-modal {
-    width: 100%;
-    max-width: 520px;
-    max-height: calc(
-      100dvh
-      - 116px
+    box-sizing:border-box;
+    width:min(520px,100%);
+    max-height:calc(
+      100dvh - 124px
       - env(safe-area-inset-top, 0px)
       - env(safe-area-inset-bottom, 0px)
     );
-    padding: 14px;
-    border-radius: 12px;
-  }
-
-  .calendar-modal h2 {
-    font-size: 1.1rem;
-  }
-
-  .calendar-add-modal #calendarAddForm,
-  #calendarEditBackdrop #calendarEditForm {
-    gap: 10px;
-  }
-
-  .calendar-add-form button[type="submit"],
-  .calendar-edit-actions button {
-    min-height: 42px;
-  }
-}
-
-/* 画面の高さが小さい端末 */
-@media (max-height: 650px) {
-  .calendar-modal-backdrop {
-    align-items: flex-start;
-  }
-
-  .calendar-modal {
-    margin-top: 4px;
-    margin-bottom: 4px;
+    min-height:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
   }
 
   .calendar-add-modal,
   #calendarEditBackdrop .calendar-modal {
-    max-height: calc(
-      100dvh
-      - 112px
-      - env(safe-area-inset-top, 0px)
-      - env(safe-area-inset-bottom, 0px)
-    );
-  }
-}
-
-/* 100dvhに対応していないブラウザ向け */
-@supports not (height: 100dvh) {
-  .calendar-modal {
-    max-height: calc(100vh - 124px);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
   }
 
-  @media (max-width: 600px) {
+  .calendar-add-modal .calendar-modal-header,
+  #calendarEditBackdrop .calendar-modal-header {
+    flex:0 0 auto;
+  }
+
+  .calendar-add-modal #calendarAddForm,
+  #calendarEditBackdrop #calendarEditForm {
+    flex:1 1 auto;
+    min-height:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    padding:2px 3px 8px 0;
+  }
+
+  .calendar-add-modal *,
+  #calendarEditBackdrop .calendar-modal * {
+    box-sizing:border-box;
+  }
+
+  @media (max-width:600px) {
+    .calendar-modal-backdrop {
+      align-items:center;
+      padding:
+        max(8px, env(safe-area-inset-top, 0px))
+        10px
+        calc(96px + env(safe-area-inset-bottom, 0px));
+    }
+
     .calendar-modal {
-      max-height: calc(100vh - 116px);
+      width:100%;
+      max-width:520px;
+      max-height:calc(
+        100dvh - 116px
+        - env(safe-area-inset-top, 0px)
+        - env(safe-area-inset-bottom, 0px)
+      );
+      padding:14px;
+      border-radius:12px;
+    }
+
+    .calendar-modal h2 {
+      font-size:1.1rem;
+    }
+
+    .calendar-add-modal #calendarAddForm,
+    #calendarEditBackdrop #calendarEditForm {
+      gap:10px;
+    }
+
+    .calendar-add-form button[type="submit"],
+    .calendar-edit-actions button {
+      min-height:42px;
     }
   }
-}
 
-/* 「時刻を設定する」を左端に配置 */
-.calendar-time-setting {
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: flex-start !important;
-  align-items: center !important;
-  width: 100%;
-  text-align: left;
-  gap: 8px !important;
-}
+  @media (max-height:650px) {
+    .calendar-modal-backdrop {
+      align-items:flex-start;
+    }
 
-.calendar-time-setting input[type="checkbox"] {
-  flex: 0 0 18px;
-  width: 18px;
-  height: 18px;
-  margin: 0;
-}
+    .calendar-modal {
+      margin-top:4px;
+      margin-bottom:4px;
+    }
 
-/* 時刻設定チェックボックスを左端に固定 */
-#calendarAddForm > label.calendar-time-setting,
-#calendarEditForm > label.calendar-time-setting {
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: flex-start !important;
-  align-items: center !important;
-  justify-self: start !important;
-  width: 100% !important;
-  text-align: left !important;
-  gap: 8px !important;
-}
-
-/* チェックボックス自体の位置とサイズ */
-#calendarAddForm > label.calendar-time-setting > input[type="checkbox"],
-#calendarEditForm > label.calendar-time-setting > input[type="checkbox"] {
-  display: block !important;
-  flex: 0 0 18px !important;
-  width: 18px !important;
-  min-width: 18px !important;
-  height: 18px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* スマホ版：開始・終了時刻の入力欄の横幅を統一 */
-@media (max-width: 600px) {
-  .calendar-time-fields {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    overflow: hidden;
+    .calendar-add-modal,
+    #calendarEditBackdrop .calendar-modal {
+      max-height:calc(
+        100dvh - 112px
+        - env(safe-area-inset-top, 0px)
+        - env(safe-area-inset-bottom, 0px)
+      );
+    }
   }
 
-  .calendar-time-fields > label {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+  @supports not (height:100dvh) {
+    .calendar-modal {
+      max-height:calc(100vh - 124px);
+    }
+
+    @media (max-width:600px) {
+      .calendar-modal {
+        max-height:calc(100vh - 116px);
+      }
+    }
   }
 
-  .calendar-time-fields input[type="time"] {
-    display: block !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
+  /* 「時刻を設定する」を左端に配置 */
+  .calendar-time-setting {
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:flex-start !important;
+    align-items:center !important;
+    width:100%;
+    text-align:left;
+    gap:8px !important;
   }
-}
+
+  .calendar-time-setting input[type="checkbox"] {
+    flex:0 0 18px;
+    width:18px;
+    height:18px;
+    margin:0;
+  }
+
+  /* 時刻設定チェックボックスを左端に固定 */
+  #calendarAddForm > label.calendar-time-setting,
+  #calendarEditForm > label.calendar-time-setting {
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:flex-start !important;
+    align-items:center !important;
+    justify-self:start !important;
+    width:100% !important;
+    text-align:left !important;
+    gap:8px !important;
+  }
+
+  #calendarAddForm > label.calendar-time-setting > input[type="checkbox"],
+  #calendarEditForm > label.calendar-time-setting > input[type="checkbox"] {
+    display:block !important;
+    flex:0 0 18px !important;
+    width:18px !important;
+    min-width:18px !important;
+    height:18px !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  /* ========================================
+     スマホ版：最終調整
+  ======================================== */
+
+  @media (max-width:600px) {
+
+    /* モーダル背景 */
+    .calendar-modal-backdrop {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-sizing:border-box;
+      padding:
+        max(8px, env(safe-area-inset-top, 0px))
+        10px
+        calc(96px + env(safe-area-inset-bottom, 0px));
+      overflow-x:hidden;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-y:contain;
+      touch-action:pan-y;
+    }
+
+    /* 追加・編集モーダル */
+    .calendar-add-modal,
+    #calendarEditBackdrop .calendar-modal {
+      display:flex !important;
+      flex-direction:column !important;
+      width:100%;
+      height:calc(
+        100dvh - 112px
+        - env(safe-area-inset-top, 0px)
+        - env(safe-area-inset-bottom, 0px)
+      );
+      max-height:calc(
+        100dvh - 112px
+        - env(safe-area-inset-top, 0px)
+        - env(safe-area-inset-bottom, 0px)
+      );
+      min-height:0;
+      padding:14px;
+      overflow:hidden !important;
+      box-sizing:border-box;
+    }
+
+    /* タイトル部分 */
+    .calendar-add-modal .calendar-modal-header,
+    #calendarEditBackdrop .calendar-modal-header {
+      flex:0 0 auto;
+    }
+
+    /* フォーム部分をスクロール */
+    #calendarAddForm,
+    #calendarEditForm {
+      display:grid !important;
+      grid-template-columns:minmax(0,1fr) !important;
+      flex:1 1 0 !important;
+      min-height:0 !important;
+      min-width:0 !important;
+      width:100% !important;
+      overflow-x:hidden !important;
+      overflow-y:auto !important;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-y:contain;
+      touch-action:pan-y;
+      padding:2px 2px 16px 0 !important;
+      box-sizing:border-box !important;
+    }
+
+    /* 時刻欄の親要素 */
+    #addTimeFields,
+    #editTimeFields {
+      display:grid !important;
+      grid-template-columns:minmax(0,1fr) !important;
+      grid-column:1 / -1 !important;
+      width:100% !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      box-sizing:border-box !important;
+      overflow:visible !important;
+    }
+
+    /* 時刻欄のラベル */
+    #addTimeFields > label,
+    #editTimeFields > label {
+      display:flex !important;
+      flex-direction:column !important;
+      width:100% !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      box-sizing:border-box !important;
+    }
+
+    /* 開始・終了時刻の入力欄 */
+    #addTimeFields input[type="time"],
+    #editTimeFields input[type="time"] {
+      display:block !important;
+      width:100% !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      box-sizing:border-box !important;
+      margin:0 !important;
+      font-size:16px !important;
+    }
+
+    /* 日付・予定名などの入力欄 */
+    #calendarAddForm > label > input,
+    #calendarEditForm > label > input,
+    #calendarAddForm > label > textarea,
+    #calendarEditForm > label > textarea {
+      width:100% !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      box-sizing:border-box !important;
+    }
+
+    /* 時刻設定チェックボックス */
+    #calendarAddForm > label.calendar-time-setting,
+    #calendarEditForm > label.calendar-time-setting {
+      display:flex !important;
+      flex-direction:row !important;
+      align-items:center !important;
+      justify-content:flex-start !important;
+      width:100% !important;
+    }
+  }
 
 </style>
 
@@ -1274,7 +1345,8 @@
 
     addBackdrop.hidden = false;
     addToggle?.setAttribute('aria-expanded', 'true');
-    setTimeout(() => addForm.querySelector('input[name="title"]')?.focus(), 50);
+
+    /* 自動フォーカスは行わない */
   }
 
   addToggle?.addEventListener('click', () => openAddForm());
@@ -1341,7 +1413,8 @@
     dayBackdrop.hidden = true;
     addBackdrop.hidden = true;
     editBackdrop.hidden = false;
-    document.getElementById('editEventTitle').focus();
+
+    /* 自動フォーカスは行わない */
   }
 
   function openDay(date) {
