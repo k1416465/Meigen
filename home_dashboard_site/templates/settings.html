@@ -1,5 +1,34 @@
 {% extends "base.html" %}
-{% block title %}迷言｜設定{% endblock %}
+{% block title %}迷言｜設定
+<style>
+  /* 保存ボタンと管理者用ボタンを、常に同じ幅で横並びにする */
+  .settings-form .settings-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    gap: 12px !important;
+    width: 100%;
+  }
+
+  .settings-form .settings-actions .settings-action-button {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: stretch !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    text-decoration: none !important;
+  }
+</style>
+{% endblock %}
 {% block content %}
 <section class="welcome-row">
   <div><h1>設定</h1></div>
@@ -70,4 +99,33 @@
     <a class="back-link settings-action-button" href="{{ url_for('admin_dashboard') }}">管理者用ページ</a>
   </div>
 </form>
+
+<style>
+  /* 保存ボタンと管理者用ボタンを、常に同じ幅で横並びにする */
+  .settings-form .settings-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    gap: 12px !important;
+    width: 100%;
+  }
+
+  .settings-form .settings-actions .settings-action-button {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: stretch !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    text-decoration: none !important;
+  }
+</style>
 {% endblock %}
