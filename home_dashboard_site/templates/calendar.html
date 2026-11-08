@@ -1373,8 +1373,17 @@
 
   addToggle?.addEventListener('click', () => openAddForm());
 
+  /* 閉じるボタン */
   document.querySelectorAll('[data-close-modal]').forEach(button => {
     button.addEventListener('click', () => {
+      const params = new URLSearchParams(location.search);
+
+      // ホーム画面から開いた編集画面なら、ホームへ戻る
+      if (!editBackdrop.hidden && params.get('return') === 'home') {
+        window.location.href = '/';
+        return;
+      }
+
       closeModals();
     });
   });
@@ -1382,7 +1391,20 @@
   /* 日付モーダルは背景クリックでは閉じない */
   [addBackdrop, editBackdrop].forEach(backdrop => {
     backdrop.addEventListener('click', event => {
-      if (event.target === backdrop) closeModals();
+      if (event.target !== backdrop) return;
+
+      const params = new URLSearchParams(location.search);
+
+      // ホーム画面から開いた編集画面なら、ホームへ戻る
+      if (
+        backdrop === editBackdrop &&
+        params.get('return') === 'home'
+      ) {
+        window.location.href = '/';
+        return;
+      }
+
+      closeModals();
     });
   });
 
@@ -1391,6 +1413,17 @@
 
     /* 日付モーダル表示中はEscapeでも閉じない */
     if (!dayBackdrop.hidden) return;
+
+    const params = new URLSearchParams(location.search);
+
+    // ホーム画面から開いた編集画面なら、ホームへ戻る
+    if (
+      !editBackdrop.hidden &&
+      params.get('return') === 'home'
+    ) {
+      window.location.href = '/';
+      return;
+    }
 
     closeModals();
   });
@@ -1831,6 +1864,15 @@
 
       save(list);
 
+      // ホーム画面から編集した場合はホームへ戻る
+      const params = new URLSearchParams(location.search);
+
+      if (params.get('return') === 'home') {
+        window.location.href = '/';
+        return;
+      }
+
+      // カレンダーから直接編集した場合は従来どおり
       const [year, month] = date.split('-').map(Number);
       window.location.href = `/calendar?year=${year}&month=${month}`;
     });
@@ -1845,6 +1887,14 @@
     if (!confirm(`「${title}」を削除しますか？`)) return;
 
     save(load().filter(item => item.id !== id));
+
+    // ホーム画面から開いた場合はホームへ戻る
+    const params = new URLSearchParams(location.search);
+
+    if (params.get('return') === 'home') {
+      window.location.href = '/';
+      return;
+    }
 
     const date = safe(document.getElementById('editEventDate')?.value);
     const [year, month] = date.split('-').map(Number);
@@ -1868,6 +1918,14 @@
       if (!confirm(`「${title}」を削除しますか？`)) return;
 
       save(load().filter(item => item.id !== id));
+
+      // ホーム画面から開いた場合はホームへ戻る
+      const params = new URLSearchParams(location.search);
+
+      if (params.get('return') === 'home') {
+        window.location.href = '/';
+        return;
+      }
 
       const date = safe(document.getElementById('editEventDate')?.value);
       const [year, month] = date.split('-').map(Number);

@@ -820,7 +820,8 @@
     const params = new URLSearchParams({
       year,
       month: String(Number(month)),
-      open_event: eventId
+      open_event: eventId,
+      return: 'home'
     });
 
     window.location.href = '{{ url_for("calendar_page") }}?' + params.toString();
@@ -1039,7 +1040,8 @@
 
         location.href =
           `/calendar?year=${year}&month=${Number(monthNumber)}` +
-          `&open_event=${encodeURIComponent(event.id)}`;
+          `&open_event=${encodeURIComponent(event.id)}` +
+          `&return=home`;
       };
 
       card.addEventListener('click', go);
