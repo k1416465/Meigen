@@ -716,6 +716,7 @@ def timetable_page():
                 "info": direction_info,
                 "trains": trains,
                 "next_trains": future[:2],
+                "has_arrival_times": any(item["arrival_iso"] for item in trains),
             }
 
     return render_template(
@@ -1632,12 +1633,12 @@ def more_page():
 
 @app.route("/map")
 def map_page():
-    return render_template("tool_placeholder.html", page_title="地図")
+    return render_template("map.html")
 
 
 @app.route("/database")
 def database_page():
-    return render_template("tool_placeholder.html", page_title="データベース")
+    return redirect("https://1drv.ms/o/c/da9538a4f9ea7cf2/EiUgrA7IIWBJijIwtkU7a8gB06UBYVQdAmJdf8D-YfVB8g?e=DCUq1E")
 
 
 @app.route("/range", methods=["GET"])
@@ -1655,7 +1656,7 @@ def range_page():
 
 @app.route("/line")
 def line_page():
-    return render_template("tool_placeholder.html", page_title="LINE")
+    return redirect("https://line.me/R/ti/p/@396dngoe")
 
 
 @app.route("/roster")
@@ -2386,11 +2387,7 @@ def stamp_admin():
 
 @app.route("/video")
 def video_page():
-    return render_template(
-        "tool_page.html",
-        tool_name="動画",
-        description="動画のページです。"
-    )
+    return redirect("https://youtube.com/playlist?list=PLCGJL6NeediL94IzE4Kk-dxjv5h7SRTzR&si=w2oGM9GDTKQxV6wT")
 
 
 @app.route("/calculator")
