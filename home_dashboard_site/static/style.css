@@ -5790,7 +5790,8 @@ body.dark .operation-loading-overlay {
 }
 
 .range-schedule-section {
-    margin: 0 0 18px;
+    /* 日程と各項目の間隔は、項目同士の間隔と統一 */
+    margin: 0 0 11px;
 }
 
 .range-schedule-accordion {
@@ -5972,8 +5973,13 @@ body.dark .operation-loading-overlay {
 }
 
 @media (max-width: 640px) {
+    /* スマホでは各項目の間隔を詰め、日程との間隔も同じにする */
+    .range-accordion-list {
+        gap: 7px;
+    }
+
     .range-schedule-section {
-        margin-bottom: 16px;
+        margin-bottom: 7px;
     }
 
     .range-schedule-summary {
