@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block title %}迷言｜カレンダー{% endblock %}
 
@@ -7,212 +8,706 @@
     <h1>カレンダー</h1>
   </div>
 </section>
-<button type="button" class="calendar-fab" id="calendarAddToggle" aria-label="予定を追加" aria-expanded="false" aria-controls="calendarAddForm">
-  <img src="{{ url_for('static', filename='icons/light/plus.png') }}" data-light-src="{{ url_for('static', filename='icons/light/plus.png') }}" data-dark-src="{{ url_for('static', filename='icons/dark/plus.png') }}" alt="">
+
+<button type="button" class="calendar-fab" id="calendarAddToggle"
+  aria-label="予定を追加" aria-expanded="false" aria-controls="calendarAddForm">
+  <img src="{{ url_for('static', filename='icons/light/plus.png') }}"
+    data-light-src="{{ url_for('static', filename='icons/light/plus.png') }}"
+    data-dark-src="{{ url_for('static', filename='icons/dark/plus.png') }}" alt="">
   <span class="calendar-fab-fallback" aria-hidden="true">＋</span>
 </button>
 
 <style>
-  .calendar-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
-  .calendar-add-toggle, .calendar-primary-button {
-    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
-    border:0; border-radius:10px; padding:10px 16px; background:#077AE3;
-    color:#fff; font:inherit; cursor:pointer;
+  .calendar-heading {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
   }
-  .calendar-add-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:16px; }
-  .calendar-add-form[hidden] { display:none; }
-  .calendar-add-modal .calendar-add-form { margin-top:0; }
-  .calendar-add-modal .calendar-add-form button[type="submit"] { margin-top:2px; }
-  .calendar-add-form label, .calendar-edit-form label { display:flex; flex-direction:column; gap:6px; font-size:.9rem; }
-  .calendar-add-form input[type="date"], .calendar-add-form input[type="text"],
-  .calendar-add-form textarea, .calendar-edit-form input[type="date"],
-  .calendar-edit-form input[type="text"], .calendar-edit-form textarea {
-    box-sizing:border-box; width:100%; max-width:100%; min-width:0; padding:10px 12px;
-    border:1px solid var(--border-color,#d7dce2); border-radius:8px;
-    background:var(--card-bg,transparent); color:inherit; font:inherit;
+
+  .calendar-add-toggle,
+  .calendar-primary-button {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    border:0;
+    border-radius:10px;
+    padding:10px 16px;
+    background:#077AE3;
+    color:#fff;
+    font:inherit;
+    cursor:pointer;
   }
-  .calendar-add-form > label, .calendar-edit-form > label { min-width:0; }
-  /* 詳細欄は枠の大きさを固定し、ドラッグで伸縮できないようにする */
-  .calendar-add-form textarea, .calendar-edit-form textarea { resize:none; }
-  .calendar-scroll { width:100%; min-width:0; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  .calendar-scroll .calendar-grid { min-width:0; }
-  .calendar-add-form .wide, .calendar-edit-form .wide { grid-column:1 / -1; }
-  .calendar-add-form button[type="submit"], .calendar-edit-form button[type="submit"] {
-    justify-self:start; border:0; border-radius:9px; padding:10px 14px; background:#077AE3; color:white; cursor:pointer; font:inherit;
+
+  .calendar-add-form {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    margin-top:16px;
   }
-  .calendar-edit-actions { display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
-  .calendar-edit-actions button { justify-self:auto; }
-  .calendar-edit-actions .calendar-danger-button { border:0; border-radius:9px; padding:10px 14px; background:#c62828; color:#fff; cursor:pointer; font:inherit; }
-  .calendar-color-options { display:flex; flex-wrap:wrap; gap:9px; margin-top:4px; }
-  .calendar-color-option { position:relative; display:inline-flex !important; flex-direction:row !important; align-items:center; gap:6px !important; cursor:pointer; }
-  .calendar-color-option input { position:absolute; opacity:0; width:1px; height:1px; }
-  .calendar-color-swatch { width:23px; height:23px; border-radius:50%; background:var(--swatch); border:2px solid transparent; box-shadow:0 0 0 1px #999; display:inline-block; }
-  .calendar-color-option input:checked + .calendar-color-swatch { outline:3px solid var(--swatch); outline-offset:3px; }
-  .calendar-color-option input:focus-visible + .calendar-color-swatch { outline:3px solid currentColor; outline-offset:4px; }
-  .calendar-day-number.holiday-date { color:#d73545 !important; }
-  .calendar-day-number { border:0; background:transparent; color:inherit; font:inherit; font-weight:700; cursor:pointer; padding:2px 5px; border-radius:5px; }
-  .calendar-day-number:hover, .calendar-day-number:focus-visible { background:rgba(7,122,227,.12); outline:2px solid #077AE3; }
-  .calendar-event { display:block; padding:3px 5px; margin-top:3px; border-radius:4px; font-size:.7em; font-weight:600; overflow-wrap:anywhere; }
-  .calendar-event.school { background:rgba(7,122,227,.13); color:#077AE3; }
-  .calendar-event.holiday { background:rgba(220,53,69,.12); color:#d73545; }
+
+  .calendar-add-form[hidden] {
+    display:none;
+  }
+
+  .calendar-add-modal .calendar-add-form {
+    margin-top:0;
+  }
+
+  .calendar-add-modal .calendar-add-form button[type="submit"] {
+    margin-top:2px;
+  }
+
+  .calendar-add-form label,
+  .calendar-edit-form label {
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    font-size:.9rem;
+  }
+
+  .calendar-add-form input[type="date"],
+  .calendar-add-form input[type="text"],
+  .calendar-add-form input[type="time"],
+  .calendar-add-form textarea,
+  .calendar-edit-form input[type="date"],
+  .calendar-edit-form input[type="text"],
+  .calendar-edit-form input[type="time"],
+  .calendar-edit-form textarea {
+    box-sizing:border-box;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    padding:10px 12px;
+    border:1px solid var(--border-color,#d7dce2);
+    border-radius:8px;
+    background:var(--card-bg,transparent);
+    color:inherit;
+    font:inherit;
+  }
+
+  .calendar-add-form > label,
+  .calendar-edit-form > label {
+    min-width:0;
+  }
+
+  .calendar-add-form textarea,
+  .calendar-edit-form textarea {
+    resize:none;
+  }
+
+  .calendar-scroll {
+    width:100%;
+    min-width:0;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .calendar-scroll .calendar-grid {
+    min-width:0;
+  }
+
+  .calendar-add-form .wide,
+  .calendar-edit-form .wide {
+    grid-column:1 / -1;
+  }
+
+  .calendar-add-form button[type="submit"],
+  .calendar-edit-form button[type="submit"] {
+    justify-self:start;
+    border:0;
+    border-radius:9px;
+    padding:10px 14px;
+    background:#077AE3;
+    color:white;
+    cursor:pointer;
+    font:inherit;
+  }
+
+  .calendar-edit-actions {
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  .calendar-edit-actions button {
+    justify-self:auto;
+  }
+
+  .calendar-edit-actions .calendar-danger-button {
+    border:0;
+    border-radius:9px;
+    padding:10px 14px;
+    background:#c62828;
+    color:#fff;
+    cursor:pointer;
+    font:inherit;
+  }
+
+  .calendar-color-options {
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+    margin-top:4px;
+  }
+
+  .calendar-color-option {
+    position:relative;
+    display:inline-flex !important;
+    flex-direction:row !important;
+    align-items:center;
+    gap:6px !important;
+    cursor:pointer;
+  }
+
+  .calendar-color-option input {
+    position:absolute;
+    opacity:0;
+    width:1px;
+    height:1px;
+  }
+
+  .calendar-color-swatch {
+    width:23px;
+    height:23px;
+    border-radius:50%;
+    background:var(--swatch);
+    border:2px solid transparent;
+    box-shadow:0 0 0 1px #999;
+    display:inline-block;
+  }
+
+  .calendar-color-option input:checked + .calendar-color-swatch {
+    outline:3px solid var(--swatch);
+    outline-offset:3px;
+  }
+
+  .calendar-color-option input:focus-visible + .calendar-color-swatch {
+    outline:3px solid currentColor;
+    outline-offset:4px;
+  }
+
+  .calendar-day-number.holiday-date {
+    color:#d73545 !important;
+  }
+
+  .calendar-day-number {
+    border:0;
+    background:transparent;
+    color:inherit;
+    font:inherit;
+    font-weight:700;
+    cursor:pointer;
+    padding:2px 5px;
+    border-radius:5px;
+  }
+
+  .calendar-day-number:hover,
+  .calendar-day-number:focus-visible {
+    background:rgba(7,122,227,.12);
+    outline:2px solid #077AE3;
+  }
+
+  .calendar-event {
+    display:block;
+    padding:3px 5px;
+    margin-top:3px;
+    border-radius:4px;
+    font-size:.7em;
+    font-weight:600;
+    overflow-wrap:anywhere;
+    overflow:hidden;
+  }
+
+  .calendar-event.school {
+    background:rgba(7,122,227,.13);
+    color:#077AE3;
+  }
+
+  .calendar-event.holiday {
+    background:rgba(220,53,69,.12);
+    color:#d73545;
+  }
+
   .calendar-event.personal {
     border-left:3px solid var(--personal-event-color,#077AE3);
     background:color-mix(in srgb,var(--personal-event-color,#077AE3) 15%,transparent);
     color:var(--personal-event-text-color,#0563B5);
-    cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:pan-y;
+    cursor:pointer;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:pan-y;
   }
-  .calendar-event-title { font-weight:700; color:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .calendar-event { overflow:hidden; }
-  .calendar-fab { position:fixed; right:24px; bottom:calc(78px + env(safe-area-inset-bottom, 0px)); z-index:900; width:54px; height:54px; padding:0; border:0; border-radius:50%; background:transparent; box-shadow:0 4px 16px rgba(0,0,0,.22); cursor:pointer; display:grid; place-items:center; }
-  .calendar-fab img { display:block; width:27px; height:27px; object-fit:contain; }
-  .calendar-fab .calendar-fab-fallback { display:none; width:100%; height:100%; border-radius:50%; background:#077AE3; color:white; font-size:36px; line-height:1; place-items:center; }
-  .calendar-time-label { font-size:.72em; opacity:.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  @media (max-width:600px) { .calendar-fab { right:14px; bottom:calc(78px + env(safe-area-inset-bottom, 0px)); width:48px; height:48px; } .calendar-fab img { width:25px; height:25px; } }
-  .calendar-event-detail { display:none; margin-top:2px; font-size:.8em; white-space:pre-wrap; font-weight:400; color:inherit; }
-  /* カレンダー上では各日の予定を2件まで表示し、残りは日付モーダルに表示 */
-  .calendar-day > .calendar-event:nth-of-type(n+3) { display:none; }
-  .calendar-more-events { margin-top:3px; font-size:.75em; opacity:.8; text-align:center; }
-  .calendar-event-delete-form { display:none; }
-  .calendar-event.personal:focus-visible { outline:2px solid #077AE3; outline-offset:2px; }
-  .calendar-modal-backdrop { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.48); }
-  .calendar-modal-backdrop[hidden] { display:none; }
-  .calendar-modal { width:min(520px,100%); max-height:min(85vh,760px); overflow:auto; padding:20px; border-radius:14px; background:var(--card-bg,#fff); color:var(--text-color,inherit); box-shadow:0 12px 40px rgba(0,0,0,.25); }
-  .calendar-modal h2 { margin:0 36px 14px 0; font-size:1.2rem; }
-  .calendar-modal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
-  .calendar-modal-close { border:0; border-radius:8px; padding:5px 10px; font:inherit; cursor:pointer; background:rgba(127,127,127,.15); color:inherit; }
-  .calendar-modal-event { padding:10px 11px; margin-top:9px; border-radius:8px; background:rgba(127,127,127,.08); overflow-wrap:anywhere; }
-  .calendar-modal-event.school { border-left:4px solid #077AE3; }
-  .calendar-modal-event.holiday { border-left:4px solid #d73545; }
-  .calendar-modal-event.personal { border-left:4px solid var(--personal-event-color,#077AE3); }
-  .calendar-modal-event-title { font-weight:700; }
-  .calendar-modal-event-detail { white-space:pre-wrap; margin-top:4px; font-size:.9em; }
-  .calendar-modal-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; }
-  .calendar-secondary-button, .calendar-danger-button { border:0; border-radius:9px; padding:9px 13px; font:inherit; cursor:pointer; }
-  .calendar-secondary-button { background:rgba(127,127,127,.16); color:inherit; }
-  .calendar-danger-button { background:#c62828; color:#fff; }
-  .calendar-edit-form { display:grid; grid-template-columns:1fr; gap:12px; }
-  .calendar-edit-form[hidden] { display:none; }
-  .calendar-modal-help { font-size:.88rem; opacity:.8; margin:0 0 12px; }
+
+  .calendar-event-title {
+    font-weight:700;
+    color:inherit;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  /* カレンダー：予定追加ボタン */
+  .calendar-fab {
+    position:fixed;
+    right:18px;
+    bottom:calc(14px + env(safe-area-inset-bottom, 0px));
+    z-index:10000;
+    width:54px;
+    height:54px;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--border);
+    border-radius:50%;
+    background:var(--surface);
+    box-shadow:0 3px 12px rgba(0,0,0,.2);
+    cursor:pointer;
+    opacity:1;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .calendar-fab img {
+    display:block;
+    width:27px;
+    height:27px;
+    object-fit:contain;
+  }
+
+  .calendar-fab:active {
+    transform:scale(.96);
+  }
+
+  body.dark .calendar-fab {
+    background:var(--surface);
+  }
+
+  .calendar-fab .calendar-fab-fallback {
+    display:none;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    color:var(--text-color, currentColor);
+    font-size:36px;
+    line-height:1;
+    place-items:center;
+  }
+
   @media (max-width:600px) {
-    .calendar-heading { align-items:flex-start; }
-    .calendar-add-toggle { padding:9px 11px; font-size:.9rem; }
-    .calendar-add-form { grid-template-columns:minmax(0,1fr); }
-    .calendar-add-modal { width:min(520px,100%); max-height:calc(100dvh - 36px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow:auto; }
-    .calendar-add-form .wide { grid-column:auto; min-width:0; }
-    /* iPhone Safariでも日付欄を予定名欄と同じ内側幅に固定 */
-    .calendar-add-modal { box-sizing:border-box; }
-    #calendarAddForm {
-      display:grid; grid-template-columns:minmax(0,1fr); width:100%; min-width:0;
-      box-sizing:border-box;
-    }
-    #calendarAddForm > label {
-      display:flex; flex-direction:column; width:auto !important;
-      max-width:100%; min-width:0; box-sizing:border-box;
-    }
-    #calendarAddForm input[type="date"],
-    #calendarAddForm input[type="text"],
-    #calendarAddForm textarea {
-      display:block; box-sizing:border-box; width:100% !important;
-      inline-size:100%; max-width:100% !important; min-width:0 !important;
-      min-inline-size:0; max-inline-size:100%;
-    }
-    /* 日付欄も予定名欄と同じ幅にする（余分な縮小はしない） */
-    #calendarAddForm input[type="date"] {
-      width:100% !important;
-      inline-size:100% !important;
-      max-width:100% !important;
-      align-self:stretch;
-    }
-    #calendarAddForm input[type="date"], .calendar-edit-form input[type="date"] {
-      padding-inline:8px; font-size:16px;
-    }
-    /* 色の選択肢をスマホでも横一列に7個並べる */
-    .calendar-add-form .calendar-color-options, .calendar-edit-form .calendar-color-options {
-      display:flex; flex-wrap:nowrap; justify-content:space-between; align-items:stretch;
-      gap:0; width:100%; min-width:0;
-    }
-    .calendar-add-form .calendar-color-option, .calendar-edit-form .calendar-color-option {
-      box-sizing:border-box; flex:1 1 0; min-width:0;
-      display:flex !important; flex-direction:column !important;
-      align-items:center; justify-content:center; gap:3px !important;
-      padding:3px 0; font-size:clamp(9px, 2.7vw, 11px);
-      line-height:1.2; white-space:nowrap;
-    }
-    .calendar-add-form .calendar-color-swatch, .calendar-edit-form .calendar-color-swatch {
-      width:16px; height:16px; flex:0 0 16px;
-    }
-    /* スマホでは色名を隠し、色の丸だけを表示 */
-    .calendar-add-form .calendar-color-option > span:not(.calendar-color-swatch),
-    .calendar-edit-form .calendar-color-option > span:not(.calendar-color-swatch) {
-      display:none !important;
-    }
-    .calendar-add-form .calendar-color-option,
-    .calendar-edit-form .calendar-color-option {
-      flex-direction:row !important;
-      gap:0 !important;
-      padding:5px 0;
-    }
-    .calendar-edit-form > label { display:flex; width:100%; min-width:0; }
-    .calendar-edit-form input[type="date"], .calendar-edit-form input[type="text"] {
-      display:block; box-sizing:border-box; width:100%; max-width:100%; min-width:0;
-    }
-    .calendar-edit-actions { flex-direction:row; align-items:center; gap:8px; }
-    .calendar-edit-actions button { padding:10px 11px; }
-    .calendar-scroll { max-width:100%; overflow-x:auto; }
-    .calendar-scroll .calendar-grid { min-width:1100px; }
-    .calendar-modal { padding:16px; }
-
-    /* iPhone Safari：日付欄と予定名欄を同じ親幅・同じ寸法ルールに統一 */
-    #calendarAddForm > label,
-    #calendarEditForm > label {
-      display:flex !important;
-      flex-direction:column !important;
-      width:100% !important;
-      min-width:0 !important;
-      max-width:100% !important;
-      box-sizing:border-box !important;
+    .calendar-fab {
+      right:14px;
+      bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+      width:48px;
+      height:48px;
     }
 
-    #calendarAddForm > label > input[type="date"],
-    #calendarAddForm > label > input[type="text"],
-    #calendarEditForm > label > input[type="date"],
-    #calendarEditForm > label > input[type="text"] {
-      display:block !important;
-      width:100% !important;
-      inline-size:100% !important;
-      min-width:0 !important;
-      min-inline-size:0 !important;
-      max-width:100% !important;
-      max-inline-size:100% !important;
-      box-sizing:border-box !important;
-      margin:0 !important;
-    }
-
-    /* iOSの日付入力固有の余分な外観幅を抑え、予定名欄と揃える */
-    #calendarAddForm > label > input[type="date"],
-    #calendarEditForm > label > input[type="date"] {
-      -webkit-appearance:none;
-      appearance:none;
-      border-radius:8px;
-    }
-
-    /* スマホ版：カレンダーの日付マスの縦の高さ */
-    @media (max-width: 600px) {
-        .calendar-scroll .calendar-day {
-            min-height: 90px;
-        }
+    .calendar-fab img {
+      width:25px;
+      height:25px;
     }
   }
 
+  /* 運行情報ページと同じ高さに調整 */
+  .calendar-fab {
+    bottom:calc(78px + env(safe-area-inset-bottom, 0px));
+  }
 
-  /* =========================================
-     ダークモード：予定追加・日付詳細・編集モーダル
-     body.dark は base.html / style.css のテーマ切替に合わせる
-  ========================================= */
+  @media (max-width:600px) {
+    .calendar-fab {
+      bottom:calc(78px + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
+  .calendar-time-label {
+    font-size:.72em;
+    opacity:.85;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .calendar-event-detail {
+    display:none;
+    margin-top:2px;
+    font-size:.8em;
+    white-space:pre-wrap;
+    font-weight:400;
+    color:inherit;
+  }
+
+  .calendar-day > .calendar-event:nth-of-type(n+3) {
+    display:none;
+  }
+
+  .calendar-more-events {
+    margin-top:3px;
+    font-size:.75em;
+    opacity:.8;
+    text-align:center;
+  }
+
+  .calendar-event-delete-form {
+    display:none;
+  }
+
+  .calendar-event.personal:focus-visible {
+    outline:2px solid #077AE3;
+    outline-offset:2px;
+  }
+
+  .calendar-time-setting {
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center;
+    gap:8px !important;
+    font-size:.9rem;
+    cursor:pointer;
+  }
+
+  .calendar-time-setting input {
+    width:18px;
+    height:18px;
+    accent-color:#077AE3;
+  }
+
+  .calendar-time-fields[hidden] {
+    display:none !important;
+  }
+
+  .calendar-time-fields {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .calendar-modal-backdrop {
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    background:rgba(0,0,0,.48);
+  }
+
+  .calendar-modal-backdrop[hidden] {
+    display:none;
+  }
+
+  .calendar-modal {
+    width:min(520px,100%);
+    max-height:min(85vh,760px);
+    overflow:auto;
+    padding:20px;
+    border-radius:14px;
+    background:var(--card-bg,#fff);
+    color:var(--text-color,inherit);
+    box-shadow:0 12px 40px rgba(0,0,0,.25);
+  }
+
+  .calendar-modal h2 {
+    margin:0 36px 14px 0;
+    font-size:1.2rem;
+  }
+
+  .calendar-modal-header {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+
+  .calendar-modal-close {
+    border:0;
+    border-radius:8px;
+    padding:5px 10px;
+    font:inherit;
+    cursor:pointer;
+    background:rgba(127,127,127,.15);
+    color:inherit;
+  }
+
+  .calendar-modal-event {
+    padding:10px 11px;
+    margin-top:9px;
+    border-radius:8px;
+    background:rgba(127,127,127,.08);
+    overflow-wrap:anywhere;
+  }
+
+  .calendar-modal-event.school {
+    border-left:4px solid #077AE3;
+  }
+
+  .calendar-modal-event.holiday {
+    border-left:4px solid #d73545;
+  }
+
+  .calendar-modal-event.personal {
+    border-left:4px solid var(--personal-event-color,#077AE3);
+  }
+
+  .calendar-modal-event-title {
+    font-weight:700;
+  }
+
+  .calendar-modal-event-time {
+    margin-top:3px;
+    font-size:.85rem;
+    opacity:.8;
+  }
+
+  .calendar-modal-event-detail {
+    white-space:pre-wrap;
+    margin-top:4px;
+    font-size:.9em;
+  }
+
+  .calendar-modal-actions {
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+    margin-top:14px;
+  }
+
+  .calendar-secondary-button,
+  .calendar-danger-button {
+    border:0;
+    border-radius:9px;
+    padding:9px 13px;
+    font:inherit;
+    cursor:pointer;
+  }
+
+  .calendar-secondary-button {
+    background:rgba(127,127,127,.16);
+    color:inherit;
+  }
+
+  .calendar-danger-button {
+    background:#c62828;
+    color:#fff;
+  }
+
+  .calendar-edit-form {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .calendar-edit-form[hidden] {
+    display:none;
+  }
+
+  .calendar-modal-help {
+    font-size:.88rem;
+    opacity:.8;
+    margin:0 0 12px;
+  }
+
+  .calendar-heading {
+    align-items:flex-start;
+  }
+
+  .calendar-add-toggle {
+    padding:9px 11px;
+    font-size:.9rem;
+  }
+
+  .calendar-add-form {
+    grid-template-columns:minmax(0,1fr);
+  }
+
+  .calendar-add-modal {
+    box-sizing:border-box;
+    width:min(520px,100%);
+    max-height:calc(100dvh - 36px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow:auto;
+  }
+
+  .calendar-add-form .wide {
+    grid-column:auto;
+    min-width:0;
+  }
+
+  #calendarAddForm {
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+
+  #calendarAddForm > label {
+    display:flex;
+    flex-direction:column;
+    width:auto !important;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+
+  #calendarAddForm input[type="date"],
+  #calendarAddForm input[type="text"],
+  #calendarAddForm input[type="time"],
+  #calendarAddForm textarea {
+    display:block;
+    box-sizing:border-box;
+    width:100% !important;
+    inline-size:100%;
+    max-width:100% !important;
+    min-width:0 !important;
+    min-inline-size:0;
+    max-inline-size:100%;
+  }
+
+  #calendarAddForm input[type="date"] {
+    width:100% !important;
+    inline-size:100% !important;
+    max-width:100% !important;
+    align-self:stretch;
+  }
+
+  #calendarAddForm input[type="date"],
+  #calendarEditForm input[type="date"],
+  #calendarAddForm input[type="time"],
+  #calendarEditForm input[type="time"] {
+    padding-inline:8px;
+    font-size:16px;
+  }
+
+  .calendar-add-form .calendar-color-options,
+  .calendar-edit-form .calendar-color-options {
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:space-between;
+    align-items:stretch;
+    gap:0;
+    width:100%;
+    min-width:0;
+  }
+
+  .calendar-add-form .calendar-color-option,
+  .calendar-edit-form .calendar-color-option {
+    box-sizing:border-box;
+    flex:1 1 0;
+    min-width:0;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center;
+    justify-content:center;
+    gap:3px !important;
+    padding:3px 0;
+    font-size:clamp(9px, 2.7vw, 11px);
+    line-height:1.2;
+    white-space:nowrap;
+  }
+
+  .calendar-add-form .calendar-color-swatch,
+  .calendar-edit-form .calendar-color-swatch {
+    width:16px;
+    height:16px;
+    flex:0 0 16px;
+  }
+
+  .calendar-add-form .calendar-color-option > span:not(.calendar-color-swatch),
+  .calendar-edit-form .calendar-color-option > span:not(.calendar-color-swatch) {
+    display:none !important;
+  }
+
+  .calendar-add-form .calendar-color-option,
+  .calendar-edit-form .calendar-color-option {
+    flex-direction:row !important;
+    gap:0 !important;
+    padding:5px 0;
+  }
+
+  .calendar-edit-form > label {
+    display:flex;
+    width:100%;
+    min-width:0;
+  }
+
+  .calendar-edit-form input[type="date"],
+  .calendar-edit-form input[type="text"],
+  .calendar-edit-form input[type="time"],
+  .calendar-edit-form textarea {
+    display:block;
+    box-sizing:border-box;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+
+  .calendar-edit-actions {
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
+  }
+
+  .calendar-edit-actions button {
+    padding:10px 11px;
+  }
+
+  .calendar-scroll {
+    max-width:100%;
+    overflow-x:auto;
+  }
+
+  .calendar-scroll .calendar-grid {
+    min-width:1100px;
+  }
+
+  .calendar-scroll .calendar-day {
+    min-height:90px;
+  }
+
+  .calendar-modal {
+    padding:16px;
+  }
+
+  #calendarAddForm > label,
+  #calendarEditForm > label {
+    display:flex !important;
+    flex-direction:column !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+
+  #calendarAddForm > label > input,
+  #calendarEditForm > label > input {
+    display:block !important;
+    width:100% !important;
+    inline-size:100% !important;
+    min-width:0 !important;
+    min-inline-size:0 !important;
+    max-width:100% !important;
+    max-inline-size:100% !important;
+    box-sizing:border-box !important;
+    margin:0 !important;
+  }
+
+  #calendarAddForm > label > input[type="date"],
+  #calendarEditForm > label > input[type="date"] {
+    -webkit-appearance:none;
+    appearance:none;
+    border-radius:8px;
+  }
+
+  .calendar-time-fields {
+    grid-template-columns:minmax(0,1fr);
+  }
+
   body.dark .calendar-modal {
-    background: #252b36 !important;
-    color: #f1f5f9 !important;
-    border: 1px solid #414b5b;
+    background:#252b36 !important;
+    color:#f1f5f9 !important;
+    border:1px solid #414b5b;
   }
 
   body.dark .calendar-modal h2,
@@ -223,95 +718,317 @@
   body.dark .calendar-modal-event-title,
   body.dark .calendar-modal-event-detail,
   body.dark .calendar-modal-header {
-    color: #f1f5f9;
+    color:#f1f5f9;
   }
 
-  body.dark .calendar-add-form input[type="date"],
-  body.dark .calendar-add-form input[type="text"],
+  body.dark .calendar-add-form input,
   body.dark .calendar-add-form textarea,
-  body.dark .calendar-edit-form input[type="date"],
-  body.dark .calendar-edit-form input[type="text"],
+  body.dark .calendar-edit-form input,
   body.dark .calendar-edit-form textarea {
-    background: #343d4b !important;
-    color: #f1f5f9 !important;
-    border: 1px solid #596579 !important;
-    color-scheme: dark;
+    background:#343d4b !important;
+    color:#f1f5f9 !important;
+    border:1px solid #596579 !important;
+    color-scheme:dark;
   }
 
   body.dark .calendar-add-form input::placeholder,
   body.dark .calendar-add-form textarea::placeholder,
   body.dark .calendar-edit-form input::placeholder,
   body.dark .calendar-edit-form textarea::placeholder {
-    color: #aab4c3 !important;
-    opacity: 1;
+    color:#aab4c3 !important;
+    opacity:1;
   }
 
   body.dark .calendar-modal-close,
   body.dark .calendar-secondary-button {
-    background: #3a4555 !important;
-    color: #f1f5f9 !important;
+    background:#3a4555 !important;
+    color:#f1f5f9 !important;
   }
 
   body.dark .calendar-modal-event {
-    background: #303947;
+    background:#303947;
   }
 
-  body.dark .calendar-modal-event.school { color: #8fc5ff; }
-  body.dark .calendar-modal-event.holiday { color: #ff9aa5; }
-  body.dark .calendar-modal-event.personal { color: #f1f5f9; }
+  body.dark .calendar-modal-event.school {
+    color:#8fc5ff;
+  }
+
+  body.dark .calendar-modal-event.holiday {
+    color:#ff9aa5;
+  }
+
+  body.dark .calendar-modal-event.personal {
+    color:#f1f5f9;
+  }
 
   body.dark .calendar-add-form button[type="submit"],
   body.dark .calendar-edit-form button[type="submit"],
   body.dark .calendar-primary-button {
-    color: #fff !important;
+    color:#fff !important;
   }
+
+
+/* ========================================
+   予定追加・編集モーダルの表示領域調整
+   PC・スマートフォン共通
+======================================== */
+
+/* モーダルの背景 */
+.calendar-modal-backdrop {
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+
+  /* 下部メニューと重ならないための余白 */
+  padding:
+    max(12px, env(safe-area-inset-top, 0px))
+    16px
+    calc(96px + env(safe-area-inset-bottom, 0px));
+
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* モーダル共通 */
+.calendar-modal {
+  box-sizing: border-box;
+  width: min(520px, 100%);
+
+  max-height: calc(
+    100dvh
+    - 124px
+    - env(safe-area-inset-top, 0px)
+    - env(safe-area-inset-bottom, 0px)
+  );
+
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 追加・編集画面はヘッダーを固定し、入力部分をスクロール */
+.calendar-add-modal,
+#calendarEditBackdrop .calendar-modal {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* タイトルと閉じるボタン */
+.calendar-add-modal .calendar-modal-header,
+#calendarEditBackdrop .calendar-modal-header {
+  flex: 0 0 auto;
+}
+
+/* 追加フォーム */
+.calendar-add-modal #calendarAddForm {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 3px 8px 0;
+}
+
+/* 編集フォーム */
+#calendarEditBackdrop #calendarEditForm {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 3px 8px 0;
+}
+
+/* 入力欄がモーダルからはみ出さないようにする */
+.calendar-add-modal *,
+#calendarEditBackdrop .calendar-modal * {
+  box-sizing: border-box;
+}
+
+/* スマートフォン */
+@media (max-width: 600px) {
+  .calendar-modal-backdrop {
+    align-items: center;
+    padding:
+      max(8px, env(safe-area-inset-top, 0px))
+      10px
+      calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .calendar-modal {
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(
+      100dvh
+      - 116px
+      - env(safe-area-inset-top, 0px)
+      - env(safe-area-inset-bottom, 0px)
+    );
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .calendar-modal h2 {
+    font-size: 1.1rem;
+  }
+
+  .calendar-add-modal #calendarAddForm,
+  #calendarEditBackdrop #calendarEditForm {
+    gap: 10px;
+  }
+
+  .calendar-add-form button[type="submit"],
+  .calendar-edit-actions button {
+    min-height: 42px;
+  }
+}
+
+/* 画面の高さが小さい端末 */
+@media (max-height: 650px) {
+  .calendar-modal-backdrop {
+    align-items: flex-start;
+  }
+
+  .calendar-modal {
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  .calendar-add-modal,
+  #calendarEditBackdrop .calendar-modal {
+    max-height: calc(
+      100dvh
+      - 112px
+      - env(safe-area-inset-top, 0px)
+      - env(safe-area-inset-bottom, 0px)
+    );
+  }
+}
+
+/* 100dvhに対応していないブラウザ向け */
+@supports not (height: 100dvh) {
+  .calendar-modal {
+    max-height: calc(100vh - 124px);
+  }
+
+  @media (max-width: 600px) {
+    .calendar-modal {
+      max-height: calc(100vh - 116px);
+    }
+  }
+}
+
+/* 「時刻を設定する」を左端に配置 */
+.calendar-time-setting {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  width: 100%;
+  text-align: left;
+  gap: 8px !important;
+}
+
+.calendar-time-setting input[type="checkbox"] {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+/* 時刻設定チェックボックスを左端に固定 */
+#calendarAddForm > label.calendar-time-setting,
+#calendarEditForm > label.calendar-time-setting {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  justify-self: start !important;
+  width: 100% !important;
+  text-align: left !important;
+  gap: 8px !important;
+}
+
+/* チェックボックス自体の位置とサイズ */
+#calendarAddForm > label.calendar-time-setting > input[type="checkbox"],
+#calendarEditForm > label.calendar-time-setting > input[type="checkbox"] {
+  display: block !important;
+  flex: 0 0 18px !important;
+  width: 18px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
 
 </style>
 
+<!-- 予定追加 -->
 <div class="calendar-modal-backdrop" id="calendarAddBackdrop" hidden>
   <section class="calendar-modal calendar-add-modal" role="dialog" aria-modal="true" aria-labelledby="calendarAddTitle">
     <div class="calendar-modal-header">
       <h2 id="calendarAddTitle">予定の追加</h2>
       <button type="button" class="calendar-modal-close" data-close-modal>閉じる</button>
     </div>
-  <form class="calendar-add-form" id="calendarAddForm" method="post" action="{{ url_for('calendar_page') }}">
-    <input type="hidden" name="action" value="add">
-    <label>開始日
-      <input type="date" name="event_date" value="{{ today.isoformat() }}" required>
-    </label>
-    <label>終了日
-      <input type="date" name="end_date" value="{{ today.isoformat() }}" required>
-    </label>
-    <label>開始時刻
-      <input type="time" name="start_time">
-    </label>
-    <label>終了時刻
-      <input type="time" name="end_time">
-    </label>
-    <label>予定名
-      <input type="text" name="title" maxlength="80" placeholder="例：友達と出かける" required>
-    </label>
-    <div class="wide">
-      <div style="font-size:.9rem; margin-bottom:6px;">予定の色</div>
-      <div class="calendar-color-options">
-        {% for color_name, color_value in personal_event_colors.items() %}
-          <label class="calendar-color-option" title="{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}">
-            <input type="radio" name="color" value="{{ color_name }}"{% if color_name == 'blue' %} checked{% endif %} aria-label="{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}">
-            <span class="calendar-color-swatch" style="--swatch:{{ color_value }};"></span>
-            <span>{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}</span>
-          </label>
-        {% endfor %}
+
+    <form class="calendar-add-form" id="calendarAddForm" method="post" action="{{ url_for('calendar_page') }}">
+      <input type="hidden" name="action" value="add">
+
+      <label>開始日
+        <input type="date" name="event_date" value="{{ today.isoformat() }}" required>
+      </label>
+
+      <label>終了日
+        <input type="date" name="end_date" value="{{ today.isoformat() }}" required>
+      </label>
+
+      <label class="calendar-time-setting wide">
+        <input type="checkbox" id="addHasTime">
+        <span>時刻を設定する</span>
+      </label>
+
+      <div class="calendar-time-fields wide" id="addTimeFields" hidden>
+        <label>開始時刻
+          <input type="time" name="start_time" id="addStartTime">
+        </label>
+        <label>終了時刻
+          <input type="time" name="end_time" id="addEndTime">
+        </label>
       </div>
-    </div>
-    <label class="wide">詳細（任意）
-      <textarea name="detail" rows="2" maxlength="300" placeholder="時間や場所など"></textarea>
-    </label>
-    <input type="hidden" name="return_date" value="{{ year }}-{{ '%02d'|format(month) }}-01">
-    <button type="submit">予定を保存</button>
-  </form>
+
+      <label>予定名
+        <input type="text" name="title" maxlength="80" placeholder="例：友達と出かける" required>
+      </label>
+
+      <div class="wide">
+        <div style="font-size:.9rem; margin-bottom:6px;">予定の色</div>
+        <div class="calendar-color-options">
+          {% for color_name, color_value in personal_event_colors.items() %}
+            <label class="calendar-color-option" title="{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}">
+              <input type="radio" name="color" value="{{ color_name }}"{% if color_name == 'blue' %} checked{% endif %} aria-label="{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}">
+              <span class="calendar-color-swatch" style="--swatch:{{ color_value }};"></span>
+              <span>{{ {'blue':'青','red':'赤','orange':'橙','yellow':'黄','green':'緑','purple':'紫','pink':'桃'}[color_name] }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <label class="wide">詳細（任意）
+        <textarea name="detail" rows="2" maxlength="300" placeholder="時間や場所など"></textarea>
+      </label>
+
+      <input type="hidden" name="return_date" value="{{ year }}-{{ '%02d'|format(month) }}-01">
+      <button type="submit">予定を保存</button>
+    </form>
   </section>
 </div>
 
+<!-- カレンダー本体 -->
 <section class="card calendar-card">
   <div class="calendar-navigation">
     <a href="{{ url_for('calendar_page', year=previous_year, month=previous_month) }}">‹ 前月</a>
@@ -320,94 +1037,108 @@
   </div>
 
   <div class="calendar-scroll" aria-label="カレンダー。左右にスクロールできます">
-  <div class="calendar-grid">
-    {% for weekday in ["日", "月", "火", "水", "木", "金", "土"] %}
-      <div class="calendar-weekday">{{ weekday }}</div>
-    {% endfor %}
-    {% for week in weeks %}
-      {% for day in week %}
-        <div class="calendar-day{% if not day.in_month %} outside-month{% endif %}{% if day.date == today %} today{% endif %}">
-          <button type="button" class="calendar-day-number{% if day.is_holiday %} holiday-date{% endif %}"
-            data-open-day="{{ day.date.isoformat() }}" aria-label="{{ day.date.year }}年{{ day.date.month }}月{{ day.date.day }}日の予定を表示">
-            {{ day.date.day }}
-          </button>
-          {% for event in day.events %}
-            {% set event_color = personal_event_colors.get(event.color, '#077AE3') if event.kind == 'personal' else '#077AE3' %}
-            {% set event_text_color = personal_event_text_colors.get(event.color, '#0563B5') if event.kind == 'personal' else '' %}
-            <div class="calendar-event {{ event.kind }}"
-              {% if event.kind == 'personal' %}
-                style="--personal-event-color:{{ event_color }};--personal-event-text-color:{{ event_text_color }};"
-                data-event-id="{{ event.id }}" data-event-date="{{ event.date }}" data-event-end-date="{{ event.end_date|default(event.date) }}" data-event-start-time="{{ event.start_time|default('') }}" data-event-end-time="{{ event.end_time|default('') }}"
-                data-event-title="{{ event.title }}" data-event-detail="{{ event.detail }}"
-                data-event-color="{{ event.color }}"
-                aria-label="共有予定：{{ event.title }}"
-              {% endif %}>
-              <div class="calendar-event-title">{{ event.title }}</div>
-              {% if event.detail %}<div class="calendar-event-detail">{{ event.detail }}</div>{% endif %}
-            </div>
-          {% endfor %}
-          {% if day.events|length > 2 %}
-            <div class="calendar-more-events">ほか {{ day.events|length - 2 }} 件</div>
-          {% endif %}
-        </div>
+    <div class="calendar-grid">
+      {% for weekday in ["日", "月", "火", "水", "木", "金", "土"] %}
+        <div class="calendar-weekday">{{ weekday }}</div>
       {% endfor %}
-    {% endfor %}
-  </div>
+
+      {% for week in weeks %}
+        {% for day in week %}
+          <div class="calendar-day{% if not day.in_month %} outside-month{% endif %}{% if day.date == today %} today{% endif %}">
+            <button type="button" class="calendar-day-number{% if day.is_holiday %} holiday-date{% endif %}"
+              data-open-day="{{ day.date.isoformat() }}"
+              aria-label="{{ day.date.year }}年{{ day.date.month }}月{{ day.date.day }}日の予定を表示">
+              {{ day.date.day }}
+            </button>
+
+            {% for event in day.events %}
+              {% set event_color = personal_event_colors.get(event.color, '#077AE3') if event.kind == 'personal' else '#077AE3' %}
+              {% set event_text_color = personal_event_text_colors.get(event.color, '#0563B5') if event.kind == 'personal' else '' %}
+              <div class="calendar-event {{ event.kind }}"
+                {% if event.kind == 'personal' %}
+                  style="--personal-event-color:{{ event_color }};--personal-event-text-color:{{ event_text_color }};"
+                  data-event-id="{{ event.id }}"
+                  data-event-date="{{ event.date }}"
+                  data-event-end-date="{{ event.end_date|default(event.date) }}"
+                  data-event-start-time="{{ event.start_time|default('') }}"
+                  data-event-end-time="{{ event.end_time|default('') }}"
+                  data-event-title="{{ event.title }}"
+                  data-event-detail="{{ event.detail }}"
+                  data-event-color="{{ event.color }}"
+                  data-personal-event
+                {% endif %}>
+                <div class="calendar-event-title">{{ event.title }}</div>
+                {% if event.detail %}
+                  <div class="calendar-event-detail">{{ event.detail }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            {% if day.events|length > 2 %}
+              <div class="calendar-more-events">ほか {{ day.events|length - 2 }} 件</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
   </div>
 </section>
 
+<!-- 日付ごとの予定一覧 -->
 <div class="calendar-modal-backdrop" id="calendarDayBackdrop" hidden>
   <section class="calendar-modal" role="dialog" aria-modal="true" aria-labelledby="calendarDayTitle">
     <div class="calendar-modal-header">
       <h2 id="calendarDayTitle">この日の予定</h2>
       <button type="button" class="calendar-modal-close" data-close-modal>閉じる</button>
     </div>
+
     <div id="calendarDayEvents"></div>
+
     <div class="calendar-modal-actions">
       <button type="button" class="calendar-primary-button" id="addEventForDay">＋ この日に予定を追加</button>
     </div>
   </section>
 </div>
 
-<div class="calendar-modal-backdrop" id="calendarActionBackdrop" hidden>
-  <section class="calendar-modal" role="dialog" aria-modal="true" aria-labelledby="calendarActionTitle">
-    <div class="calendar-modal-header">
-      <h2 id="calendarActionTitle">予定の操作</h2>
-      <button type="button" class="calendar-modal-close" data-close-modal>閉じる</button>
-    </div>
-    <p id="calendarActionSummary"></p>
-    <div class="calendar-modal-actions">
-      <button type="button" class="calendar-primary-button" id="editEventButton">編集</button>
-      <button type="button" class="calendar-danger-button" id="deleteEventButton">削除</button>
-      <button type="button" class="calendar-secondary-button" data-close-modal>キャンセル</button>
-    </div>
-  </section>
-</div>
-
+<!-- 予定編集 -->
 <div class="calendar-modal-backdrop" id="calendarEditBackdrop" hidden>
   <section class="calendar-modal" role="dialog" aria-modal="true" aria-labelledby="calendarEditTitle">
     <div class="calendar-modal-header">
       <h2 id="calendarEditTitle">予定を編集</h2>
       <button type="button" class="calendar-modal-close" data-close-modal>閉じる</button>
     </div>
-    <form class="calendar-edit-form" id="calendarEditForm" method="post" action="{{ url_for('calendar_page', year=year, month=month) }}">
+
+    <form class="calendar-edit-form" id="calendarEditForm" method="post"
+      action="{{ url_for('calendar_page', year=year, month=month) }}">
       <input type="hidden" name="action" value="edit">
       <input type="hidden" name="event_id" id="editEventId">
+
       <label>開始日
         <input type="date" name="event_date" id="editEventDate" required>
       </label>
+
       <label>終了日
         <input type="date" name="end_date" id="editEventEndDate" required>
       </label>
-      <label>開始時刻
-        <input type="time" name="start_time" id="editEventStartTime">
+
+      <label class="calendar-time-setting">
+        <input type="checkbox" id="editHasTime">
+        <span>✓ 時刻を設定する</span>
       </label>
-      <label>終了時刻
-        <input type="time" name="end_time" id="editEventEndTime">
-      </label>
+
+      <div class="calendar-time-fields" id="editTimeFields" hidden>
+        <label>開始時刻
+          <input type="time" name="start_time" id="editEventStartTime">
+        </label>
+        <label>終了時刻
+          <input type="time" name="end_time" id="editEventEndTime">
+        </label>
+      </div>
+
       <label>予定名
         <input type="text" name="title" id="editEventTitle" maxlength="80" required>
       </label>
+
       <div>
         <div style="font-size:.9rem; margin-bottom:6px;">予定の色</div>
         <div class="calendar-color-options">
@@ -420,10 +1151,14 @@
           {% endfor %}
         </div>
       </div>
+
       <label>詳細（任意）
         <textarea name="detail" id="editEventDetail" rows="3" maxlength="300"></textarea>
       </label>
-      <input type="hidden" name="return_date" id="editReturnDate" value="{{ year }}-{{ '%02d'|format(month) }}-01">
+
+      <input type="hidden" name="return_date" id="editReturnDate"
+        value="{{ year }}-{{ '%02d'|format(month) }}-01">
+
       <div class="calendar-edit-actions">
         <button type="submit">変更を保存</button>
         <button type="button" class="calendar-danger-button" id="editDeleteButton">予定を削除</button>
@@ -432,10 +1167,12 @@
   </section>
 </div>
 
-<form id="calendarDeleteForm" method="post" action="{{ url_for('calendar_page', year=year, month=month) }}" hidden>
+<form id="calendarDeleteForm" method="post"
+  action="{{ url_for('calendar_page', year=year, month=month) }}" hidden>
   <input type="hidden" name="action" value="delete">
   <input type="hidden" name="event_id" id="deleteEventId">
-  <input type="hidden" name="return_date" id="deleteReturnDate" value="{{ year }}-{{ '%02d'|format(month) }}-01">
+  <input type="hidden" name="return_date" id="deleteReturnDate"
+    value="{{ year }}-{{ '%02d'|format(month) }}-01">
 </form>
 
 <script>
@@ -443,100 +1180,240 @@
   const addToggle = document.getElementById('calendarAddToggle');
   const fabImage = document.querySelector('.calendar-fab img');
   const fabFallback = document.querySelector('.calendar-fab-fallback');
+
   function updateFabIcon() {
     if (!fabImage) return;
-    fabImage.src = document.body.classList.contains('dark') ? fabImage.dataset.darkSrc : fabImage.dataset.lightSrc;
+    fabImage.src = document.body.classList.contains('dark')
+      ? fabImage.dataset.darkSrc
+      : fabImage.dataset.lightSrc;
   }
+
   if (fabImage) {
-    fabImage.addEventListener('error', () => { fabImage.style.display='none'; if(fabFallback) fabFallback.style.display='grid'; });
+    fabImage.addEventListener('error', () => {
+      fabImage.style.display = 'none';
+      if (fabFallback) fabFallback.style.display = 'grid';
+    });
     updateFabIcon();
-    new MutationObserver(updateFabIcon).observe(document.body,{attributes:true,attributeFilter:['class']});
+    new MutationObserver(updateFabIcon).observe(document.body, {
+      attributes:true,
+      attributeFilter:['class']
+    });
   }
+
   const addForm = document.getElementById('calendarAddForm');
   const addBackdrop = document.getElementById('calendarAddBackdrop');
   const dayBackdrop = document.getElementById('calendarDayBackdrop');
-  const actionBackdrop = document.getElementById('calendarActionBackdrop');
   const editBackdrop = document.getElementById('calendarEditBackdrop');
   const dayEvents = document.getElementById('calendarDayEvents');
+
   let selectedDay = '{{ today.isoformat() }}';
   let selectedEvent = null;
-  let pressTimer = null;
-  let longPressHandled = false;
 
-  if (addToggle && addForm && addBackdrop) {
-    addToggle.addEventListener('click', () => openAddForm());
+  const addHasTime = document.getElementById('addHasTime');
+  const editHasTime = document.getElementById('editHasTime');
+
+  function setupTimeToggle(checkbox, fields) {
+    if (!checkbox || !fields) return;
+    const update = () => {
+      fields.hidden = !checkbox.checked;
+    };
+    checkbox.addEventListener('change', update);
+    update();
   }
 
-  const closeModals = () => {
-    [addBackdrop, dayBackdrop, actionBackdrop, editBackdrop].forEach(el => { if (el) el.hidden = true; });
+  setupTimeToggle(addHasTime, document.getElementById('addTimeFields'));
+  setupTimeToggle(editHasTime, document.getElementById('editTimeFields'));
+
+  function closeModals() {
+    [addBackdrop, dayBackdrop, editBackdrop].forEach(el => {
+      if (el) el.hidden = true;
+    });
     addToggle?.setAttribute('aria-expanded', 'false');
-  };
+  }
 
   function openAddForm(date) {
     closeModals();
-    if (date) { addForm.querySelector('input[name="event_date"]').value = date; addForm.querySelector('input[name="end_date"]').value = date; }
+
+    if (date) {
+      addForm.querySelector('input[name="event_date"]').value = date;
+      addForm.querySelector('input[name="end_date"]').value = date;
+    }
+
+    addHasTime.checked = false;
+    document.getElementById('addTimeFields').hidden = true;
+    document.getElementById('addStartTime').value = '';
+    document.getElementById('addEndTime').value = '';
+
     addBackdrop.hidden = false;
     addToggle?.setAttribute('aria-expanded', 'true');
     setTimeout(() => addForm.querySelector('input[name="title"]')?.focus(), 50);
   }
+
+  addToggle?.addEventListener('click', () => openAddForm());
+
   document.querySelectorAll('[data-close-modal]').forEach(button => {
-    button.addEventListener('click', closeModals);
+    button.addEventListener('click', () => {
+      closeModals();
+    });
   });
-  [addBackdrop, dayBackdrop, actionBackdrop, editBackdrop].forEach(backdrop => {
+
+  /* 日付モーダルは背景クリックでは閉じない */
+  [addBackdrop, editBackdrop].forEach(backdrop => {
     backdrop.addEventListener('click', event => {
       if (event.target === backdrop) closeModals();
     });
   });
+
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') closeModals();
+    if (event.key !== 'Escape') return;
+
+    /* 日付モーダル表示中はEscapeでも閉じない */
+    if (!dayBackdrop.hidden) return;
+
+    closeModals();
   });
 
   const safeText = value => String(value ?? '');
+
+  function formatTime(start, end) {
+    if (!start && !end) return '';
+    if (start && end) return `${start}〜${end}`;
+    return start || end;
+  }
+
+  function openEdit(eventEl) {
+    if (!eventEl || !eventEl.dataset.deviceEvent) return;
+
+    selectedEvent = eventEl;
+
+    const startTime = eventEl.dataset.eventStartTime || '';
+    const endTime = eventEl.dataset.eventEndTime || '';
+    const hasTime = !!(startTime || endTime);
+
+    document.getElementById('editEventId').value = eventEl.dataset.eventId || '';
+    document.getElementById('editEventDate').value = eventEl.dataset.eventDate || '';
+    document.getElementById('editEventEndDate').value =
+      eventEl.dataset.eventEndDate || eventEl.dataset.eventDate || '';
+    document.getElementById('editEventStartTime').value = startTime;
+    document.getElementById('editEventEndTime').value = endTime;
+    document.getElementById('editHasTime').checked = hasTime;
+    document.getElementById('editTimeFields').hidden = !hasTime;
+    document.getElementById('editEventTitle').value = eventEl.dataset.eventTitle || '';
+    document.getElementById('editEventDetail').value = eventEl.dataset.eventDetail || '';
+    document.getElementById('editReturnDate').value = eventEl.dataset.eventDate || '';
+    document.getElementById('deleteEventId').value = eventEl.dataset.eventId || '';
+    document.getElementById('deleteReturnDate').value = eventEl.dataset.eventDate || '';
+
+    const color = eventEl.dataset.eventColor || 'blue';
+    const radio = document.querySelector(
+      `#calendarEditForm input[name="color"][value="${color}"]`
+    );
+    if (radio) radio.checked = true;
+
+    dayBackdrop.hidden = true;
+    addBackdrop.hidden = true;
+    editBackdrop.hidden = false;
+    document.getElementById('editEventTitle').focus();
+  }
+
   function openDay(date) {
     selectedDay = date;
+
     const dayButton = document.querySelector(`[data-open-day="${date}"]`);
     const dayCell = dayButton?.closest('.calendar-day');
-    document.getElementById('calendarDayTitle').textContent = `${date.replaceAll('-', '/')} の予定`;
+
+    document.getElementById('calendarDayTitle').textContent =
+      `${date.replaceAll('-', '/')} の予定`;
+
     dayEvents.replaceChildren();
-    const events = dayCell ? Array.from(dayCell.querySelectorAll('.calendar-event')) : [];
+
+    const events = dayCell
+      ? Array.from(dayCell.querySelectorAll('.calendar-event'))
+      : [];
+
     if (!events.length) {
       const empty = document.createElement('p');
       empty.textContent = 'この日の予定はありません。';
       dayEvents.appendChild(empty);
     }
+
     events.forEach(eventEl => {
+      const isPersonal = eventEl.classList.contains('personal');
+
       const item = document.createElement('div');
-      item.className = `calendar-modal-event ${eventEl.classList.contains('personal') ? 'personal' : eventEl.classList.contains('holiday') ? 'holiday' : 'school'}`;
-      if (eventEl.classList.contains('personal')) {
-        item.style.setProperty('--personal-event-color', eventEl.style.getPropertyValue('--personal-event-color'));
+      item.className = `calendar-modal-event ${
+        isPersonal ? 'personal' :
+        eventEl.classList.contains('holiday') ? 'holiday' : 'school'
+      }`;
+
+      if (isPersonal) {
+        item.style.setProperty(
+          '--personal-event-color',
+          eventEl.style.getPropertyValue('--personal-event-color')
+        );
       }
+
       const title = document.createElement('div');
       title.className = 'calendar-modal-event-title';
-      title.textContent = eventEl.querySelector('.calendar-event-title')?.textContent || '';
+      title.textContent =
+        eventEl.dataset.eventTitle ||
+        eventEl.querySelector('.calendar-event-title')?.textContent ||
+        '';
       item.appendChild(title);
-      const detailText = eventEl.querySelector('.calendar-event-detail')?.textContent || '';
+
+      if (isPersonal) {
+        const timeText = formatTime(
+          eventEl.dataset.eventStartTime,
+          eventEl.dataset.eventEndTime
+        );
+
+        if (timeText) {
+          const time = document.createElement('div');
+          time.className = 'calendar-modal-event-time';
+          time.textContent = timeText;
+          item.appendChild(time);
+        }
+      } else {
+        const time = eventEl.querySelector('.calendar-time-label')?.textContent || '';
+        if (time) {
+          const timeEl = document.createElement('div');
+          timeEl.className = 'calendar-modal-event-time';
+          timeEl.textContent = time;
+          item.appendChild(timeEl);
+        }
+      }
+
+      const detailText =
+        eventEl.dataset.eventDetail ||
+        eventEl.querySelector('.calendar-event-detail')?.textContent ||
+        '';
+
       if (detailText) {
         const detail = document.createElement('div');
         detail.className = 'calendar-modal-event-detail';
         detail.textContent = detailText;
         item.appendChild(detail);
       }
-      if (eventEl.hasAttribute('data-personal-event')) {
+
+      if (eventEl.dataset.deviceEvent) {
         const actions = document.createElement('div');
         actions.className = 'calendar-modal-actions';
-        const manage = document.createElement('button');
-        manage.type = 'button';
-        manage.className = 'calendar-secondary-button';
-        manage.textContent = '編集・削除';
-        manage.addEventListener('click', () => {
-          selectedEvent = eventEl;
-          openActions();
-        });
-        actions.appendChild(manage);
+
+        const editButton = document.createElement('button');
+        editButton.type = 'button';
+        editButton.className = 'calendar-secondary-button';
+        editButton.textContent = '編集';
+        editButton.addEventListener('click', () => openEdit(eventEl));
+
+        actions.appendChild(editButton);
         item.appendChild(actions);
       }
+
       dayEvents.appendChild(item);
     });
+
+    addBackdrop.hidden = true;
+    editBackdrop.hidden = true;
     dayBackdrop.hidden = false;
   }
 
@@ -548,148 +1425,345 @@
     openAddForm(selectedDay);
   });
 
-  function openActions() {
-    if (!selectedEvent) return;
-    document.getElementById('calendarActionSummary').textContent =
-      `${selectedEvent.dataset.eventDate}：${selectedEvent.dataset.eventTitle}`;
-    dayBackdrop.hidden = true;
-    actionBackdrop.hidden = false;
-  }
-
-  function openEdit() {
-    if (!selectedEvent) return;
-    document.getElementById('editEventId').value = selectedEvent.dataset.eventId;
-    document.getElementById('editEventDate').value = selectedEvent.dataset.eventDate;
-    document.getElementById('editEventTitle').value = selectedEvent.dataset.eventTitle || '';
-    document.getElementById('editEventDetail').value = selectedEvent.dataset.eventDetail || '';
-    document.getElementById('editReturnDate').value = selectedEvent.dataset.eventDate;
-    const color = selectedEvent.dataset.eventColor || 'blue';
-    const radio = document.querySelector(`#calendarEditForm input[name="color"][value="${color}"]`);
-    if (radio) radio.checked = true;
-    actionBackdrop.hidden = true;
-    editBackdrop.hidden = false;
-    document.getElementById('editEventTitle').focus();
-  }
-
-  document.getElementById('editEventButton').addEventListener('click', openEdit);
-  const deleteSelectedEvent = () => {
-    if (!selectedEvent) return;
-    if (window.confirm(`「${selectedEvent.dataset.eventTitle}」を削除しますか？`)) {
-      document.getElementById('deleteEventId').value = selectedEvent.dataset.eventId;
-      document.getElementById('deleteReturnDate').value = selectedEvent.dataset.eventDate;
-      document.getElementById('calendarDeleteForm').submit();
-    }
-  };
-  document.getElementById('deleteEventButton').addEventListener('click', deleteSelectedEvent);
-  document.getElementById('editDeleteButton').addEventListener('click', deleteSelectedEvent);
-
+  /* サーバー側の予定についても、編集可能な予定は直接編集画面へ */
   document.querySelectorAll('[data-personal-event]').forEach(eventEl => {
-    const beginPress = () => {
-      longPressHandled = false;
-      clearTimeout(pressTimer);
-      pressTimer = setTimeout(() => {
-        longPressHandled = true;
-        selectedEvent = eventEl;
-        openActions();
-      }, 650);
-    };
-    const cancelPress = () => {
-      clearTimeout(pressTimer);
-      pressTimer = null;
-    };
-    eventEl.addEventListener('pointerdown', beginPress);
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(name => eventEl.addEventListener(name, cancelPress));
-    eventEl.addEventListener('click', event => {
-      if (longPressHandled) {
-        longPressHandled = false;
-        event.preventDefault();
-        return;
-      }
-      selectedEvent = eventEl;
-      openActions();
-    });
+    if (!eventEl.dataset.deviceEvent) return;
+
+    eventEl.addEventListener('click', () => openEdit(eventEl));
     eventEl.addEventListener('keydown', event => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        selectedEvent = eventEl;
-        openActions();
+        openEdit(eventEl);
       }
     });
   });
+
+  document.getElementById('editDeleteButton').addEventListener('click', () => {
+    const id = document.getElementById('editEventId').value;
+    const title = document.getElementById('editEventTitle').value || 'この予定';
+
+    if (id.startsWith('device-')) {
+      document.dispatchEvent(new CustomEvent('calendar-delete-device', {
+        detail:{id, title}
+      }));
+      return;
+    }
+
+    if (!confirm(`「${title}」を削除しますか？`)) return;
+
+    document.getElementById('deleteEventId').value = id;
+    document.getElementById('deleteReturnDate').value =
+      document.getElementById('editEventDate').value;
+    document.getElementById('calendarDeleteForm').submit();
+  });
+
+  /* 他のスクリプトから使用 */
+  window.calendarOpenEdit = openEdit;
+  window.calendarFormatTime = formatTime;
 })();
 </script>
 
 <script>
 (() => {
   const KEY = 'meigen.devicePersonalEvents.v1';
-  const colors = {blue:'#077AE3',red:'#E53935',orange:'#F57C00',yellow:'#D6A400',green:'#2E7D32',purple:'#7B1FA2',pink:'#C2185B'};
-  const textColors = {blue:'#0563B5',red:'#C62828',orange:'#B45309',yellow:'#8A6D00',green:'#1B5E20',purple:'#6A1B9A',pink:'#AD1457'};
-  const load = () => { try { const v=JSON.parse(localStorage.getItem(KEY)||'[]'); return Array.isArray(v)?v:[]; } catch { return []; } };
-  const save = list => localStorage.setItem(KEY, JSON.stringify(list));
-  const validDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s||'') && !Number.isNaN(Date.parse(s+'T00:00:00'));
-  const safe = s => String(s ?? '');
-  const currentMonth = () => { const h=document.querySelector('.calendar-navigation h2')?.textContent.match(/(\d{4})年(\d{1,2})月/); return h?{year:+h[1],month:+h[2]}:null; };
-  const eventEl = ev => {
-    const el=document.createElement('div'); el.className='calendar-event personal device-personal-event';
-    el.style.setProperty('--personal-event-color',colors[ev.color]||colors.blue); el.style.setProperty('--personal-event-text-color',textColors[ev.color]||textColors.blue);
-    el.setAttribute('role','button'); el.tabIndex=0; el.dataset.personalEvent=''; el.dataset.deviceEvent='1';
-    el.dataset.eventId=ev.id; el.dataset.eventDate=ev.date; el.dataset.eventEndDate=ev.end_date||ev.date; el.dataset.eventTitle=ev.title; el.dataset.eventDetail=ev.detail||''; el.dataset.eventColor=ev.color||'blue';
-    if(ev.start_time||ev.end_time){const t=document.createElement('div');t.className='calendar-time-label';t.textContent=[ev.start_time,ev.end_time].filter(Boolean).join('〜');el.appendChild(t);}
-    const title=document.createElement('div'); title.className='calendar-event-title'; title.textContent=ev.title; el.appendChild(title);
-    if(ev.detail){const d=document.createElement('div');d.className='calendar-event-detail';d.textContent=ev.detail;el.appendChild(d);}
-    const openEdit=()=>{const form=document.getElementById('calendarEditForm');if(!form)return;document.getElementById('editEventId').value=ev.id;document.getElementById('editEventDate').value=ev.date;document.getElementById('editEventEndDate').value=ev.end_date||ev.date;document.getElementById('editEventStartTime').value=ev.start_time||'';document.getElementById('editEventEndTime').value=ev.end_time||'';document.getElementById('editEventTitle').value=ev.title;document.getElementById('editEventDetail').value=ev.detail||'';document.getElementById('editReturnDate').value=ev.date;document.getElementById('deleteEventId').value=ev.id;document.getElementById('deleteReturnDate').value=ev.date;const radio=form.querySelector(`input[name="color"][value="${ev.color||'blue'}"]`);if(radio)radio.checked=true;document.getElementById('calendarEditBackdrop').hidden=false;};
-    el.addEventListener('click',openEdit);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openEdit();}});
-    return el;
+
+  const colors = {
+    blue:'#077AE3',
+    red:'#E53935',
+    orange:'#F57C00',
+    yellow:'#D6A400',
+    green:'#2E7D32',
+    purple:'#7B1FA2',
+    pink:'#C2185B'
   };
-  function renderCalendar(){
-    if(!document.querySelector('.calendar-grid')) return;
-    const month=currentMonth(); if(!month)return;
-    load().filter(e=>{const end=e.end_date||e.date;return e.date<=`${month.year}-${String(month.month).padStart(2,'0')}-31`&&end>=`${month.year}-${String(month.month).padStart(2,'0')}-01`;}).forEach(ev=>{
-      const end=ev.end_date||ev.date;
-      document.querySelectorAll('[data-open-day]').forEach(btn=>{
-        const date=btn.dataset.openDay;if(date<ev.date||date>end)return;
-        const cell=btn.closest('.calendar-day');if(!cell)return;
-        const el=eventEl(ev);cell.appendChild(el);
-        const count=cell.querySelectorAll('.calendar-event').length;const more=cell.querySelector('.calendar-more-events');
-        if(count>2){if(more)more.textContent=`ほか ${count-2} 件`;else{const m=document.createElement('div');m.className='calendar-more-events';m.textContent=`ほか ${count-2} 件`;cell.appendChild(m);}}
+
+  const textColors = {
+    blue:'#0563B5',
+    red:'#C62828',
+    orange:'#B45309',
+    yellow:'#8A6D00',
+    green:'#1B5E20',
+    purple:'#6A1B9A',
+    pink:'#AD1457'
+  };
+
+  const load = () => {
+    try {
+      const value = JSON.parse(localStorage.getItem(KEY) || '[]');
+      return Array.isArray(value) ? value : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const save = list => localStorage.setItem(KEY, JSON.stringify(list));
+  const safe = value => String(value ?? '');
+
+  const validDate = value =>
+    /^\d{4}-\d{2}-\d{2}$/.test(value || '') &&
+    !Number.isNaN(Date.parse(value + 'T00:00:00'));
+
+  const currentMonth = () => {
+    const heading = document.querySelector('.calendar-navigation h2');
+    const match = heading?.textContent.match(/(\d{4})年(\d{1,2})月/);
+    return match ? {year:+match[1], month:+match[2]} : null;
+  };
+
+  const dateString = date => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
+  const dateObject = value => new Date(value + 'T00:00:00');
+
+  /*
+   * 複数日にまたがる予定も、通常の予定と同じ形式で作成する。
+   * 日付ごとに独立した予定表示を追加する。
+   */
+  function createSourceEvent(ev, date) {
+    const el = document.createElement('div');
+    el.className = 'calendar-event personal';
+    el.dataset.personalEvent = '';
+    el.dataset.deviceEvent = '1';
+    el.dataset.eventId = ev.id;
+    el.dataset.eventDate = ev.date;
+    el.dataset.eventEndDate = ev.end_date || ev.date;
+    el.dataset.eventStartTime = ev.start_time || '';
+    el.dataset.eventEndTime = ev.end_time || '';
+    el.dataset.eventTitle = ev.title;
+    el.dataset.eventDetail = ev.detail || '';
+    el.dataset.eventColor = ev.color || 'blue';
+    el.dataset.displayDate = date;
+
+    el.style.setProperty(
+      '--personal-event-color',
+      colors[ev.color] || colors.blue
+    );
+    el.style.setProperty(
+      '--personal-event-text-color',
+      textColors[ev.color] || textColors.blue
+    );
+
+    const time = [ev.start_time, ev.end_time].filter(Boolean).join('〜');
+
+    if (time) {
+      const timeLabel = document.createElement('div');
+      timeLabel.className = 'calendar-time-label';
+      timeLabel.textContent = time;
+      el.appendChild(timeLabel);
+    }
+
+    const title = document.createElement('div');
+    title.className = 'calendar-event-title';
+    title.textContent = ev.title;
+    el.appendChild(title);
+
+    if (ev.detail) {
+      const detail = document.createElement('div');
+      detail.className = 'calendar-event-detail';
+      detail.textContent = ev.detail;
+      el.appendChild(detail);
+    }
+
+    el.addEventListener('click', () => {
+      window.calendarOpenEdit?.(el);
+    });
+
+    return el;
+  }
+
+  function getCalendarDates() {
+    return Array.from(document.querySelectorAll('[data-open-day]'))
+      .map(button => ({
+        date:button.dataset.openDay,
+        cell:button.closest('.calendar-day')
+      }))
+      .filter(item => item.cell);
+  }
+
+  /*
+   * 端末内に保存した予定を、該当するすべての日付のマスに追加する。
+   */
+  function addDeviceEventSources() {
+    const dates = getCalendarDates();
+
+    load().forEach(ev => {
+      const end = ev.end_date || ev.date;
+
+      dates.forEach(item => {
+        if (item.date < ev.date || item.date > end) return;
+
+        item.cell.appendChild(createSourceEvent(ev, item.date));
       });
     });
   }
-  // Existing shared JSON events remain visible but are deliberately not editable.
+
+  function updateMoreEvents() {
+    document.querySelectorAll('.calendar-day').forEach(cell => {
+      const events = cell.querySelectorAll('.calendar-event');
+      const existing = cell.querySelector('.calendar-more-events');
+      const count = events.length;
+
+      if (count > 2) {
+        if (existing) {
+          existing.textContent = `ほか ${count - 2} 件`;
+        } else {
+          const more = document.createElement('div');
+          more.className = 'calendar-more-events';
+          more.textContent = `ほか ${count - 2} 件`;
+          cell.appendChild(more);
+        }
+      } else if (existing) {
+        existing.remove();
+      }
+    });
+  }
+
+  function renderCalendar() {
+    if (!document.querySelector('.calendar-grid')) return;
+
+    addDeviceEventSources();
+    updateMoreEvents();
+  }
+
   renderCalendar();
-  const addForm=document.getElementById('calendarAddForm');
-  if(addForm) addForm.addEventListener('submit',e=>{
-    e.preventDefault();const f=new FormData(addForm);const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!validDate(date)||!title)return;
-    const list=load();const endDate=safe(f.get('end_date'))||date;if(!validDate(endDate)||endDate<date)return;list.push({id:'device-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)),date,end_date:endDate,start_time:safe(f.get('start_time')),end_time:safe(f.get('end_time')),title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);
-    const month=currentMonth();const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
+
+  /* 予定の追加 */
+  const addForm = document.getElementById('calendarAddForm');
+
+  if (addForm) {
+    addForm.addEventListener('submit', event => {
+      event.preventDefault();
+
+      const form = new FormData(addForm);
+      const date = safe(form.get('event_date'));
+      const endDate = safe(form.get('end_date')) || date;
+      const title = safe(form.get('title')).trim();
+
+      if (!validDate(date) || !validDate(endDate) || endDate < date || !title) return;
+
+      const hasTime = document.getElementById('addHasTime').checked;
+
+      const list = load();
+      list.push({
+        id:'device-' + (
+          crypto.randomUUID
+            ? crypto.randomUUID()
+            : Date.now() + '-' + Math.random().toString(16).slice(2)
+        ),
+        date,
+        end_date:endDate,
+        start_time:hasTime ? safe(form.get('start_time')) : '',
+        end_time:hasTime ? safe(form.get('end_time')) : '',
+        title:title.slice(0,80),
+        detail:safe(form.get('detail')).trim().slice(0,300),
+        color:safe(form.get('color')) || 'blue'
+      });
+
+      save(list);
+
+      const [year, month] = date.split('-').map(Number);
+      window.location.href = `/calendar?year=${year}&month=${month}`;
+    });
+  }
+
+  /* 予定の編集 */
+  const editForm = document.getElementById('calendarEditForm');
+
+  if (editForm) {
+    editForm.addEventListener('submit', event => {
+      event.preventDefault();
+
+      const form = new FormData(editForm);
+      const id = safe(form.get('event_id'));
+      const date = safe(form.get('event_date'));
+      const endDate = safe(form.get('end_date')) || date;
+      const title = safe(form.get('title')).trim();
+
+      if (
+        !id.startsWith('device-') ||
+        !validDate(date) ||
+        !validDate(endDate) ||
+        endDate < date ||
+        !title
+      ) return;
+
+      const hasTime = document.getElementById('editHasTime').checked;
+
+      const list = load();
+      const ev = list.find(item => item.id === id);
+      if (!ev) return;
+
+      Object.assign(ev, {
+        date,
+        end_date:endDate,
+        start_time:hasTime ? safe(form.get('start_time')) : '',
+        end_time:hasTime ? safe(form.get('end_time')) : '',
+        title:title.slice(0,80),
+        detail:safe(form.get('detail')).trim().slice(0,300),
+        color:safe(form.get('color')) || 'blue'
+      });
+
+      save(list);
+
+      const [year, month] = date.split('-').map(Number);
+      window.location.href = `/calendar?year=${year}&month=${month}`;
+    });
+  }
+
+  /* 端末内に保存した予定の削除 */
+  document.addEventListener('calendar-delete-device', event => {
+    const id = safe(event.detail?.id);
+    const title = safe(event.detail?.title || 'この予定');
+
+    if (!id.startsWith('device-')) return;
+    if (!confirm(`「${title}」を削除しますか？`)) return;
+
+    save(load().filter(item => item.id !== id));
+
+    const date = safe(document.getElementById('editEventDate')?.value);
+    const [year, month] = date.split('-').map(Number);
+
+    window.location.href =
+      `/calendar?year=${year || new Date().getFullYear()}&month=${month || new Date().getMonth() + 1}`;
   });
-  const editForm=document.getElementById('calendarEditForm');
-  if(editForm) editForm.addEventListener('submit',e=>{
-    e.preventDefault();const f=new FormData(editForm);const id=safe(f.get('event_id'));const date=safe(f.get('event_date'));const endDate=safe(f.get('end_date'))||date;const title=safe(f.get('title')).trim();if(!id.startsWith('device-')||!validDate(date)||!validDate(endDate)||endDate<date||!title)return;
-    const list=load();const ev=list.find(x=>x.id===id);if(!ev)return;Object.assign(ev,{date,end_date:endDate,start_time:safe(f.get('start_time')),end_time:safe(f.get('end_time')),title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
-  });
-  const deleteButton=document.getElementById('deleteEventButton');
-  const editDeleteButton=document.getElementById('editDeleteButton');
-  // Delete buttons must remove device-created events from localStorage.
-  // Capture phase prevents the older form-submit handler from submitting to Flask first.
-  const deleteDeviceEvent = (e, idInput, dateInput) => {
-    const id=safe(document.getElementById(idInput)?.value);
-    if(!id.startsWith('device-')){e.stopImmediatePropagation();e.preventDefault();return;}
-    e.stopImmediatePropagation();e.preventDefault();
-    const title=safe(document.getElementById('editEventTitle')?.value || document.getElementById('calendarActionSummary')?.textContent || 'この予定');
-    if(!confirm(`「${title}」を削除しますか？`))return;
-    save(load().filter(x=>x.id!==id));
-    const d=safe(document.getElementById(dateInput)?.value || document.getElementById('editEventDate')?.value || document.getElementById('deleteReturnDate')?.value);
-    const [y,m]=d.split('-').map(Number);
-    window.location.href=`/calendar?year=${y||new Date().getFullYear()}&month=${m||new Date().getMonth()+1}`;
-  };
-  if(deleteButton) deleteButton.addEventListener('click',e=>deleteDeviceEvent(e,'deleteEventId','deleteReturnDate'),true);
-  if(editDeleteButton) editDeleteButton.addEventListener('click',e=>deleteDeviceEvent(e,'editEventId','editEventDate'),true);
-  // Disable actions for shared events; only device-prefixed entries can be edited.
-  document.addEventListener('click',e=>{const el=e.target.closest('[data-personal-event]');if(el&&!el.dataset.deviceEvent){e.preventDefault();e.stopImmediatePropagation();}},true);
-  document.addEventListener('keydown',e=>{const el=e.target.closest('[data-personal-event]');if(el&&!el.dataset.deviceEvent){e.preventDefault();e.stopImmediatePropagation();}},true);
-  // Open a specific local event when navigating from the home page.
-  const openId=new URLSearchParams(location.search).get('open_event');if(openId){const el=document.querySelector(`[data-event-id="${CSS.escape(openId)}"]`);if(el&&el.dataset.deviceEvent){el.click();}}
+
+  /* 削除ボタンの端末内予定向け処理 */
+  const editDeleteButton = document.getElementById('editDeleteButton');
+
+  if (editDeleteButton) {
+    editDeleteButton.addEventListener('click', event => {
+      const id = safe(document.getElementById('editEventId')?.value);
+      if (!id.startsWith('device-')) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const title = safe(document.getElementById('editEventTitle')?.value || 'この予定');
+      if (!confirm(`「${title}」を削除しますか？`)) return;
+
+      save(load().filter(item => item.id !== id));
+
+      const date = safe(document.getElementById('editEventDate')?.value);
+      const [year, month] = date.split('-').map(Number);
+
+      window.location.href =
+        `/calendar?year=${year || new Date().getFullYear()}&month=${month || new Date().getMonth() + 1}`;
+    }, true);
+  }
+
+  /* ホーム画面などから指定された予定を開く */
+  const openId = new URLSearchParams(location.search).get('open_event');
+
+  if (openId) {
+    const el = document.querySelector(
+      `.calendar-event[data-event-id="${CSS.escape(openId)}"][data-device-event]`
+    );
+
+    if (el) window.calendarOpenEdit?.(el);
+  }
 })();
 </script>
 
