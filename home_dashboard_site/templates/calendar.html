@@ -1021,17 +1021,22 @@
       box-sizing:border-box !important;
     }
 
-    /* 時刻欄：2つの入力欄を小さくして横並びにする */
-    #addTimeFields,
-    #editTimeFields {
-      display:grid !important;
-      grid-template-columns:minmax(0, 1fr) minmax(0, 1fr) !important;
-      column-gap:6px !important;
-      width:100% !important;
-      min-width:0 !important;
-      max-width:100% !important;
-      overflow:hidden !important;
-      box-sizing:border-box !important;
+    /* 時刻欄：チェックが入った場合のみ2列で表示 */
+    #addTimeFields:not([hidden]),
+    #editTimeFields:not([hidden]) {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 8px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    /* hidden属性がある場合は必ず非表示 */
+    #addTimeFields[hidden],
+    #editTimeFields[hidden] {
+      display: none !important;
     }
 
     #addTimeFields > label,
