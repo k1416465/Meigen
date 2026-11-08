@@ -1118,14 +1118,6 @@ def _extract_detail(text, status, status_index):
     # 詳細欄に混入する操作案内・状態ラベルを除去
     text = re.sub(r"路線を登録", "", text)
     text = re.sub(r"列車遅延", "", text)
-
-    # 路線内の区間を示す補足表記は詳細文に表示しない
-    text = re.sub(
-        r"\[(?:東京～宇都宮|宇都宮～黒磯|南栗橋～東武日光|久喜～伊勢崎)\]\s*",
-        "",
-        text,
-    )
-
     text = re.sub(r"[ \t　]{2,}", " ", text).strip(" \t　・|｜-—")
 
     # 先頭に路線名が残っている場合は除去
@@ -1648,9 +1640,17 @@ def database_page():
     return render_template("tool_placeholder.html", page_title="データベース")
 
 
-@app.route("/range")
+@app.route("/range", methods=["GET"])
 def range_page():
-    return render_template("tool_placeholder.html", page_title="範囲表")
+    requested_class = request.args.get("class_name", "")
+    class_name = requested_class if requested_class in CLASS_SCHEDULES else selected_class()
+    range_group = "12" if class_name in ("1組", "2組") else "34" if class_name in ("3組", "4組") else None
+    return render_template(
+        "range.html",
+        class_name=class_name,
+        class_names=CLASS_NAMES,
+        range_group=range_group,
+    )
 
 
 @app.route("/line")
