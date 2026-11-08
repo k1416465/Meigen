@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}迷言｜範囲表{% endblock %}
+{% block content %}
+<section class="welcome-row schedule-welcome">
+  <h1>範囲表</h1>
+</section>
+
+<nav class="schedule-class-switch" aria-label="クラスを切り替え">
+  {% for name in class_names %}
+    <a
+      class="schedule-class-button{% if name == class_name %} active{% endif %}"
+      href="{{ url_for('range_page', class_name=name) }}"
+      {% if name == class_name %}aria-current="page"{% endif %}
+    >{{ name }}</a>
+  {% endfor %}
+</nav>
+
+{% if range_group %}
+  <div class="range-group-label">{{ '1・2組 共通' if range_group == '12' else '3・4組 共通' }}</div>
+  <div class="range-accordion-list">
+    {% if range_group == '12' %}
+      {% set items = [
+        ('国語', '文学国語・論理国語・古典探究', '教科書 p.10〜35／問題集 p.4〜12', '漢字・語句・本文の内容を確認してください。'),
+        ('数学', '数学ⅡBC', '教科書 p.20〜48／問題集 p.15〜28', '例題と基本問題を中心に復習してください。'),
+        ('英語', 'コミュニケーション英語Ⅱ・論理表現Ⅱ', '教科書 Lesson 1〜3／ワーク p.6〜18', '本文・重要表現・文法事項が範囲です。'),
+        ('理科', '化学基礎', '教科書 p.12〜29／問題集 p.3〜10', '用語と計算問題を確認してください。'),
+        ('地歴・公民', '日本史／世界史・地理総合', '授業プリント No.1〜5', '配布プリントを中心に学習してください。')
+      ] %}
+    {% else %}
+      {% set items = [
+        ('国語', '論理国語・文学探究A', '教科書 p.14〜40／問題集 p.5〜13', '漢字・語句・本文の内容を確認してください。'),
+        ('数学', '数学ⅡBC', '教科書 p.25〜52／問題集 p.18〜30', '例題と基本問題を中心に復習してください。'),
+        ('英語', 'コミュニケーション英語Ⅱ・論理表現Ⅱ', '教科書 Lesson 2〜4／ワーク p.9〜21', '本文・重要表現・文法事項が範囲です。'),
+        ('理科', '化学基礎・生物／物理', '教科書 p.16〜34／授業プリント No.1〜3', '用語と計算問題を確認してください。'),
+        ('地歴・公民', '地理総合', '教科書 p.18〜42／資料集 p.8〜15', '地図・統計資料も確認してください。')
+      ] %}
+    {% endif %}
+    {% for title, subjects, pages, note in items %}
+      <details class="card range-accordion">
+        <summary>
+          <span class="range-accordion-title">{{ title }}</span>
+          <span class="range-accordion-subtitle">{{ subjects }}</span>
+        </summary>
+        <div class="range-accordion-content">
+          <div class="range-detail-row">
+            <strong>範囲</strong>
+            <span>{{ pages }}</span>
+          </div>
+          <div class="range-detail-row">
+            <strong>備考</strong>
+            <span>{{ note }}</span>
+          </div>
+        </div>
+      </details>
+    {% endfor %}
+  </div>
+{% else %}
+  <section class="card empty-state schedule-empty">
+    <a class="class-not-selected" href="{{ url_for('settings') }}">設定から範囲表のクラス選択ができます</a>
+  </section>
+{% endif %}
+{% endblock %}
