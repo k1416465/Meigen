@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block title %}迷言｜カレンダー{% endblock %}
 
@@ -1003,12 +1004,14 @@
       flex:0 0 auto;
     }
 
-    /* フォーム部分をスクロール */
+    /* フォーム部分：内容に合わせた高さにして上から詰める */
     #calendarAddForm,
     #calendarEditForm {
       display:grid !important;
       grid-template-columns:minmax(0,1fr) !important;
-      flex:1 1 0 !important;
+      grid-auto-rows:max-content !important;
+      align-content:start !important;
+      flex:0 1 auto !important;
       min-height:0 !important;
       min-width:0 !important;
       width:100% !important;
@@ -1024,19 +1027,19 @@
     /* 時刻欄：チェックが入った場合のみ2列で表示 */
     #addTimeFields:not([hidden]),
     #editTimeFields:not([hidden]) {
-      display: grid !important;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 8px !important;
-      width: 100% !important;
-      min-width: 0 !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
+      display:grid !important;
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:8px !important;
+      width:100% !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      box-sizing:border-box !important;
     }
 
     /* hidden属性がある場合は必ず非表示 */
     #addTimeFields[hidden],
     #editTimeFields[hidden] {
-      display: none !important;
+      display:none !important;
     }
 
     #addTimeFields > label,
