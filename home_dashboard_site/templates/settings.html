@@ -65,9 +65,9 @@
     </div>
   </details>
 
-  <div class="settings-actions" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-    <button class="primary-button" type="submit">設定を保存</button>
-    <a class="back-link" href="{{ url_for('admin_dashboard') }}">管理者用ページ</a>
+  <div class="settings-actions">
+    <button class="primary-button settings-action-button" type="submit">設定を保存</button>
+    <a class="back-link settings-action-button" href="{{ url_for('admin_dashboard') }}">管理者用ページ</a>
   </div>
 </form>
 {% endblock %}
