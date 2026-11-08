@@ -6367,3 +6367,53 @@ html body main.page form.settings-form > details.setting-accordion > summary > .
         line-height: 1.6 !important;
     }
 }
+
+/* 範囲表：タイトル右端の一括開閉ボタン */
+.range-page-heading {
+    align-items: center;
+}
+
+.range-toggle-all {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid var(--purple);
+    border-radius: 11px;
+    background: var(--purple);
+    color: #fff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: opacity .15s ease, transform .15s ease;
+}
+
+.range-toggle-all:hover {
+    opacity: .88;
+}
+
+.range-toggle-all:active {
+    transform: scale(.97);
+}
+
+.range-toggle-all:focus-visible {
+    outline: 2px solid var(--purple);
+    outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+    .range-page-heading {
+        gap: 10px;
+    }
+
+    .range-page-heading h1 {
+        min-width: 0;
+    }
+
+    .range-toggle-all {
+        min-height: 36px;
+        padding: 7px 10px;
+        font-size: 11px;
+    }
+}
