@@ -1,12 +1,71 @@
 {% extends "base.html" %}
 {% block title %}迷言｜設定{% endblock %}
 {% block content %}
+
+{% block content %}
 <section class="welcome-row">
   <div><h1>設定</h1></div>
 </section>
 
 <form method="post" class="settings-form">
-  <!-- ここには、現在のクラス選択・My路線・My駅・天気・外観の設定項目をそのまま残す -->
+  <details class="card settings-card setting-accordion">
+    <summary>
+      <span class="setting-heading">クラスの選択</span>
+      <span class="setting-description">ホームの時間割表示に反映されます。</span>
+      <span class="setting-toggle-icon" aria-hidden="true"></span>
+    </summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="クラスの選択">
+      <label class="choice-option"><input type="radio" name="class_name" value="" {% if not class_name %}checked{% endif %}><span>選択しない</span></label>
+      {% for name in class_names %}<label class="choice-option"><input type="radio" name="class_name" value="{{ name }}" {% if name == class_name %}checked{% endif %}><span>{{ name }}</span></label>{% endfor %}
+    </div>
+  </details>
+
+  <details class="card settings-card setting-accordion">
+    <summary>
+      <span class="setting-heading">My路線</span>
+      <span class="setting-description">画面上部に表示する運行情報の路線を選択できます。</span>
+      <span class="setting-toggle-icon" aria-hidden="true"></span>
+    </summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My路線">
+      {% for key, label in route_options.items() %}<label class="choice-option"><input type="radio" name="my_route" value="{{ key }}" {% if key == my_route %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
+    </div>
+  </details>
+
+  <details class="card settings-card setting-accordion">
+    <summary>
+      <span class="setting-heading">My駅</span>
+      <span class="setting-description">時刻表ページのMy駅表示で使用します。</span>
+      <span class="setting-toggle-icon" aria-hidden="true"></span>
+    </summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="My駅">
+      <label class="choice-option"><input type="radio" name="my_station" value="" {% if my_station == '' %}checked{% endif %}><span>選択しない</span></label>
+      {% for name in station_options %}<label class="choice-option"><input type="radio" name="my_station" value="{{ name }}" {% if name == my_station %}checked{% endif %}><span>{{ name }}</span></label>{% endfor %}
+    </div>
+  </details>
+
+  <details class="card settings-card setting-accordion">
+    <summary>
+      <span class="setting-heading">天気</span>
+      <span class="setting-description">ホーム画面の天気の地点を選択できます。</span>
+      <span class="setting-toggle-icon" aria-hidden="true"></span>
+    </summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="天気">
+      {% for key, label in weather_options.items() %}<label class="choice-option"><input type="radio" name="weather_place" value="{{ key }}" {% if key == weather_place %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
+    </div>
+  </details>
+
+  <details class="card settings-card setting-accordion">
+    <summary>
+      <span class="setting-heading">外観</span>
+      <span class="setting-description">画面全体の配色を変更できます。デバイスの設定に合わせることもできます。</span>
+      <span class="setting-toggle-icon" aria-hidden="true"></span>
+    </summary>
+    <div class="setting-options setting-choice-list" role="radiogroup" aria-label="外観">
+      <label class="choice-option"><input type="radio" name="appearance" value="light" {% if appearance == 'light' %}checked{% endif %}><span>ライトモード</span></label>
+      <label class="choice-option"><input type="radio" name="appearance" value="dark" {% if appearance == 'dark' %}checked{% endif %}><span>ダークモード</span></label>
+      <label class="choice-option"><input type="radio" name="appearance" value="system" {% if appearance == 'system' %}checked{% endif %}><span>デバイスの設定に従う</span></label>
+    </div>
+  </details>
 
   <div class="settings-actions">
     <button class="back-link settings-action-button" type="submit">設定を保存</button>
@@ -15,7 +74,7 @@
 </form>
 
 <style>
-  /* 保存ボタンと管理者用ボタンを同じ大きさで横並びにする */
+  /* 保存ボタンと管理者用ボタンを、常に同じ幅で横並びにする */
   .settings-form .settings-actions {
     display: flex !important;
     flex-direction: row !important;
