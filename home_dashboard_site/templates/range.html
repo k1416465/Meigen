@@ -17,6 +17,28 @@
 
 {% if range_group %}
   <div class="range-group-label">{{ '1・2組 共通' if range_group == '12' else '3・4組 共通' }}</div>
+
+  <section class="range-schedule-section" aria-labelledby="range-schedule-title">
+    <h2 id="range-schedule-title" class="range-section-title">日程</h2>
+    <div class="card range-schedule-card">
+      <table class="range-schedule-table" aria-label="日程表">
+        <tbody>
+          {% for row in range(5) %}
+            <tr>
+              {% for col in range(4) %}
+                {% set day_number = row * 4 + col + 1 %}
+                <td>
+                  <span class="range-schedule-day">{{ day_number }}日目</span>
+                  <span class="range-schedule-date">〇月〇日（〇）</span>
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
   <div class="range-accordion-list">
     {% if range_group == '12' %}
       {% set items = [
