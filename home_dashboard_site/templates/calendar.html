@@ -6,8 +6,11 @@
   <div>
     <h1>カレンダー</h1>
   </div>
-  <button type="button" class="calendar-add-toggle" id="calendarAddToggle" aria-expanded="false" aria-controls="calendarAddForm">＋ 予定を追加</button>
 </section>
+<button type="button" class="calendar-fab" id="calendarAddToggle" aria-label="予定を追加" aria-expanded="false" aria-controls="calendarAddForm">
+  <img src="{{ url_for('static', filename='icons/light/plus.png') }}" data-light-src="{{ url_for('static', filename='icons/light/plus.png') }}" data-dark-src="{{ url_for('static', filename='icons/dark/plus.png') }}" alt="">
+  <span class="calendar-fab-fallback" aria-hidden="true">＋</span>
+</button>
 
 <style>
   .calendar-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
@@ -58,7 +61,13 @@
     color:var(--personal-event-text-color,#0563B5);
     cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:pan-y;
   }
-  .calendar-event-title { font-weight:700; color:inherit; }
+  .calendar-event-title { font-weight:700; color:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .calendar-event { overflow:hidden; }
+  .calendar-fab { position:fixed; right:24px; bottom:calc(78px + env(safe-area-inset-bottom, 0px)); z-index:900; width:54px; height:54px; padding:0; border:0; border-radius:50%; background:transparent; box-shadow:0 4px 16px rgba(0,0,0,.22); cursor:pointer; display:grid; place-items:center; }
+  .calendar-fab img { display:block; width:27px; height:27px; object-fit:contain; }
+  .calendar-fab .calendar-fab-fallback { display:none; width:100%; height:100%; border-radius:50%; background:#077AE3; color:white; font-size:36px; line-height:1; place-items:center; }
+  .calendar-time-label { font-size:.72em; opacity:.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  @media (max-width:600px) { .calendar-fab { right:14px; bottom:calc(78px + env(safe-area-inset-bottom, 0px)); width:48px; height:48px; } .calendar-fab img { width:25px; height:25px; } }
   .calendar-event-detail { display:none; margin-top:2px; font-size:.8em; white-space:pre-wrap; font-weight:400; color:inherit; }
   /* カレンダー上では各日の予定を2件まで表示し、残りは日付モーダルに表示 */
   .calendar-day > .calendar-event:nth-of-type(n+3) { display:none; }
@@ -267,8 +276,17 @@
     </div>
   <form class="calendar-add-form" id="calendarAddForm" method="post" action="{{ url_for('calendar_page') }}">
     <input type="hidden" name="action" value="add">
-    <label>日付
+    <label>開始日
       <input type="date" name="event_date" value="{{ today.isoformat() }}" required>
+    </label>
+    <label>終了日
+      <input type="date" name="end_date" value="{{ today.isoformat() }}" required>
+    </label>
+    <label>開始時刻
+      <input type="time" name="start_time">
+    </label>
+    <label>終了時刻
+      <input type="time" name="end_time">
     </label>
     <label>予定名
       <input type="text" name="title" maxlength="80" placeholder="例：友達と出かける" required>
@@ -319,7 +337,7 @@
             <div class="calendar-event {{ event.kind }}"
               {% if event.kind == 'personal' %}
                 style="--personal-event-color:{{ event_color }};--personal-event-text-color:{{ event_text_color }};"
-                data-event-id="{{ event.id }}" data-event-date="{{ event.date }}"
+                data-event-id="{{ event.id }}" data-event-date="{{ event.date }}" data-event-end-date="{{ event.end_date|default(event.date) }}" data-event-start-time="{{ event.start_time|default('') }}" data-event-end-time="{{ event.end_time|default('') }}"
                 data-event-title="{{ event.title }}" data-event-detail="{{ event.detail }}"
                 data-event-color="{{ event.color }}"
                 aria-label="共有予定：{{ event.title }}"
@@ -375,8 +393,17 @@
     <form class="calendar-edit-form" id="calendarEditForm" method="post" action="{{ url_for('calendar_page', year=year, month=month) }}">
       <input type="hidden" name="action" value="edit">
       <input type="hidden" name="event_id" id="editEventId">
-      <label>日付
+      <label>開始日
         <input type="date" name="event_date" id="editEventDate" required>
+      </label>
+      <label>終了日
+        <input type="date" name="end_date" id="editEventEndDate" required>
+      </label>
+      <label>開始時刻
+        <input type="time" name="start_time" id="editEventStartTime">
+      </label>
+      <label>終了時刻
+        <input type="time" name="end_time" id="editEventEndTime">
       </label>
       <label>予定名
         <input type="text" name="title" id="editEventTitle" maxlength="80" required>
@@ -414,6 +441,17 @@
 <script>
 (() => {
   const addToggle = document.getElementById('calendarAddToggle');
+  const fabImage = document.querySelector('.calendar-fab img');
+  const fabFallback = document.querySelector('.calendar-fab-fallback');
+  function updateFabIcon() {
+    if (!fabImage) return;
+    fabImage.src = document.body.classList.contains('dark') ? fabImage.dataset.darkSrc : fabImage.dataset.lightSrc;
+  }
+  if (fabImage) {
+    fabImage.addEventListener('error', () => { fabImage.style.display='none'; if(fabFallback) fabFallback.style.display='grid'; });
+    updateFabIcon();
+    new MutationObserver(updateFabIcon).observe(document.body,{attributes:true,attributeFilter:['class']});
+  }
   const addForm = document.getElementById('calendarAddForm');
   const addBackdrop = document.getElementById('calendarAddBackdrop');
   const dayBackdrop = document.getElementById('calendarDayBackdrop');
@@ -436,7 +474,7 @@
 
   function openAddForm(date) {
     closeModals();
-    if (date) addForm.querySelector('input[name="event_date"]').value = date;
+    if (date) { addForm.querySelector('input[name="event_date"]').value = date; addForm.querySelector('input[name="end_date"]').value = date; }
     addBackdrop.hidden = false;
     addToggle?.setAttribute('aria-expanded', 'true');
     setTimeout(() => addForm.querySelector('input[name="title"]')?.focus(), 50);
@@ -595,21 +633,26 @@
     const el=document.createElement('div'); el.className='calendar-event personal device-personal-event';
     el.style.setProperty('--personal-event-color',colors[ev.color]||colors.blue); el.style.setProperty('--personal-event-text-color',textColors[ev.color]||textColors.blue);
     el.setAttribute('role','button'); el.tabIndex=0; el.dataset.personalEvent=''; el.dataset.deviceEvent='1';
-    el.dataset.eventId=ev.id; el.dataset.eventDate=ev.date; el.dataset.eventTitle=ev.title; el.dataset.eventDetail=ev.detail||''; el.dataset.eventColor=ev.color||'blue';
+    el.dataset.eventId=ev.id; el.dataset.eventDate=ev.date; el.dataset.eventEndDate=ev.end_date||ev.date; el.dataset.eventTitle=ev.title; el.dataset.eventDetail=ev.detail||''; el.dataset.eventColor=ev.color||'blue';
+    if(ev.start_time||ev.end_time){const t=document.createElement('div');t.className='calendar-time-label';t.textContent=[ev.start_time,ev.end_time].filter(Boolean).join('〜');el.appendChild(t);}
     const title=document.createElement('div'); title.className='calendar-event-title'; title.textContent=ev.title; el.appendChild(title);
     if(ev.detail){const d=document.createElement('div');d.className='calendar-event-detail';d.textContent=ev.detail;el.appendChild(d);}
-    const openEdit=()=>{const form=document.getElementById('calendarEditForm');if(!form)return;document.getElementById('editEventId').value=ev.id;document.getElementById('editEventDate').value=ev.date;document.getElementById('editEventTitle').value=ev.title;document.getElementById('editEventDetail').value=ev.detail||'';document.getElementById('editReturnDate').value=ev.date;document.getElementById('deleteEventId').value=ev.id;document.getElementById('deleteReturnDate').value=ev.date;const radio=form.querySelector(`input[name="color"][value="${ev.color||'blue'}"]`);if(radio)radio.checked=true;document.getElementById('calendarEditBackdrop').hidden=false;};
+    const openEdit=()=>{const form=document.getElementById('calendarEditForm');if(!form)return;document.getElementById('editEventId').value=ev.id;document.getElementById('editEventDate').value=ev.date;document.getElementById('editEventEndDate').value=ev.end_date||ev.date;document.getElementById('editEventStartTime').value=ev.start_time||'';document.getElementById('editEventEndTime').value=ev.end_time||'';document.getElementById('editEventTitle').value=ev.title;document.getElementById('editEventDetail').value=ev.detail||'';document.getElementById('editReturnDate').value=ev.date;document.getElementById('deleteEventId').value=ev.id;document.getElementById('deleteReturnDate').value=ev.date;const radio=form.querySelector(`input[name="color"][value="${ev.color||'blue'}"]`);if(radio)radio.checked=true;document.getElementById('calendarEditBackdrop').hidden=false;};
     el.addEventListener('click',openEdit);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openEdit();}});
     return el;
   };
   function renderCalendar(){
     if(!document.querySelector('.calendar-grid')) return;
     const month=currentMonth(); if(!month)return;
-    load().filter(e=>{const d=new Date(e.date+'T00:00:00');return d.getFullYear()===month.year&&d.getMonth()+1===month.month;}).forEach(ev=>{
-      const btn=document.querySelector(`[data-open-day="${ev.date}"]`); const cell=btn?.closest('.calendar-day'); if(!cell)return;
-      const el=eventEl(ev); cell.appendChild(el);
-      const count=cell.querySelectorAll('.calendar-event').length; const more=cell.querySelector('.calendar-more-events');
-      if(count>2){if(more)more.textContent=`ほか ${count-2} 件`;else{const m=document.createElement('div');m.className='calendar-more-events';m.textContent=`ほか ${count-2} 件`;cell.appendChild(m);}}
+    load().filter(e=>{const end=e.end_date||e.date;return e.date<=`${month.year}-${String(month.month).padStart(2,'0')}-31`&&end>=`${month.year}-${String(month.month).padStart(2,'0')}-01`;}).forEach(ev=>{
+      const end=ev.end_date||ev.date;
+      document.querySelectorAll('[data-open-day]').forEach(btn=>{
+        const date=btn.dataset.openDay;if(date<ev.date||date>end)return;
+        const cell=btn.closest('.calendar-day');if(!cell)return;
+        const el=eventEl(ev);cell.appendChild(el);
+        const count=cell.querySelectorAll('.calendar-event').length;const more=cell.querySelector('.calendar-more-events');
+        if(count>2){if(more)more.textContent=`ほか ${count-2} 件`;else{const m=document.createElement('div');m.className='calendar-more-events';m.textContent=`ほか ${count-2} 件`;cell.appendChild(m);}}
+      });
     });
   }
   // Existing shared JSON events remain visible but are deliberately not editable.
@@ -617,13 +660,13 @@
   const addForm=document.getElementById('calendarAddForm');
   if(addForm) addForm.addEventListener('submit',e=>{
     e.preventDefault();const f=new FormData(addForm);const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!validDate(date)||!title)return;
-    const list=load();list.push({id:'device-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)),date,title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);
+    const list=load();const endDate=safe(f.get('end_date'))||date;if(!validDate(endDate)||endDate<date)return;list.push({id:'device-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)),date,end_date:endDate,start_time:safe(f.get('start_time')),end_time:safe(f.get('end_time')),title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);
     const month=currentMonth();const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
   });
   const editForm=document.getElementById('calendarEditForm');
   if(editForm) editForm.addEventListener('submit',e=>{
-    e.preventDefault();const f=new FormData(editForm);const id=safe(f.get('event_id'));const date=safe(f.get('event_date'));const title=safe(f.get('title')).trim();if(!id.startsWith('device-')||!validDate(date)||!title)return;
-    const list=load();const ev=list.find(x=>x.id===id);if(!ev)return;Object.assign(ev,{date,title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
+    e.preventDefault();const f=new FormData(editForm);const id=safe(f.get('event_id'));const date=safe(f.get('event_date'));const endDate=safe(f.get('end_date'))||date;const title=safe(f.get('title')).trim();if(!id.startsWith('device-')||!validDate(date)||!validDate(endDate)||endDate<date||!title)return;
+    const list=load();const ev=list.find(x=>x.id===id);if(!ev)return;Object.assign(ev,{date,end_date:endDate,start_time:safe(f.get('start_time')),end_time:safe(f.get('end_time')),title:title.slice(0,80),detail:safe(f.get('detail')).trim().slice(0,300),color:safe(f.get('color'))||'blue'});save(list);const [y,m]=date.split('-').map(Number);window.location.href=`/calendar?year=${y}&month=${m}`;
   });
   const deleteButton=document.getElementById('deleteEventButton');
   const editDeleteButton=document.getElementById('editDeleteButton');

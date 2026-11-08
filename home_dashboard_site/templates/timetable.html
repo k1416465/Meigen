@@ -66,7 +66,8 @@
                         {% endif %}
 
                         <p class="tt-countdown" data-countdown>
-                          {% if train.is_stopped %}
+                          {% if not section.has_arrival_times and train.upcoming_rank not in [1, 2] %}
+                          {% elif train.is_stopped %}
                             停車中
                           {% elif train.is_past %}
                             {% if train.departure_iso %}発車済{% else %}到着済{% endif %}
@@ -885,6 +886,10 @@ html body.dark .tt-empty {
 
       const upcoming = [];
       const stoppedRows = [];
+      const hasArrivalTimes = rows.some(row => {
+        const value = row.getAttribute('data-arrival');
+        return Boolean(value && !Number.isNaN(new Date(value).getTime()));
+      });
 
       rows.forEach(row => {
         const eventRaw = row.getAttribute('data-event');
@@ -1065,15 +1070,18 @@ html body.dark .tt-empty {
         ranked.map(item => item.row)
       );
 
-      // 順位のない列車は到着カウントダウンを消す。
+      // 到着時刻がない駅では、直近2列車以外の発車カウントダウンを消す。
+      // 到着時刻がある駅では、従来どおり順位のない到着カウントダウンのみ消す。
       rows.forEach(row => {
         const kind = row.getAttribute('data-event-kind');
         const countdown = row.querySelector('[data-countdown]');
 
         if (
           countdown &&
-          kind === 'arrival' &&
-          !rankedRows.has(row)
+          (
+            (!hasArrivalTimes && !rankedRows.has(row)) ||
+            (hasArrivalTimes && kind === 'arrival' && !rankedRows.has(row))
+          )
         ) {
           countdown.textContent = '';
         }

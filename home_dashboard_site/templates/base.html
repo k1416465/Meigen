@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="{% if request.endpoint == 'timetable_page' %}width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no{% else %}width=device-width, initial-scale=1{% endif %}">
   <meta name="theme-color" content="#f5f7fb">
   <meta name="msapplication-TileColor" content="#ffffff">
   <meta name="msapplication-TileImage" content="{{ url_for('static', filename='icons/windows-tile-150.png') }}">
