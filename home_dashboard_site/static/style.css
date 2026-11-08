@@ -5781,6 +5781,31 @@ body.dark .operation-loading-overlay {
 }
 
 
+/* 運行情報ページ：見出しと直下のカードの間隔を統一 */
+.operation-page .operation-alert-section > .operation-section-heading,
+.operation-page .route-settings-section > .operation-section-heading {
+    margin-bottom: 6px !important;
+}
+
+.operation-page .operation-alert-list,
+.operation-page .operation-no-alert,
+.operation-page .route-settings-card {
+    margin-top: 0 !important;
+}
+
+/* スマホ版：時刻表（駅選択）と運行情報の間隔を広げる */
+@media (max-width: 600px) {
+    .operation-page .operation-alert-section {
+        margin-top: 30px !important;
+    }
+
+    /* 「運行情報」と「路線の設定」のセクション間隔を広げる */
+    .operation-page .route-settings-section {
+        margin-top: 20px !important;
+    }
+}
+
+
 /* 範囲表ページ */
 .range-group-label {
     margin: -5px 0 12px;
