@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}迷言｜問い合わせ{% endblock %}
+{% block content %}
+<section class="welcome-row">
+  <div><h1>問い合わせ</h1></div>
+</section>
+
+<style>
+  .form-page-card { max-width: 760px; margin: 0 auto; padding: 22px; }
+  .form-field { margin: 0 0 22px; }
+  .form-field > label, .form-field-title { display:block; font-weight:700; margin-bottom:10px; }
+  .form-category-options {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+  /* 週間時間割ページのクラス切り替えボタンと同じデザイン */
+  .form-category-option {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:43px;
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:var(--surface);
+    color:var(--text);
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s,border-color .15s;
+  }
+  .form-category-option:hover { border-color:var(--purple); }
+  .form-category-option:has(input:checked) {
+    border-color:var(--purple);
+    background:var(--purple-soft);
+    color:var(--purple);
+  }
+  .form-category-option input {
+    position:absolute;
+    opacity:0;
+    width:1px;
+    height:1px;
+    pointer-events:none;
+  }
+  .form-category-option:focus-within {
+    outline:2px solid var(--purple);
+    outline-offset:2px;
+  }
+  .form-page-card textarea {
+    display:block;
+    width:100%;
+    min-height:170px;
+    resize:vertical;
+    box-sizing:border-box;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface-2);
+    color:var(--text);
+    font:inherit;
+    line-height:1.6;
+    color-scheme:light dark;
+  }
+  .form-page-card textarea::placeholder { color:var(--muted); opacity:1; }
+  .form-page-card textarea:focus {
+    outline:2px solid var(--purple);
+    outline-offset:1px;
+    border-color:var(--purple);
+  }
+  .form-upload-box { border:1px dashed var(--border); border-radius:12px; padding:16px; background:var(--surface-soft, transparent); }
+  .form-upload-box input { max-width:100%; }
+  .form-error { padding:11px 13px; border-radius:10px; background:rgba(239,68,68,.10); color:#dc2626; margin-bottom:16px; }
+  .survey-success-backdrop {
+    position:fixed;
+    inset:0;
+    z-index:10000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.52);
+  }
+  .survey-success-dialog {
+    width:min(100%,420px);
+    padding:28px 24px 22px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    background:var(--card-bg,var(--surface));
+    color:var(--text);
+    box-shadow:0 18px 55px rgba(0,0,0,.25);
+    text-align:center;
+  }
+  .survey-success-icon {
+    display:grid;
+    place-items:center;
+    width:54px;
+    height:54px;
+    margin:0 auto 14px;
+    border-radius:50%;
+    background:rgba(34,197,94,.13);
+    color:#16a34a;
+    font-size:28px;
+    font-weight:800;
+  }
+  .survey-success-dialog h2 { margin:0 0 10px; font-size:1.2rem; }
+  .survey-success-dialog p { margin:0 0 22px; line-height:1.7; }
+  .survey-success-dialog a { display:block; width:100%; box-sizing:border-box; }
+  @media(max-width:520px) {
+    .form-page-card { padding:16px; }
+    .form-category-options { gap:7px; }
+    .form-category-option { padding:10px 5px; font-size:.9rem; }
+  }
+</style>
+
+<section class="card form-page-card">
+  {% if error %}<div class="form-error" role="alert">{{ error }}</div>{% endif %}
+  <form method="post" enctype="multipart/form-data" id="surveyForm">
+    <div class="form-field">
+      <span class="form-field-title">① 種類を選択してください</span>
+      <div class="form-category-options" role="radiogroup" aria-label="アンケートの種類">
+        <label class="form-category-option"><input type="radio" name="category" value="ご意見" checked>ご意見</label>
+        <label class="form-category-option"><input type="radio" name="category" value="不具合">不具合</label>
+        <label class="form-category-option"><input type="radio" name="category" value="その他">その他</label>
+      </div>
+    </div>
+
+    <div class="form-field" id="imageField" hidden>
+      <span class="form-field-title">② 画像の添付 <span style="font-weight:400;color:var(--muted);font-size:.85em;">（任意）</span></span>
+      <div class="form-upload-box">
+        <input type="file" name="image" id="surveyImage" accept=".png,.jpg,.jpeg,.webp,.gif,image/png,image/jpeg,image/webp,image/gif">
+        <p style="margin:8px 0 0;color:var(--muted);font-size:.85rem;">不具合が分かる画面などを添付できます。PNG・JPG・WEBP・GIF、8MBまで。</p>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="surveyMessage"><span id="messageNumber">②</span> 内容を入力してください</label>
+      <textarea id="surveyMessage" name="message" class="form-control" placeholder="ご意見・不具合の内容などをご自由に入力してください。" required maxlength="10000"></textarea>
+    </div>
+
+    <button type="submit" class="primary-button" style="width:100%;">送信する</button>
+  </form>
+</section>
+
+{% if submitted %}
+<div class="survey-success-backdrop" role="presentation">
+  <section class="survey-success-dialog" role="dialog" aria-modal="true" aria-labelledby="surveySuccessTitle">
+    <div class="survey-success-icon" aria-hidden="true">✓</div>
+    <h2 id="surveySuccessTitle">アンケートを送信しました。</h2>
+    <p>ご協力ありがとうございます。</p>
+    <a class="primary-button" href="{{ url_for('more_page') }}">閉じる</a>
+  </section>
+</div>
+{% endif %}
+
+<script>
+(() => {
+  const radios = document.querySelectorAll('input[name="category"]');
+  const imageField = document.getElementById('imageField');
+  const imageInput = document.getElementById('surveyImage');
+  const messageNumber = document.getElementById('messageNumber');
+  function updateCategory() {
+    const selected = document.querySelector('input[name="category"]:checked')?.value;
+    const isBug = selected === '不具合';
+    imageField.hidden = !isBug;
+    messageNumber.textContent = isBug ? '③' : '②';
+    if (!isBug) imageInput.value = '';
+  }
+  radios.forEach(radio => radio.addEventListener('change', updateCategory));
+  updateCategory();
+})();
+</script>
+{% endblock %}

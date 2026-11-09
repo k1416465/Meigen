@@ -138,7 +138,7 @@
             <audio class="recording-audio-source" preload="metadata" src="{{ url_for('static', filename='recording/' ~ item['filename']) }}">
               お使いのブラウザは音声再生に対応していません。
             </audio>
-            <button class="recording-play-button" type="button" data-play aria-label="再生" aria-pressed="false">
+            <button class="recording-play-button" type="button" data-play data-recording-title="{{ item['title'] or item['filename'] }}" aria-label="{{ (item['title'] or item['filename']) ~ 'を再生' }}" aria-pressed="false">
               <svg class="recording-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" fill="currentColor"/></svg>
               <svg class="recording-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor"/></svg>
             </button>
@@ -186,6 +186,7 @@
       var progress = player.querySelector('[data-progress]');
       var current = player.querySelector('[data-current-time]');
       var duration = player.querySelector('[data-duration]');
+      var recordingTitle = play ? (play.dataset.recordingTitle || '録音') : '録音';
       if (!audio || !play || !progress) return;
       function sync() {
         var ratio = audio.duration ? audio.currentTime / audio.duration : 0;
@@ -194,7 +195,7 @@
         current.textContent = formatTime(audio.currentTime);
         duration.textContent = formatTime(audio.duration);
         player.classList.toggle('is-playing', !audio.paused && !audio.ended);
-        play.setAttribute('aria-label', audio.paused ? '再生' : '一時停止');
+        play.setAttribute('aria-label', recordingTitle + (audio.paused ? 'を再生' : 'を一時停止'));
         play.setAttribute('aria-pressed', String(!audio.paused));
       }
       play.addEventListener('click', function () {

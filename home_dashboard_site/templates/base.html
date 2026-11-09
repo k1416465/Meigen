@@ -38,12 +38,49 @@
     /* テーマ切り替えアイコンをボタンの中央に配置 */
     #themeToggle { display: inline-flex; align-items: center; justify-content: center; }
     #themeToggle #themeIcon { display: block; flex: 0 0 auto; margin: 0 auto; object-fit: contain; }
+    .admin-login-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px solid rgba(34, 197, 94, .35);
+      border-radius: 999px;
+      background: rgba(34, 197, 94, .10);
+      color: #15803d;
+      font-size: .78rem;
+      font-weight: 700;
+      white-space: nowrap;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .admin-login-indicator:hover {
+      background: rgba(34, 197, 94, .18);
+      border-color: rgba(34, 197, 94, .55);
+    }
+    .admin-login-indicator::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      flex: 0 0 auto;
+    }
+    [data-theme="dark"] .admin-login-indicator {
+      color: #86efac;
+      border-color: rgba(134, 239, 172, .3);
+      background: rgba(34, 197, 94, .13);
+    }
+    @media (max-width: 520px) {
+      .admin-login-indicator { padding: 5px 7px; font-size: .68rem; gap: 4px; }
+    }
   </style>
 </head>
 
 <body
   data-weather-place="{{ weather_place|default('sano') }}"
   data-appearance="{{ appearance|default('system') }}"
+  data-analytics-page="{{ analytics_current_page|default('不明') }}"
 >
   <header class="topbar">
     <a class="brand" href="{{ url_for('home') }}">
@@ -56,6 +93,9 @@
     </a>
 
     <div class="top-actions">
+      {% if session.get('recording_admin_authenticated') %}
+        <a class="admin-login-indicator" href="{{ url_for('admin_dashboard') }}" aria-label="管理者ページを開く" title="管理者ページを開く">管理者ログイン中</a>
+      {% endif %}
       <a
         class="operation-top-link"
         id="operationTopLink"
@@ -218,6 +258,31 @@
         overlay.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('operation-loading-active');
       });
+    })();
+  </script>
+  <script>
+    /* ボタン操作の集計（管理者ログイン中はサーバー側でも除外） */
+    (() => {
+      const page = document.body.dataset.analyticsPage || '不明';
+      document.addEventListener('click', (event) => {
+        const target = event.target instanceof Element ? event.target : event.target.parentElement;
+        const control = target && target.closest('button, input[type="button"], input[type="submit"], [role="button"]');
+        if (!control || control.disabled || control.dataset.analyticsIgnore === 'true') return;
+        const label = (
+          control.getAttribute('aria-label') ||
+          control.getAttribute('title') ||
+          control.innerText ||
+          control.value ||
+          control.textContent ||
+          '名称未設定'
+        ).replace(/\s+/g, ' ').trim().slice(0, 120);
+        fetch('/api/analytics/click', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ page, button: label || '名称未設定' }),
+          keepalive: true
+        }).catch(() => {});
+      }, true);
     })();
   </script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>

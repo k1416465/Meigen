@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}迷言｜アンケート管理{% endblock %}
+{% block content %}
+<section class="welcome-row">
+  <div><h1>アンケート管理</h1><p>送信されたご意見・不具合報告を確認できます。</p></div>
+  <a class="back-link" href="{{ url_for('admin_dashboard') }}">管理者ページへ戻る</a>
+</section>
+<style>
+  .form-admin-summary { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+  .form-admin-count { padding:12px 16px; border:1px solid var(--border); border-radius:12px; background:var(--card-bg, var(--surface)); min-width:100px; }
+  .form-admin-count strong { display:block; font-size:1.35rem; }
+  .form-submission { padding:16px; margin-bottom:12px; }
+  .form-submission-meta { display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; color:var(--muted); font-size:.88rem; }
+  .form-submission-message { white-space:pre-wrap; overflow-wrap:anywhere; margin:14px 0; }
+  .form-submission-image { display:block; max-width:min(100%,560px); max-height:420px; object-fit:contain; border-radius:10px; border:1px solid var(--border); }
+  .form-submission-actions { display:flex; justify-content:flex-end; }
+</style>
+
+<div class="form-admin-summary">
+  <div class="form-admin-count">合計<strong>{{ submissions|length }}</strong></div>
+  <div class="form-admin-count">ご意見<strong>{{ counts.get('ご意見', 0) }}</strong></div>
+  <div class="form-admin-count">不具合<strong>{{ counts.get('不具合', 0) }}</strong></div>
+  <div class="form-admin-count">その他<strong>{{ counts.get('その他', 0) }}</strong></div>
+</div>
+
+{% if submissions %}
+  {% for item in submissions %}
+    <article class="card form-submission">
+      <div class="form-submission-meta">
+        <strong style="color:var(--text);">#{{ item.id }}　{{ item.category }}</strong>
+        <span>{{ item.submitted_at }}</span>
+      </div>
+      <div class="form-submission-message">{{ item.message }}</div>
+      {% if item.image_filename %}
+        <p style="margin:8px 0;color:var(--muted);font-size:.85rem;">添付画像：{{ item.image_original_name }}</p>
+        <a href="{{ url_for('form_attachment', filename=item.image_filename) }}" target="_blank" rel="noopener">
+          <img class="form-submission-image" src="{{ url_for('form_attachment', filename=item.image_filename) }}" alt="添付画像">
+        </a>
+      {% endif %}
+      <div class="form-submission-actions">
+        <form method="post" onsubmit="return confirm('このアンケートと添付画像を削除します。よろしいですか？');">
+          <input type="hidden" name="submission_id" value="{{ item.id }}">
+          <button class="secondary-button" type="submit">削除</button>
+        </form>
+      </div>
+    </article>
+  {% endfor %}
+{% else %}
+  <section class="card" style="padding:24px;text-align:center;color:var(--muted);">まだアンケートは届いていません。</section>
+{% endif %}
+{% endblock %}

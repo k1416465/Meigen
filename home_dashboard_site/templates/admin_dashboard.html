@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}管理者用ページ{% endblock %}
+{% block title %}迷言｜管理者用ページ{% endblock %}
 {% block content %}
 <section class="welcome-row">
   <div><h1>管理者用ページ</h1><p>管理する項目を選択してください。</p></div>
@@ -14,6 +14,12 @@
   </a>
   <a class="card" href="{{ url_for('recording_admin') }}" style="display:flex; align-items:center; justify-content:center; min-height:130px; padding:24px; text-decoration:none; text-align:center;">
     <strong style="font-size:1.5rem;">録音</strong>
+  </a>
+  <a class="card" href="{{ url_for('form_admin') }}" style="display:flex; align-items:center; justify-content:center; min-height:130px; padding:24px; text-decoration:none; text-align:center;">
+    <strong style="font-size:1.5rem;">アンケート管理</strong>
+  </a>
+  <a class="card" href="{{ url_for('analytics_page') }}" style="display:flex; align-items:center; justify-content:center; min-height:130px; padding:24px; text-decoration:none; text-align:center;">
+    <strong style="font-size:1.5rem;">アクセス解析</strong>
   </a>
 </div>
 <form method="post" action="{{ url_for('recording_admin_logout') }}" style="margin-top:20px;">
