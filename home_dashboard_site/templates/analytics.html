@@ -15,16 +15,8 @@
 </section>
 
 <nav class="schedule-class-switch analytics-period-switch" aria-label="集計期間">
-  <a
-    class="schedule-class-button{% if period == 'all' %} active{% endif %}"
-    href="{{ url_for('analytics_page', period='all') }}"
-    {% if period == 'all' %}aria-current="page"{% endif %}
-  >全て</a>
-  <a
-    class="schedule-class-button{% if period == 'today' %} active{% endif %}"
-    href="{{ url_for('analytics_page', period='today') }}"
-    {% if period == 'today' %}aria-current="page"{% endif %}
-  >今日</a>
+  <a class="schedule-class-button{% if period == 'all' %} active{% endif %}" href="{{ url_for('analytics_page', period='all') }}" {% if period == 'all' %}aria-current="page"{% endif %}>全て</a>
+  <a class="schedule-class-button{% if period == 'today' %} active{% endif %}" href="{{ url_for('analytics_page', period='today') }}" {% if period == 'today' %}aria-current="page"{% endif %}>今日</a>
 </nav>
 
 <div class="stats-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0;">
@@ -42,95 +34,136 @@
   </section>
 </div>
 
-<section class="card" style="padding:18px;margin:16px 0;">
-  <h2 style="margin-top:0;">ページ別アクセス数</h2>
-  {% if page_rows %}
-  <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr><th style="text-align:left;padding:9px;">ページ</th><th style="text-align:right;padding:9px;">アクセス数</th><th style="text-align:right;padding:9px;">利用者数</th></tr></thead>
-      <tbody>
-      {% for row in page_rows %}
-        <tr><td style="padding:9px;border-top:1px solid var(--border);">{{ row.page }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.count) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visitors) }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% else %}<p>まだアクセスデータがありません。</p>{% endif %}
-</section>
+{% set page_label_map = {'運行情報': '時刻表', '時刻表': '時刻表（駅名不明・過去の記録）', '列車詳細': '列車時刻表（列車番号不明・過去の記録）'} %}
+{% set button_label_map = {'Play': '再生', 'Pause': '一時停止', 'Play/Pause': '再生／一時停止', 'Search': '検索', 'Reset': 'リセット', 'Sort': '並び替え', 'Download all': 'すべてダウンロード', 'Download All': 'すべてダウンロード', 'Unit Converter': '単位変換', 'Admin Dashboard': '管理者用ページ', 'play': '再生', 'pause': '一時停止', 'unit converter page': '単位変換', 'admin dashboard': '管理者用ページ', 'recording admin login': '管理者ログイン', 'Recording Admin Login': '管理者ログイン', 'recording_admin_login': '管理者ログイン', 'recording-admin-login': '管理者ログイン'} %}
 
-<section class="card" style="padding:18px;margin:16px 0;">
-  <h2 style="margin-top:0;">ボタン別クリック数</h2>
-  {% if click_rows %}
-  {% set page_label_map = {'unit_converter_page': '単位変換', 'unit converter page': '単位変換', 'admin_dashboard': '管理者用ページ', 'admin dashboard': '管理者用ページ', 'recording_page': '録音', 'recording_admin_login': '管理者ログイン', 'recording admin login': '管理者ログイン'} %}
-  {% set button_label_map = {'Play': '再生', 'Pause': '一時停止', 'Play/Pause': '再生／一時停止', 'Search': '検索', 'Reset': 'リセット', 'Sort': '並び替え', 'Download all': 'すべてダウンロード', 'Download All': 'すべてダウンロード', 'Unit Converter': '単位変換', 'Admin Dashboard': '管理者用ページ', 'play': '再生', 'pause': '一時停止', 'unit converter page': '単位変換', 'admin dashboard': '管理者用ページ', 'recording admin login': '管理者ログイン', 'Recording Admin Login': '管理者ログイン', 'recording_admin_login': '管理者ログイン', 'recording-admin-login': '管理者ログイン'} %}
-  <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr><th style="text-align:left;padding:9px;">ページ</th><th style="text-align:left;padding:9px;">ボタン</th><th style="text-align:right;padding:9px;">クリック数</th><th style="text-align:right;padding:9px;">利用者数</th></tr></thead>
-      <tbody>
-      {% for row in click_rows %}
-        <tr><td style="padding:9px;border-top:1px solid var(--border);">{{ page_label_map.get(row.page|lower|trim, page_label_map.get(row.page, row.page)) }}</td><td style="padding:9px;border-top:1px solid var(--border);">{{ button_label_map.get(row.button|lower|trim, button_label_map.get(row.button, row.button)) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.count) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visitors) }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
+<details class="card settings-card setting-accordion analytics-accordion">
+  <summary><span class="setting-heading">ページ別アクセス数</span></summary>
+  <div class="analytics-accordion-content">
+    {% if page_rows %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr><th style="text-align:left;padding:9px;">ページ</th><th style="text-align:right;padding:9px;">アクセス数</th><th style="text-align:right;padding:9px;">利用者数</th></tr></thead>
+        <tbody>{% for row in page_rows %}
+          <tr><td style="padding:9px;border-top:1px solid var(--border);">{{ page_label_map.get(row.page, row.page) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.count) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visitors) }}</td></tr>
+        {% endfor %}</tbody>
+      </table>
+    </div>
+    {% else %}<p>まだアクセスデータがありません。</p>{% endif %}
   </div>
-  {% else %}<p>まだクリックデータがありません。</p>{% endif %}
-</section>
+</details>
 
-<section class="card" style="padding:18px;margin:16px 0;">
-  <h2 style="margin-top:0;">利用者別の閲覧状況</h2>
-  <p style="color:var(--muted);font-size:.9rem;">匿名IDで識別しています。氏名やメールアドレスは取得しません。</p>
-  {% if visitor_rows %}
-  <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr><th style="text-align:left;padding:9px;">利用者</th><th style="text-align:right;padding:9px;">閲覧回数</th><th style="text-align:right;padding:9px;">クリック数</th><th style="text-align:left;padding:9px;">閲覧ページ</th><th style="text-align:left;padding:9px;">最終アクセス</th><th style="text-align:left;padding:9px;">操作</th></tr></thead>
-      <tbody>
-      {% for row in visitor_rows %}
-        <tr>
-          <td style="padding:9px;border-top:1px solid var(--border);white-space:nowrap;">利用者 #{{ row.visitor_id[:8] }}</td>
-          <td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visits) }}</td>
-          <td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.clicks) }}</td>
-          <td style="padding:9px;border-top:1px solid var(--border);">{{ row.pages or "—" }}</td>
-          <td style="padding:9px;border-top:1px solid var(--border);white-space:nowrap;">{{ row.last_seen }}</td>
-          <td style="padding:9px;border-top:1px solid var(--border);white-space:nowrap;">
-            <form method="post" style="margin:0;" onsubmit="return confirm('利用者 #{{ row.visitor_id[:8] }} のアクセス履歴とクリック履歴をすべて削除します。この操作は取り消せません。よろしいですか？');">
-              <input type="hidden" name="action" value="delete_visitor">
-              <input type="hidden" name="visitor_id" value="{{ row.visitor_id }}">
-              <input type="hidden" name="period" value="{{ period }}">
-              <button type="submit" class="secondary-button">履歴をすべて削除</button>
-            </form>
-          </td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+<details class="card settings-card setting-accordion analytics-accordion">
+  <summary><span class="setting-heading">ボタン別クリック数</span></summary>
+  <div class="analytics-accordion-content">
+    {% if click_rows %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr><th style="text-align:left;padding:9px;">ページ</th><th style="text-align:left;padding:9px;">ボタン</th><th style="text-align:right;padding:9px;">クリック数</th><th style="text-align:right;padding:9px;">利用者数</th></tr></thead>
+        <tbody>{% for row in click_rows %}
+          <tr><td style="padding:9px;border-top:1px solid var(--border);">{{ page_label_map.get(row.page, row.page) }}</td><td style="padding:9px;border-top:1px solid var(--border);">{{ button_label_map.get(row.button|lower|trim, button_label_map.get(row.button, row.button)) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.count) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visitors) }}</td></tr>
+        {% endfor %}</tbody>
+      </table>
+    </div>
+    {% else %}<p>まだクリックデータがありません。</p>{% endif %}
   </div>
-  {% else %}<p>まだ利用者データがありません。</p>{% endif %}
-</section>
+</details>
 
-<section class="card" style="padding:18px;margin:16px 0;">
-  <h2 style="margin-top:0;">最近のアクセス（全件）</h2>
-  {% if recent_rows %}
-    {% for row in recent_rows %}
-      <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--border);">
-        <span>{{ row.page }} <small style="color:var(--muted);">{% if row.visitor_id %}利用者 #{{ row.visitor_id[:8] }}{% else %}過去の記録{% endif %}</small></span><time style="color:var(--muted);white-space:nowrap;">{{ row.visited_at }}</time>
-      </div>
-    {% endfor %}
-  {% else %}<p>まだアクセスデータがありません。</p>{% endif %}
-</section>
+<details class="card settings-card setting-accordion analytics-accordion">
+  <summary><span class="setting-heading">利用者別のアクセス状況</span></summary>
+  <div class="analytics-accordion-content">
+    <p style="color:var(--muted);font-size:.9rem;">匿名IDで識別しています。氏名やメールアドレスは取得しません。</p>
+    {% if visitor_rows %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr><th style="text-align:left;padding:9px;">利用者</th><th style="text-align:right;padding:9px;">閲覧回数</th><th style="text-align:right;padding:9px;">クリック数</th><th style="text-align:left;padding:9px;">閲覧ページ</th><th style="text-align:left;padding:9px;">最終アクセス</th><th style="text-align:left;padding:9px;">操作</th></tr></thead>
+        <tbody>{% for row in visitor_rows %}
+          <tr>
+            <td style="padding:9px;border-top:1px solid var(--border);white-space:nowrap;">利用者 #{{ row.visitor_id[:8] }}</td>
+            <td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visits) }}</td>
+            <td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.clicks) }}</td>
+            <td style="padding:9px;border-top:1px solid var(--border);">{{ row.pages or "—" }}</td>
+            <td style="padding:9px;border-top:1px solid var(--border);white-space:nowrap;">{{ row.last_seen }}</td>
+            <td style="padding:9px;border-top:1px solid var(--border);white-space:nowrap;">
+              <form method="post" style="margin:0;" onsubmit="return confirm('利用者 #{{ row.visitor_id[:8] }} のアクセス履歴とクリック履歴をすべて削除します。この操作は取り消せません。よろしいですか？');">
+                <input type="hidden" name="action" value="delete_visitor"><input type="hidden" name="visitor_id" value="{{ row.visitor_id }}"><input type="hidden" name="period" value="{{ period }}">
+                <button type="submit" class="secondary-button">履歴をすべて削除</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}</tbody>
+      </table>
+    </div>
+    {% else %}<p>まだ利用者データがありません。</p>{% endif %}
+  </div>
+</details>
+
+<details class="card settings-card setting-accordion analytics-accordion">
+  <summary><span class="setting-heading">利用者別のボタンクリック状況</span></summary>
+  <div class="analytics-accordion-content">
+    {% if visitor_click_rows %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr><th style="text-align:left;padding:9px;">利用者</th><th style="text-align:right;padding:9px;">クリック数</th><th style="text-align:left;padding:9px;">クリックしたボタン</th><th style="text-align:left;padding:9px;">最終クリック</th></tr></thead>
+        <tbody>{% for row in visitor_click_rows %}
+          <tr><td style="padding:9px;border-top:1px solid var(--border);white-space:nowrap;">利用者 #{{ row.visitor_id[:8] }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.clicks) }}</td><td style="padding:9px;border-top:1px solid var(--border);">{{ row.buttons or "—" }}</td><td style="padding:9px;border-top:1px solid var(--border);white-space:nowrap;">{{ row.last_clicked }}</td></tr>
+        {% endfor %}</tbody>
+      </table>
+    </div>
+    {% else %}<p>まだ利用者別のクリックデータがありません。</p>{% endif %}
+  </div>
+</details>
+
+<details class="card settings-card setting-accordion analytics-accordion">
+  <summary><span class="setting-heading">最近のアクセス</span></summary>
+  <div class="analytics-accordion-content">
+    {% if recent_rows %}
+      {% for row in recent_rows %}
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--border);">
+          <span>{{ page_label_map.get(row.page, row.page) }} <small style="color:var(--muted);">{% if row.visitor_id %}利用者 #{{ row.visitor_id[:8] }}{% else %}過去の記録{% endif %}</small></span><time style="color:var(--muted);white-space:nowrap;">{{ row.visited_at }}</time>
+        </div>
+      {% endfor %}
+    {% else %}<p>まだアクセスデータがありません。</p>{% endif %}
+  </div>
+</details>
+
+<details class="card settings-card setting-accordion analytics-accordion">
+  <summary><span class="setting-heading">最近のボタンクリック</span></summary>
+  <div class="analytics-accordion-content">
+    {% if recent_click_rows %}
+      {% for row in recent_click_rows %}
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--border);">
+          <span>{{ page_label_map.get(row.page, row.page) }} ／ {{ button_label_map.get(row.button|lower|trim, button_label_map.get(row.button, row.button)) }} <small style="color:var(--muted);">{% if row.visitor_id %}利用者 #{{ row.visitor_id[:8] }}{% else %}過去の記録{% endif %}</small></span><time style="color:var(--muted);white-space:nowrap;">{{ row.clicked_at }}</time>
+        </div>
+      {% endfor %}
+    {% else %}<p>まだクリックデータがありません。</p>{% endif %}
+  </div>
+</details>
 
 <form method="post" onsubmit="return confirm('アクセス解析データをすべて削除します。よろしいですか？');" style="margin:20px 0;">
   <input type="hidden" name="action" value="reset">
   <button class="secondary-button" type="submit">集計データをリセット</button>
 </form>
+
 <style>
-@media (max-width: 600px) {
+.analytics-accordion { margin: 14px 0; padding: 0 !important; overflow: hidden; max-width:none !important; }
+.analytics-accordion > summary {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:18px 20px; cursor:pointer; list-style:none; min-height:58px;
+}
+.analytics-accordion > summary::after { content:"＋"; color:var(--purple); font-size:20px; font-weight:400; }
+.analytics-accordion[open] > summary::after { content:"−"; }
+.analytics-accordion > summary::-webkit-details-marker { display:none; }
+.analytics-accordion .setting-heading { font-size:1rem; font-weight:700; color:var(--text); }
+.analytics-accordion-content { padding:0 18px 18px; }
+.analytics-accordion-content p { color:var(--muted); }
+.analytics-accordion table th { color:var(--muted); font-weight:600; }
+@media (max-width:600px) {
   .stats-grid { grid-template-columns:1fr !important; }
   .stats-grid > section { grid-column:auto !important; }
-}
-.analytics-period-switch {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  max-width: 260px;
-  margin: 18px 0;
+  .analytics-period-switch { grid-template-columns:repeat(2,minmax(0,1fr)); max-width:260px; margin:18px 0; }
+  .analytics-accordion > summary { padding:16px; }
+  .analytics-accordion-content { padding:0 12px 14px; }
 }
 </style>
 {% endblock %}
