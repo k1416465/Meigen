@@ -5988,6 +5988,7 @@ body.dark .operation-loading-overlay {
     font-size: 14px;
     line-height: 1.6;
     font-weight: 800;
+    white-space: pre-line;
 }
 
 .range-task-note {
@@ -5995,6 +5996,7 @@ body.dark .operation-loading-overlay {
     color: var(--muted);
     font-size: 11px;
     line-height: 1.6;
+    white-space: pre-line;
 }
 
 @media (max-width: 640px) {
