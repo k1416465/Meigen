@@ -37,7 +37,7 @@
 {% set page_label_map = {'運行情報': '時刻表', '時刻表': '時刻表（駅名不明・過去の記録）', '列車詳細': '列車時刻表（列車番号不明・過去の記録）'} %}
 {% set button_label_map = {'Play': '再生', 'Pause': '一時停止', 'Play/Pause': '再生／一時停止', 'Search': '検索', 'Reset': 'リセット', 'Sort': '並び替え', 'Download all': 'すべてダウンロード', 'Download All': 'すべてダウンロード', 'Unit Converter': '単位変換', 'Admin Dashboard': '管理者用ページ', 'play': '再生', 'pause': '一時停止', 'unit converter page': '単位変換', 'admin dashboard': '管理者用ページ', 'recording admin login': '管理者ログイン', 'Recording Admin Login': '管理者ログイン', 'recording_admin_login': '管理者ログイン', 'recording-admin-login': '管理者ログイン'} %}
 
-<details class="card settings-card setting-accordion analytics-accordion">
+<details class="card settings-card setting-accordion analytics-accordion" open>
   <summary><span class="setting-heading">ページ別アクセス数</span></summary>
   <div class="analytics-accordion-content">
     {% if page_rows %}
@@ -53,7 +53,7 @@
   </div>
 </details>
 
-<details class="card settings-card setting-accordion analytics-accordion">
+<details class="card settings-card setting-accordion analytics-accordion" open>
   <summary><span class="setting-heading">ボタン別クリック数</span></summary>
   <div class="analytics-accordion-content">
     {% if click_rows %}
@@ -69,7 +69,7 @@
   </div>
 </details>
 
-<details class="card settings-card setting-accordion analytics-accordion">
+<details class="card settings-card setting-accordion analytics-accordion" open>
   <summary><span class="setting-heading">利用者別のアクセス状況</span></summary>
   <div class="analytics-accordion-content">
     <p style="color:var(--muted);font-size:.9rem;">匿名IDで識別しています。氏名やメールアドレスは取得しません。</p>
@@ -98,7 +98,7 @@
   </div>
 </details>
 
-<details class="card settings-card setting-accordion analytics-accordion">
+<details class="card settings-card setting-accordion analytics-accordion" open>
   <summary><span class="setting-heading">利用者別のボタンクリック状況</span></summary>
   <div class="analytics-accordion-content">
     {% if visitor_click_rows %}
@@ -114,7 +114,7 @@
   </div>
 </details>
 
-<details class="card settings-card setting-accordion analytics-accordion">
+<details class="card settings-card setting-accordion analytics-accordion" open>
   <summary><span class="setting-heading">最近のアクセス</span></summary>
   <div class="analytics-accordion-content">
     {% if recent_rows %}
@@ -127,7 +127,7 @@
   </div>
 </details>
 
-<details class="card settings-card setting-accordion analytics-accordion">
+<details class="card settings-card setting-accordion analytics-accordion" open>
   <summary><span class="setting-heading">最近のボタンクリック</span></summary>
   <div class="analytics-accordion-content">
     {% if recent_click_rows %}
@@ -148,13 +148,13 @@
 <style>
 .analytics-accordion { margin: 14px 0; padding: 0 !important; overflow: hidden; max-width:none !important; }
 .analytics-accordion > summary {
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  padding:18px 20px; cursor:pointer; list-style:none; min-height:58px;
+  display:flex; align-items:center; justify-content:flex-start; gap:12px;
+  padding:18px 20px; cursor:pointer; list-style:none; min-height:58px; text-align:left;
 }
-.analytics-accordion > summary::after { content:"＋"; color:var(--purple); font-size:20px; font-weight:400; }
+.analytics-accordion > summary::after { content:"＋"; color:var(--purple); font-size:20px; font-weight:400; margin-left:auto; flex:0 0 auto; }
 .analytics-accordion[open] > summary::after { content:"−"; }
 .analytics-accordion > summary::-webkit-details-marker { display:none; }
-.analytics-accordion .setting-heading { font-size:1rem; font-weight:700; color:var(--text); }
+.analytics-accordion .setting-heading { display:block; flex:1 1 auto; text-align:left; font-size:1rem; font-weight:700; color:var(--text); }
 .analytics-accordion-content { padding:0 18px 18px; }
 .analytics-accordion-content p { color:var(--muted); }
 .analytics-accordion table th { color:var(--muted); font-weight:600; }
