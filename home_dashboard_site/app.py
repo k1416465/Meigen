@@ -23,6 +23,248 @@ app = Flask(__name__)
 RECORDING_ADMIN_PASSWORD = "Meigen123"
 FLASK_SESSION_SECRET = "nidc2i39nfow19dnocms269"
 app.secret_key = FLASK_SESSION_SECRET
+# 管理者ログインをブラウザ終了後も維持する（ログアウト操作またはCookie削除まで）
+app.permanent_session_lifetime = timedelta(days=3650)
+
+
+# ==================================================
+# アクセス解析
+# ==================================================
+
+ANALYTICS_DB = Path(__file__).resolve().parent / "analytics.sqlite3"
+
+PAGE_ANALYTICS_LABELS = {
+    "home": "ホーム",
+    "special_timetable": "特別時間割",
+    "schedule": "時間割",
+    "timetable_page": "時刻表",
+    "train_detail": "列車詳細",
+    "settings": "設定",
+    "operation_page": "運行情報",
+    "calendar_page": "カレンダー",
+    "more_page": "その他",
+    "map_page": "地図",
+    "range_page": "範囲表",
+    "line_page": "路線",
+    "roster_page": "名簿",
+    "recording_page": "録音",
+    "quiz_page": "クイズ",
+    "stamp_page": "スタンプ",
+    "video_page": "動画",
+    "calculator_page": "電卓",
+    "calculator_history_page": "電卓履歴",
+    "unit_converter_page": "単位変換",
+    "admin_dashboard": "管理者用ページ",
+    "form_page": "アンケート",
+}
+
+def analytics_connect():
+    conn = sqlite3.connect(ANALYTICS_DB, timeout=10)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_analytics_db():
+    with analytics_connect() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS page_views (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                page TEXT NOT NULL,
+                visited_at TEXT NOT NULL,
+                visitor_id TEXT
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS button_clicks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                page TEXT NOT NULL,
+                button TEXT NOT NULL,
+                clicked_at TEXT NOT NULL,
+                visitor_id TEXT
+            )
+        """)
+        # 既存データベースにも利用者ID列を追加（過去データは不明のまま保持）
+        for table in ("page_views", "button_clicks"):
+            columns = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+            if "visitor_id" not in columns:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN visitor_id TEXT")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_page_views_visitor ON page_views(visitor_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_page_views_page ON page_views(page)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_button_clicks_visitor ON button_clicks(visitor_id)")
+
+def analytics_page_name(endpoint):
+    if endpoint in PAGE_ANALYTICS_LABELS:
+        return PAGE_ANALYTICS_LABELS[endpoint]
+    return (endpoint or "不明").replace("_", " ")
+
+@app.context_processor
+def inject_analytics_page_name():
+    return {"analytics_current_page": analytics_page_name(request.endpoint)}
+
+def analytics_owner_excluded():
+    # 管理者ログイン中の閲覧・操作はサイト所有者本人として集計しない
+    return bool(session.get("recording_admin_authenticated"))
+
+def analytics_now():
+    return datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S")
+
+def analytics_get_visitor_id():
+    """Cookieで匿名の利用者を識別。氏名など個人を特定する情報は取得しない。"""
+    value = request.cookies.get("myHomeAnalyticsVisitor", "")
+    try:
+        return str(uuid.UUID(value))
+    except (ValueError, TypeError, AttributeError):
+        return str(uuid.uuid4())
+
+def analytics_set_visitor_cookie(response, visitor_id):
+    response.set_cookie(
+        "myHomeAnalyticsVisitor", visitor_id,
+        max_age=60 * 60 * 24 * 730,
+        httponly=True, samesite="Lax", secure=request.is_secure,
+    )
+    return response
+
+init_analytics_db()
+
+@app.after_request
+def record_analytics_page_view(response):
+    endpoint = request.endpoint or ""
+    should_track = (
+        request.method == "GET"
+        and response.status_code < 400
+        and response.mimetype == "text/html"
+        and not endpoint.startswith("static")
+        and not endpoint.startswith("api_")
+        and endpoint not in {"recording_admin_login", "recording_admin_logout", "analytics_page"}
+        and not analytics_owner_excluded()
+    )
+    if should_track:
+        visitor_id = analytics_get_visitor_id()
+        try:
+            with analytics_connect() as conn:
+                conn.execute(
+                    "INSERT INTO page_views (page, visited_at, visitor_id) VALUES (?, ?, ?)",
+                    (analytics_page_name(endpoint), analytics_now(), visitor_id),
+                )
+        except Exception:
+            app.logger.exception("アクセス解析（ページ）の記録に失敗しました")
+        analytics_set_visitor_cookie(response, visitor_id)
+    return response
+
+@app.route("/api/analytics/click", methods=["POST"])
+def analytics_record_click():
+    if analytics_owner_excluded():
+        return jsonify({"ok": True, "ignored": True})
+    data = request.get_json(silent=True) or {}
+    page = str(data.get("page", "不明")).strip()[:80] or "不明"
+    button = str(data.get("button", "名称未設定")).strip()[:120] or "名称未設定"
+    if page in {"管理者用ページ", "アクセス解析"}:
+        return jsonify({"ok": True, "ignored": True})
+    visitor_id = analytics_get_visitor_id()
+    try:
+        with analytics_connect() as conn:
+            conn.execute(
+                "INSERT INTO button_clicks (page, button, clicked_at, visitor_id) VALUES (?, ?, ?, ?)",
+                (page, button, analytics_now(), visitor_id),
+            )
+        response = jsonify({"ok": True})
+        return analytics_set_visitor_cookie(response, visitor_id)
+    except Exception:
+        app.logger.exception("アクセス解析（クリック）の記録に失敗しました")
+        return jsonify({"ok": False}), 500
+
+@app.route("/admin/analytics", methods=["GET", "POST"])
+def analytics_page():
+    if not session.get("recording_admin_authenticated"):
+        return redirect(url_for("recording_admin_login", next=url_for("analytics_page")))
+    if request.method == "POST":
+        action = request.form.get("action", "")
+        if action == "delete_visitor":
+            visitor_id = request.form.get("visitor_id", "").strip()
+            # DB内に存在する匿名IDのみを対象に、閲覧履歴とクリック履歴をまとめて削除
+            if visitor_id:
+                with analytics_connect() as conn:
+                    page_result = conn.execute(
+                        "DELETE FROM page_views WHERE visitor_id = ?", (visitor_id,)
+                    )
+                    click_result = conn.execute(
+                        "DELETE FROM button_clicks WHERE visitor_id = ?", (visitor_id,)
+                    )
+                deleted_total = page_result.rowcount + click_result.rowcount
+                flash(
+                    f"利用者 #{visitor_id[:8]} のアクセス履歴・クリック履歴を削除しました。"
+                    if deleted_total else "該当する利用者の履歴は見つかりませんでした。"
+                )
+            return redirect(url_for(
+                "analytics_page",
+                period=request.form.get("period", "all")
+                if request.form.get("period") in {"all", "today"} else "all"
+            ))
+        if action == "reset":
+            with analytics_connect() as conn:
+                conn.execute("DELETE FROM page_views")
+                conn.execute("DELETE FROM button_clicks")
+            flash("アクセス解析データをリセットしました。")
+            return redirect(url_for("analytics_page"))
+
+    # 「今日」は日本時間（JST）の0:00以降を対象にする。
+    period = request.args.get("period", "all")
+    if period not in {"all", "today"}:
+        period = "all"
+    today_start = datetime.now(JST).strftime("%Y-%m-%d") + " 00:00:00"
+    page_where = "WHERE visited_at >= ?" if period == "today" else ""
+    click_where = "WHERE clicked_at >= ?" if period == "today" else ""
+    page_params = (today_start,) if period == "today" else ()
+    click_params = (today_start,) if period == "today" else ()
+
+    with analytics_connect() as conn:
+        total_views = conn.execute(
+            f"SELECT COUNT(*) FROM page_views {page_where}", page_params
+        ).fetchone()[0]
+        total_clicks = conn.execute(
+            f"SELECT COUNT(*) FROM button_clicks {click_where}", click_params
+        ).fetchone()[0]
+        visitor_count = conn.execute(
+            f"SELECT COUNT(DISTINCT visitor_id) FROM page_views {page_where} "
+            + ("AND" if page_where else "WHERE") + " visitor_id IS NOT NULL",
+            page_params,
+        ).fetchone()[0]
+        page_rows = conn.execute(f"""
+            SELECT page, COUNT(*) AS count, COUNT(DISTINCT visitor_id) AS visitors
+            FROM page_views {page_where} GROUP BY page ORDER BY count DESC, page
+        """, page_params).fetchall()
+        click_rows = conn.execute(f"""
+            SELECT page, button, COUNT(*) AS count, COUNT(DISTINCT visitor_id) AS visitors
+            FROM button_clicks {click_where} GROUP BY page, button
+            ORDER BY count DESC, page, button
+        """, click_params).fetchall()
+        recent_rows = conn.execute(f"""
+            SELECT page, visited_at, visitor_id FROM page_views {page_where}
+            ORDER BY id DESC
+        """, page_params).fetchall()
+        visitor_rows = conn.execute(f"""
+            SELECT pv.visitor_id,
+                   COUNT(DISTINCT pv.id) AS visits,
+                   COUNT(DISTINCT bc.id) AS clicks,
+                   MAX(pv.visited_at) AS last_seen,
+                   GROUP_CONCAT(DISTINCT pv.page) AS pages
+            FROM page_views pv
+            LEFT JOIN button_clicks bc ON bc.visitor_id = pv.visitor_id
+                {"AND bc.clicked_at >= ?" if period == "today" else ""}
+            {"WHERE pv.visited_at >= ? AND pv.visitor_id IS NOT NULL" if period == "today" else "WHERE pv.visitor_id IS NOT NULL"}
+            GROUP BY pv.visitor_id
+            ORDER BY last_seen DESC
+        """, ((today_start, today_start) if period == "today" else ())).fetchall()
+    return render_template(
+        "analytics.html",
+        total_views=total_views,
+        total_clicks=total_clicks,
+        visitor_count=visitor_count,
+        page_rows=page_rows,
+        click_rows=click_rows,
+        recent_rows=recent_rows,
+        visitor_rows=visitor_rows,
+        period=period,
+    )
 
 JST = timezone(timedelta(hours=9))
 WEEKDAYS = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"]
@@ -1142,6 +1384,12 @@ def _extract_detail(text, status, status_index):
 
     text = _normalise_text(text)
 
+    # 詳細文の先頭にある「[東京～宇都宮]運転見合わせ」などの
+    # 区間名・状態ラベルを除き、時刻（例: 16:14頃）以降の本文を表示する。
+    time_match = re.search(r"\d{1,2}:\d{2}頃", text)
+    if time_match:
+        text = text[time_match.start():].strip()
+
     if not text:
         return "詳細は情報元のページをご確認ください。"
 
@@ -1659,6 +1907,158 @@ def line_page():
     return redirect("https://line.me/R/ti/p/@396dngoe")
 
 
+
+
+# ==================================================
+# アンケート
+# ==================================================
+
+FORM_DB = Path(__file__).resolve().parent / "form_submissions.sqlite3"
+FORM_UPLOAD_DIR = Path(__file__).resolve().parent / "form_uploads"
+FORM_ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+FORM_MAX_IMAGE_BYTES = 8 * 1024 * 1024  # 8MB
+
+
+def form_connect():
+    conn = sqlite3.connect(FORM_DB, timeout=10)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_form_db():
+    FORM_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    with form_connect() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS form_submissions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                message TEXT NOT NULL,
+                image_filename TEXT NOT NULL DEFAULT '',
+                image_original_name TEXT NOT NULL DEFAULT '',
+                submitted_at TEXT NOT NULL
+            )
+        """)
+
+
+init_form_db()
+
+
+@app.route("/form", methods=["GET", "POST"])
+def form_page():
+    categories = ("ご意見", "不具合", "その他")
+    error = ""
+    if request.method == "POST":
+        category = request.form.get("category", "").strip()
+        message = request.form.get("message", "").strip()
+        uploaded = request.files.get("image")
+
+        if category not in categories:
+            error = "項目を選択してください。"
+        elif not message:
+            error = "内容を入力してください。"
+        elif len(message) > 10000:
+            error = "入力できる文字数は10,000文字までです。"
+        elif category != "不具合" and uploaded and uploaded.filename:
+            error = "画像を添付できるのは「不具合」の場合のみです。"
+        else:
+            image_filename = ""
+            original_name = ""
+            if category == "不具合" and uploaded and uploaded.filename:
+                original_name = Path(uploaded.filename.replace("\\", "/")).name[:200]
+                extension = Path(original_name).suffix.lower()
+                if extension not in FORM_ALLOWED_IMAGE_EXTENSIONS:
+                    error = "画像はPNG・JPG・JPEG・WEBP・GIF形式にしてください。"
+                else:
+                    image_data = uploaded.stream.read(FORM_MAX_IMAGE_BYTES + 1)
+                    if len(image_data) > FORM_MAX_IMAGE_BYTES:
+                        error = "画像の容量は8MB以下にしてください。"
+                    elif not image_data:
+                        error = "画像ファイルを読み込めませんでした。"
+                    else:
+                        image_filename = f"{uuid.uuid4().hex}{extension}"
+                        FORM_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+                        (FORM_UPLOAD_DIR / image_filename).write_bytes(image_data)
+
+            if not error:
+                try:
+                    with form_connect() as conn:
+                        conn.execute("""
+                            INSERT INTO form_submissions
+                                (category, message, image_filename, image_original_name, submitted_at)
+                            VALUES (?, ?, ?, ?, ?)
+                        """, (
+                            category, message, image_filename, original_name,
+                            datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S")
+                        ))
+                    # 送信完了後は確認ダイアログを表示するページへリダイレクト
+                    return redirect(url_for("form_page", sent="1"))
+                except Exception:
+                    if image_filename:
+                        try:
+                            (FORM_UPLOAD_DIR / image_filename).unlink(missing_ok=True)
+                        except OSError:
+                            pass
+                    app.logger.exception("アンケートの保存に失敗しました")
+                    error = "送信に失敗しました。時間をおいて再度お試しください。"
+
+    return render_template(
+        "form.html",
+        error=error,
+        submitted=(request.method == "GET" and request.args.get("sent") == "1"),
+    )
+
+
+@app.route("/admin/forms", methods=["GET", "POST"])
+def form_admin():
+    if not session.get("recording_admin_authenticated"):
+        return redirect(url_for("recording_admin_login", next=url_for("form_admin")))
+    if request.method == "POST":
+        submission_id = request.form.get("submission_id", type=int)
+        if submission_id:
+            with form_connect() as conn:
+                row = conn.execute(
+                    "SELECT image_filename FROM form_submissions WHERE id = ?",
+                    (submission_id,)
+                ).fetchone()
+                conn.execute("DELETE FROM form_submissions WHERE id = ?", (submission_id,))
+            if row and row["image_filename"]:
+                try:
+                    (FORM_UPLOAD_DIR / row["image_filename"]).unlink(missing_ok=True)
+                except OSError:
+                    app.logger.exception("アンケート添付画像の削除に失敗しました")
+            flash("アンケートを削除しました。", "success")
+        return redirect(url_for("form_admin"))
+
+    with form_connect() as conn:
+        submissions = conn.execute(
+            "SELECT * FROM form_submissions ORDER BY id DESC"
+        ).fetchall()
+        counts = {
+            row["category"]: row["total"]
+            for row in conn.execute(
+                "SELECT category, COUNT(*) AS total FROM form_submissions GROUP BY category"
+            ).fetchall()
+        }
+    return render_template("form_admin.html", submissions=submissions, counts=counts)
+
+
+@app.route("/admin/forms/image/<filename>")
+def form_attachment(filename):
+    if not session.get("recording_admin_authenticated"):
+        abort(403)
+    # DBに登録されたランダム生成名の画像だけを配信する
+    with form_connect() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM form_submissions WHERE image_filename = ?", (filename,)
+        ).fetchone()
+    if not row:
+        abort(404)
+    path = FORM_UPLOAD_DIR / Path(filename).name
+    if not path.is_file():
+        abort(404)
+    return send_file(path)
+
+
 @app.route("/roster")
 def roster_page():
     """4桁番号と名前だけで管理し、番号から学年・クラス・出席番号を取得する名簿ページ。"""
@@ -1963,6 +2363,7 @@ def recording_admin_login():
             submitted.encode("utf-8"), configured_password.encode("utf-8")
         ):
             session["recording_admin_authenticated"] = True
+            session.permanent = True
             next_url = request.form.get("next", request.args.get("next", ""))
             if next_url.startswith("/") and not next_url.startswith("//"):
                 return redirect(next_url)
