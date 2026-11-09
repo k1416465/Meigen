@@ -37,10 +37,10 @@ PAGE_ANALYTICS_LABELS = {
     "home": "ホーム",
     "special_timetable": "特別時間割",
     "schedule": "時間割",
-    "timetable_page": "時刻表",
-    "train_detail": "列車詳細",
+    "timetable_page": "駅時刻表",
+    "train_detail": "列車時刻表",
     "settings": "設定",
-    "operation_page": "運行情報",
+    "operation_page": "時刻表",
     "calendar_page": "カレンダー",
     "more_page": "その他",
     "map_page": "地図",
@@ -92,6 +92,17 @@ def init_analytics_db():
         conn.execute("CREATE INDEX IF NOT EXISTS idx_button_clicks_visitor ON button_clicks(visitor_id)")
 
 def analytics_page_name(endpoint):
+    # URLの選択内容も記録し、解析画面でページを判別しやすくする。
+    if endpoint == "timetable_page":
+        station = request.args.get("station", "").strip()
+        if station and station in TIMETABLE_STATIONS:
+            return f"{station}駅時刻表"
+        return "時刻表（駅未選択）"
+    if endpoint == "train_detail":
+        train_number = (request.view_args or {}).get("train_number", "")
+        if train_number:
+            return f"{train_number}M 列車時刻表"
+        return "列車時刻表"
     if endpoint in PAGE_ANALYTICS_LABELS:
         return PAGE_ANALYTICS_LABELS[endpoint]
     return (endpoint or "不明").replace("_", " ")
@@ -237,10 +248,24 @@ def analytics_page():
             FROM button_clicks {click_where} GROUP BY page, button
             ORDER BY count DESC, page, button
         """, click_params).fetchall()
+        visitor_click_rows = conn.execute(f"""
+            SELECT visitor_id,
+                   COUNT(*) AS clicks,
+                   MAX(clicked_at) AS last_clicked,
+                   GROUP_CONCAT(DISTINCT page || '：' || button) AS buttons
+            FROM button_clicks {click_where}
+            {"AND" if click_where else "WHERE"} visitor_id IS NOT NULL
+            GROUP BY visitor_id
+            ORDER BY last_clicked DESC
+        """, click_params).fetchall()
         recent_rows = conn.execute(f"""
             SELECT page, visited_at, visitor_id FROM page_views {page_where}
             ORDER BY id DESC
         """, page_params).fetchall()
+        recent_click_rows = conn.execute(f"""
+            SELECT page, button, clicked_at, visitor_id FROM button_clicks {click_where}
+            ORDER BY id DESC
+        """, click_params).fetchall()
         visitor_rows = conn.execute(f"""
             SELECT pv.visitor_id,
                    COUNT(DISTINCT pv.id) AS visits,
@@ -261,7 +286,9 @@ def analytics_page():
         visitor_count=visitor_count,
         page_rows=page_rows,
         click_rows=click_rows,
+        visitor_click_rows=visitor_click_rows,
         recent_rows=recent_rows,
+        recent_click_rows=recent_click_rows,
         visitor_rows=visitor_rows,
         period=period,
     )
