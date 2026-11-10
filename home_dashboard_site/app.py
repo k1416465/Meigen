@@ -101,7 +101,7 @@ def analytics_page_name(endpoint):
     if endpoint == "train_detail":
         train_number = (request.view_args or {}).get("train_number", "")
         if train_number:
-            return f"{train_number}M 列車時刻表"
+            return f"{str(train_number).rstrip(chr(77))}M 列車時刻表"
         return "列車時刻表"
     if endpoint in PAGE_ANALYTICS_LABELS:
         return PAGE_ANALYTICS_LABELS[endpoint]
@@ -1410,6 +1410,10 @@ def _extract_detail(text, status, status_index):
             break
 
     text = _normalise_text(text)
+
+    # 詳細文の先頭にある「[東京～宇都宮] 」などの区間名を除去する。
+    # 角括弧の直後にスペースがある場合も、ない場合も対応する。
+    text = re.sub(r"^\s*[\[［][^\]］]+[\]］]\s*", "", text)
 
     # 詳細文の先頭にある「[東京～宇都宮]運転見合わせ」などの
     # 区間名・状態ラベルを除き、時刻（例: 16:14頃）以降の本文を表示する。
