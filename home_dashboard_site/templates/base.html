@@ -73,6 +73,7 @@
     }
     @media (max-width: 520px) {
       .admin-login-indicator { padding: 5px 7px; font-size: .68rem; gap: 4px; }
+      .brand.admin-logged-in-brand > span { display: none; }
     }
   </style>
 </head>
@@ -83,7 +84,7 @@
   data-analytics-page="{{ analytics_current_page|default('不明') }}"
 >
   <header class="topbar">
-    <a class="brand" href="{{ url_for('home') }}">
+    <a class="brand{% if session.get('recording_admin_authenticated') %} admin-logged-in-brand{% endif %}" href="{{ url_for('home') }}">
       <img
         class="brand-mark custom-icon"
         src="{{ url_for('static', filename='icons/home-top.png') }}"

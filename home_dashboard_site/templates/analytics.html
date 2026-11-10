@@ -34,7 +34,7 @@
   </section>
 </div>
 
-{% set page_label_map = {'運行情報': '時刻表', '時刻表': '時刻表（駅名不明・過去の記録）', '列車詳細': '列車時刻表（列車番号不明・過去の記録）'} %}
+{% set page_label_map = {'運行情報': '時刻表', '時刻表': '時刻表', '時刻表（駅未選択）': '時刻表', '列車詳細': '列車時刻表（列車番号不明・過去の記録）', 'recording admin login': '管理者ログイン', 'Recording Admin Login': '管理者ログイン', 'recording_admin_login': '管理者ログイン', 'recording-admin-login': '管理者ログイン'} %}
 {% set button_label_map = {'Play': '再生', 'Pause': '一時停止', 'Play/Pause': '再生／一時停止', 'Search': '検索', 'Reset': 'リセット', 'Sort': '並び替え', 'Download all': 'すべてダウンロード', 'Download All': 'すべてダウンロード', 'Unit Converter': '単位変換', 'Admin Dashboard': '管理者用ページ', 'play': '再生', 'pause': '一時停止', 'unit converter page': '単位変換', 'admin dashboard': '管理者用ページ', 'recording admin login': '管理者ログイン', 'Recording Admin Login': '管理者ログイン', 'recording_admin_login': '管理者ログイン', 'recording-admin-login': '管理者ログイン'} %}
 
 <details class="card settings-card setting-accordion analytics-accordion" open>
@@ -45,7 +45,7 @@
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr><th style="text-align:left;padding:9px;">ページ</th><th style="text-align:right;padding:9px;">アクセス数</th><th style="text-align:right;padding:9px;">利用者数</th></tr></thead>
         <tbody>{% for row in page_rows %}
-          <tr><td style="padding:9px;border-top:1px solid var(--border);">{{ page_label_map.get(row.page, row.page) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.count) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visitors) }}</td></tr>
+          <tr><td style="padding:9px;border-top:1px solid var(--border);">{{ page_label_map.get(row.page, row.page)|replace('MM 列車時刻表', 'M 列車時刻表') }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.count) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visitors) }}</td></tr>
         {% endfor %}</tbody>
       </table>
     </div>
@@ -61,7 +61,7 @@
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr><th style="text-align:left;padding:9px;">ページ</th><th style="text-align:left;padding:9px;">ボタン</th><th style="text-align:right;padding:9px;">クリック数</th><th style="text-align:right;padding:9px;">利用者数</th></tr></thead>
         <tbody>{% for row in click_rows %}
-          <tr><td style="padding:9px;border-top:1px solid var(--border);">{{ page_label_map.get(row.page, row.page) }}</td><td style="padding:9px;border-top:1px solid var(--border);">{{ button_label_map.get(row.button|lower|trim, button_label_map.get(row.button, row.button)) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.count) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visitors) }}</td></tr>
+          <tr><td style="padding:9px;border-top:1px solid var(--border);">{{ page_label_map.get(row.page, row.page)|replace('MM 列車時刻表', 'M 列車時刻表') }}</td><td style="padding:9px;border-top:1px solid var(--border);">{{ button_label_map.get(row.button|lower|trim, button_label_map.get(row.button, row.button)) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.count) }}</td><td style="padding:9px;text-align:right;border-top:1px solid var(--border);">{{ "{:,}".format(row.visitors) }}</td></tr>
         {% endfor %}</tbody>
       </table>
     </div>
@@ -120,7 +120,7 @@
     {% if recent_rows %}
       {% for row in recent_rows %}
         <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--border);">
-          <span>{{ page_label_map.get(row.page, row.page) }} <small style="color:var(--muted);">{% if row.visitor_id %}利用者 #{{ row.visitor_id[:8] }}{% else %}過去の記録{% endif %}</small></span><time style="color:var(--muted);white-space:nowrap;">{{ row.visited_at }}</time>
+          <span>{{ page_label_map.get(row.page, row.page)|replace('MM 列車時刻表', 'M 列車時刻表') }} <small style="color:var(--muted);">{% if row.visitor_id %}利用者 #{{ row.visitor_id[:8] }}{% else %}過去の記録{% endif %}</small></span><time style="color:var(--muted);white-space:nowrap;">{{ row.visited_at }}</time>
         </div>
       {% endfor %}
     {% else %}<p>まだアクセスデータがありません。</p>{% endif %}
@@ -133,7 +133,7 @@
     {% if recent_click_rows %}
       {% for row in recent_click_rows %}
         <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--border);">
-          <span>{{ page_label_map.get(row.page, row.page) }} ／ {{ button_label_map.get(row.button|lower|trim, button_label_map.get(row.button, row.button)) }} <small style="color:var(--muted);">{% if row.visitor_id %}利用者 #{{ row.visitor_id[:8] }}{% else %}過去の記録{% endif %}</small></span><time style="color:var(--muted);white-space:nowrap;">{{ row.clicked_at }}</time>
+          <span>{{ page_label_map.get(row.page, row.page)|replace('MM 列車時刻表', 'M 列車時刻表') }} ／ {{ button_label_map.get(row.button|lower|trim, button_label_map.get(row.button, row.button)) }} <small style="color:var(--muted);">{% if row.visitor_id %}利用者 #{{ row.visitor_id[:8] }}{% else %}過去の記録{% endif %}</small></span><time style="color:var(--muted);white-space:nowrap;">{{ row.clicked_at }}</time>
         </div>
       {% endfor %}
     {% else %}<p>まだクリックデータがありません。</p>{% endif %}
@@ -164,6 +164,207 @@
   .analytics-period-switch { grid-template-columns:repeat(2,minmax(0,1fr)); max-width:260px; margin:18px 0; }
   .analytics-accordion > summary { padding:16px; }
   .analytics-accordion-content { padding:0 12px 14px; }
+}
+
+/* スマートフォン向けレイアウト */
+.analytics-header-actions {
+  min-width: 0;
+}
+.analytics-accordion-content > div[style*="overflow-x:auto"] {
+  max-width: 100%;
+}
+.analytics-accordion table {
+  table-layout: auto;
+}
+.analytics-accordion th,
+.analytics-accordion td {
+  overflow-wrap: anywhere;
+}
+.analytics-accordion-content form button {
+  white-space: nowrap;
+}
+.analytics-accordion-content > div[style*="display:flex"] {
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .welcome-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .welcome-row > div:first-child {
+    min-width: 0;
+    width: 100%;
+  }
+  .welcome-row h1 {
+    font-size: 1.45rem;
+    line-height: 1.35;
+  }
+  .analytics-header-actions {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .analytics-header-actions .back-link {
+    min-width: 0;
+    text-align: center;
+    padding: 9px 8px;
+    font-size: 12px;
+    white-space: normal;
+  }
+  .analytics-header-actions form button {
+    min-height: 40px;
+    padding: 8px 12px;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+  .stats-grid {
+    gap: 9px !important;
+    margin: 14px 0 !important;
+  }
+  .stats-grid > section {
+    padding: 15px !important;
+    min-width: 0;
+  }
+  .stats-grid > section p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .stats-grid > section strong {
+    font-size: 1.65rem !important;
+  }
+  .analytics-period-switch {
+    width: 100%;
+    max-width: 100% !important;
+    gap: 8px;
+  }
+  .analytics-period-switch a {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .analytics-accordion {
+    margin: 10px 0;
+  }
+  .analytics-accordion > summary {
+    min-height: 54px;
+    padding: 14px 15px;
+  }
+  .analytics-accordion .setting-heading {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .analytics-accordion-content {
+    padding: 0 10px 13px;
+    min-width: 0;
+  }
+
+  /* 表は横スクロールではなく、1件ずつのカード形式で表示 */
+  .analytics-accordion-content > div[style*="overflow-x:auto"] {
+    overflow: visible !important;
+  }
+  .analytics-accordion table,
+  .analytics-accordion table tbody {
+    display: block;
+    width: 100% !important;
+  }
+  .analytics-accordion table thead {
+    display: none;
+  }
+  .analytics-accordion table tbody tr {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 10px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--surface, transparent);
+  }
+  .analytics-accordion table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+  .analytics-accordion table tbody td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 7px 0 !important;
+    border-top: 0 !important;
+    border-bottom: 1px solid var(--border);
+    text-align: right !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .analytics-accordion table tbody td:last-child {
+    border-bottom: 0;
+  }
+  .analytics-accordion table tbody td::before {
+    flex: 0 0 38%;
+    color: var(--muted);
+    content: "";
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  /* ページ別アクセス数 */
+  .analytics-accordion table tbody td:nth-child(1)::before { content: "ページ"; }
+  .analytics-accordion table tbody td:nth-child(2)::before { content: "アクセス数"; }
+  .analytics-accordion table tbody td:nth-child(3)::before { content: "利用者数"; }
+  /* ボタン別クリック数 */
+  .analytics-accordion table tbody td:nth-child(4)::before { content: "利用者数"; }
+  /* ボタン別クリック数 */
+  .analytics-accordion:nth-of-type(2) table tbody td:nth-child(1)::before { content: "ページ"; }
+  .analytics-accordion:nth-of-type(2) table tbody td:nth-child(2)::before { content: "ボタン"; }
+  .analytics-accordion:nth-of-type(2) table tbody td:nth-child(3)::before { content: "クリック数"; }
+  .analytics-accordion:nth-of-type(2) table tbody td:nth-child(4)::before { content: "利用者数"; }
+  /* 利用者別のアクセス状況 */
+  .analytics-accordion:nth-of-type(3) table tbody td:nth-child(1)::before { content: "利用者"; }
+  .analytics-accordion:nth-of-type(3) table tbody td:nth-child(2)::before { content: "閲覧回数"; }
+  .analytics-accordion:nth-of-type(3) table tbody td:nth-child(3)::before { content: "クリック数"; }
+  .analytics-accordion:nth-of-type(3) table tbody td:nth-child(4)::before { content: "閲覧ページ"; }
+  .analytics-accordion:nth-of-type(3) table tbody td:nth-child(5)::before { content: "最終アクセス"; }
+  .analytics-accordion:nth-of-type(3) table tbody td:nth-child(6)::before { content: "操作"; }
+  .analytics-accordion:nth-of-type(3) table tbody td:nth-child(6) form {
+    max-width: 62%;
+  }
+  .analytics-accordion:nth-of-type(3) table tbody td:nth-child(6) button {
+    white-space: normal;
+    min-height: 38px;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+  /* 利用者別ボタンクリック状況 */
+  .analytics-accordion:nth-of-type(4) table tbody td:nth-child(1)::before { content: "利用者"; }
+  .analytics-accordion:nth-of-type(4) table tbody td:nth-child(2)::before { content: "クリック数"; }
+  .analytics-accordion:nth-of-type(4) table tbody td:nth-child(3)::before { content: "クリックしたボタン"; }
+  .analytics-accordion:nth-of-type(4) table tbody td:nth-child(4)::before { content: "最終クリック"; }
+
+  .analytics-accordion-content > div[style*="display:flex"] {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    padding: 10px 0 !important;
+    overflow-wrap: anywhere;
+  }
+  .analytics-accordion-content > div[style*="display:flex"] time {
+    white-space: normal !important;
+    font-size: 11px;
+  }
+  form[onsubmit*="アクセス解析データ"] {
+    margin: 14px 0 !important;
+  }
+  form[onsubmit*="アクセス解析データ"] button {
+    width: 100%;
+    min-height: 44px;
+  }
 }
 </style>
 {% endblock %}
