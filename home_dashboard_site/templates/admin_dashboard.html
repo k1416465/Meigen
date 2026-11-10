@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}迷言｜管理者用ページ
+{% block title %}迷言｜管理者用ページ{% endblock %}
+{% block content %}
 <style>
 .admin-menu {
   width: 100%;
@@ -14,23 +15,46 @@
 .admin-menu > a.card:active {
   transform: scale(.98);
 }
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.admin-header-actions form {
+  margin: 0;
+}
 @media (max-width: 640px) {
   .welcome-row {
     align-items: flex-start;
     gap: 12px;
   }
-  .welcome-row > div {
+  .welcome-row > div:first-child {
     min-width: 0;
   }
   .welcome-row h1 {
     font-size: 1.45rem;
     line-height: 1.35;
   }
-  .welcome-row > a.back-link {
-    flex: 0 0 auto;
+  .admin-header-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+  .admin-header-actions .back-link,
+  .admin-header-actions button {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
     font-size: 12px;
-    padding: 8px 10px;
-    white-space: nowrap;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
   }
   .admin-menu {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -49,13 +73,6 @@
   .admin-menu > a.card[href*="form_admin"] strong {
     font-size: .95rem !important;
   }
-  body main.page form[action*="logout"] {
-    margin-top: 14px !important;
-  }
-  body main.page form[action*="logout"] button {
-    width: 100%;
-    min-height: 44px;
-  }
 }
 @media (max-width: 360px) {
   .admin-menu {
@@ -66,11 +83,15 @@
   }
 }
 </style>
-{% endblock %}
-{% block content %}
+
 <section class="welcome-row">
   <div><h1>管理者用ページ</h1><p>管理する項目を選択してください。</p></div>
-  <a class="back-link" href="{{ url_for('home') }}">ホームへ戻る</a>
+  <div class="admin-header-actions">
+    <a class="back-link" href="{{ url_for('home') }}">ホームへ戻る</a>
+    <form method="post" action="{{ url_for('recording_admin_logout') }}">
+      <button class="secondary-button" type="submit">管理者ログアウト</button>
+    </form>
+  </div>
 </section>
 <div class="admin-menu" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
   <a class="card" href="{{ url_for('special_schedule') }}" style="display:flex; align-items:center; justify-content:center; min-height:130px; padding:24px; text-decoration:none; text-align:center;">
@@ -89,74 +110,4 @@
     <strong style="font-size:1.5rem;">アクセス解析</strong>
   </a>
 </div>
-<form method="post" action="{{ url_for('recording_admin_logout') }}" style="margin-top:20px;">
-  <button class="secondary-button" type="submit">管理者ログアウト</button>
-</form>
-
-<style>
-.admin-menu {
-  width: 100%;
-  min-width: 0;
-}
-.admin-menu > a.card {
-  box-sizing: border-box;
-  min-width: 0;
-  overflow-wrap: anywhere;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-.admin-menu > a.card:active {
-  transform: scale(.98);
-}
-@media (max-width: 640px) {
-  .welcome-row {
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .welcome-row > div {
-    min-width: 0;
-  }
-  .welcome-row h1 {
-    font-size: 1.45rem;
-    line-height: 1.35;
-  }
-  .welcome-row > a.back-link {
-    flex: 0 0 auto;
-    font-size: 12px;
-    padding: 8px 10px;
-    white-space: nowrap;
-  }
-  .admin-menu {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 10px !important;
-  }
-  .admin-menu > a.card {
-    min-height: 104px !important;
-    padding: 14px 8px !important;
-    border-radius: 13px;
-  }
-  .admin-menu > a.card strong {
-    font-size: 1.05rem !important;
-    line-height: 1.4;
-    overflow-wrap: anywhere;
-  }
-  .admin-menu > a.card[href*="form_admin"] strong {
-    font-size: .95rem !important;
-  }
-  body main.page form[action*="logout"] {
-    margin-top: 14px !important;
-  }
-  body main.page form[action*="logout"] button {
-    width: 100%;
-    min-height: 44px;
-  }
-}
-@media (max-width: 360px) {
-  .admin-menu {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-  .admin-menu > a.card {
-    min-height: 76px !important;
-  }
-}
-</style>
 {% endblock %}

@@ -140,7 +140,7 @@
   </div>
 </details>
 
-<form method="post" onsubmit="return confirm('アクセス解析データをすべて削除します。よろしいですか？');" style="margin:20px 0;">
+<form class="analytics-reset-form" method="post" onsubmit="return confirm('アクセス解析データをすべて削除します。よろしいですか？');">
   <input type="hidden" name="action" value="reset">
   <button class="secondary-button" type="submit">集計データをリセット</button>
 </form>
@@ -201,24 +201,26 @@
     line-height: 1.35;
   }
   .analytics-header-actions {
-    width: 100%;
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto;
+    width: fit-content;
+    max-width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 7px !important;
   }
   .analytics-header-actions .back-link {
     min-width: 0;
     text-align: center;
-    padding: 9px 8px;
-    font-size: 12px;
-    white-space: normal;
+    width: auto;
+    padding: 8px 9px;
+    font-size: 11px;
+    white-space: nowrap;
   }
   .analytics-header-actions form button {
     min-height: 40px;
-    padding: 8px 12px;
+    padding: 8px 10px;
     white-space: nowrap;
-    font-size: 12px;
+    font-size: 11px;
   }
   .stats-grid {
     gap: 9px !important;
@@ -358,12 +360,18 @@
     white-space: normal !important;
     font-size: 11px;
   }
-  form[onsubmit*="アクセス解析データ"] {
+  .analytics-reset-form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: 14px 0 !important;
   }
-  form[onsubmit*="アクセス解析データ"] button {
-    width: 100%;
+  .analytics-reset-form button {
+    width: auto;
+    max-width: 100%;
     min-height: 44px;
+    margin: 0 auto;
   }
 }
 </style>
