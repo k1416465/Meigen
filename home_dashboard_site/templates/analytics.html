@@ -6,10 +6,10 @@
     <h1>アクセス解析</h1>
     <p>ページの閲覧数とボタンのクリック数を確認できます。</p>
   </div>
-  <div class="analytics-header-actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <a class="back-link" href="{{ url_for('admin_dashboard') }}">管理者用ページへ戻る</a>
-    <form method="post" action="{{ url_for('recording_admin_logout') }}" style="margin:0;">
-      <button type="submit" class="secondary-button" onclick="return confirm('ログアウトしますか？');">ログアウト</button>
+  <div class="admin-common-actions">
+    <a class="admin-common-button" href="{{ url_for('admin_dashboard') }}">管理者用ページへ戻る</a>
+    <form class="admin-common-form" method="post" action="{{ url_for('recording_admin_logout') }}">
+      <button type="submit" class="admin-common-button" onclick="return confirm('ログアウトしますか？');">ログアウト</button>
     </form>
   </div>
 </section>
@@ -140,9 +140,9 @@
   </div>
 </details>
 
-<form class="analytics-reset-form" method="post" onsubmit="return confirm('アクセス解析データをすべて削除します。よろしいですか？');">
+<form class="analytics-reset-form admin-reset-form" method="post" onsubmit="return confirm('アクセス解析データをすべて削除します。よろしいですか？');">
   <input type="hidden" name="action" value="reset">
-  <button class="secondary-button" type="submit">集計データをリセット</button>
+  <button class="admin-common-button" type="submit">集計データをリセット</button>
 </form>
 
 <style>
@@ -374,5 +374,104 @@
     margin: 0 auto;
   }
 }
+</style>
+<style>
+
+/* 管理者用ページ・アクセス解析 共通操作ボタン */
+.admin-common-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.admin-common-form {
+  display: flex;
+  margin: 0;
+}
+.admin-common-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 190px;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.admin-common-button:hover {
+  filter: brightness(.97);
+}
+.admin-reset-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 20px 0 8px;
+}
+.admin-reset-form .admin-common-button {
+  flex: 0 0 190px;
+}
+@media (max-width: 640px) {
+  .welcome-row {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .welcome-row > div:first-child {
+    width: 100%;
+    min-width: 0;
+  }
+  .welcome-row h1 {
+    font-size: 1.45rem;
+    line-height: 1.35;
+  }
+  .admin-common-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    justify-content: stretch;
+    width: 100%;
+    gap: 8px;
+  }
+  .admin-common-actions > a,
+  .admin-common-actions > form {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+  }
+  .admin-common-actions .admin-common-button {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  .admin-reset-form {
+    justify-content: center;
+    margin: 16px 0 8px !important;
+  }
+  .admin-reset-form .admin-common-button {
+    width: 190px;
+    max-width: 100%;
+    min-height: 44px;
+    flex: 0 1 190px;
+  }
+}
+
 </style>
 {% endblock %}
